@@ -10,4 +10,20 @@ public class EmploiDuTemps {
         this.id = id;
         this.cours = new ArrayList<>();
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public ArrayList<Cours> getCours() {
+        return cours;
+    }
+
+    public void setCours(ArrayList<Cours> cours) {
+        this.cours = cours;
+    }
 }
