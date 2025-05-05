@@ -1,51 +1,48 @@
 package org.example.projet_java;
 
-public class Administrateur extends Utilisateur {
+import java.util.ArrayList;
+
+public class Utilisateur {
     protected int id;
     protected String nom;
     protected String prenom;
     protected String mail;
 
-    public Administrateur(int id, String nom, String prenom, String mail) {
-        super(id,nom,prenom,mail);
+    public Utilisateur(int id, String nom, String prenom, String mail) {
+        this.id = id;
+        this.nom = nom;
+        this.prenom = prenom;
+        this.mail = mail;
     }
 
-    @Override
     public int getId() {
         return id;
     }
 
-    @Override
     public void setId(int id) {
         this.id = id;
     }
 
-    @Override
-    public String getNom() {
-        return nom;
-    }
-
-    @Override
-    public void setNom(String nom) {
-        this.nom = nom;
-    }
-
-    @Override
     public String getPrenom() {
         return prenom;
     }
 
-    @Override
     public void setPrenom(String prenom) {
         this.prenom = prenom;
     }
 
-    @Override
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
     public String getMail() {
         return mail;
     }
 
-    @Override
     public void setMail(String mail) {
         this.mail = mail;
     }

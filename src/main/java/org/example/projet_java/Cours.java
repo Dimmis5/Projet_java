@@ -19,4 +19,51 @@ public class Cours {
         this.etudiants = new ArrayList<>();
     }
 
+    public int getId_cours() {
+        return id_cours;
+    }
+
+    public void setId_cours(int id_cours) {
+        this.id_cours = id_cours;
+    }
+
+    public Salle getSalle() {
+        return salle;
+    }
+
+    public void setSalle(Salle salle) {
+        this.salle = salle;
+    }
+
+    public String getMatiere() {
+        return matiere;
+    }
+
+    public void setMatiere(String matiere) {
+        this.matiere = matiere;
+    }
+
+    public Horaire getHoraire() {
+        return horaire;
+    }
+
+    public void setHoraire(Horaire horaire) {
+        this.horaire = horaire;
+    }
+
+    public Enseignant getEnseignant() {
+        return enseignant;
+    }
+
+    public void setEnseignant(Enseignant enseignant) {
+        this.enseignant = enseignant;
+    }
+
+    public ArrayList<Etudiant> getEtudiants() {
+        return etudiants;
+    }
+
+    public void setEtudiants(ArrayList<Etudiant> etudiants) {
+        this.etudiants = etudiants;
+    }
 }
