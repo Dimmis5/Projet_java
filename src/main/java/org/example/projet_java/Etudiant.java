@@ -62,6 +62,7 @@ public class Etudiant extends Utilisateur {
                     + "Horaire : " + cour.horaire + "\n"
                     + "Enseignant : " + cour.enseignant;
         }
+        return null;
     }
 
     public Salle getSalle(int id_cours) {
