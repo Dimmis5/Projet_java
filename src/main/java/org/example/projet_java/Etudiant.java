@@ -65,6 +65,7 @@ public class Etudiant extends Utilisateur {
         return null;
     }
 
+    // Methode getSalle
     public Salle getSalle(int id_cours) {
         for (Cours cour : cours) {
             if (cour.getId_cours() == id_cours) {
@@ -75,4 +76,7 @@ public class Etudiant extends Utilisateur {
     }
 
     // Méthode notification
+    public String notification(String date, String message) {
+        return "Date : " + date + "\n" + "Message : " + message;
+    }
 }
