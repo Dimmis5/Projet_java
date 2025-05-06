@@ -61,7 +61,7 @@ public class Etudiant extends Utilisateur {
                     + "Matiere : " + cour.matiere + "\n"
                     + "Horaire : " + cour.horaire + "\n"
                     + "Enseignant : " + cour.enseignant;
-        }
+        } return consulter();
     }
 
     public Salle getSalle(int id_cours) {
