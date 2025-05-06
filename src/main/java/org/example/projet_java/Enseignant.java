@@ -63,7 +63,19 @@ public class Enseignant extends Utilisateur{
     }
 
     // Methode consulter
+    public String consulter() {
+        for (Cours cour : cours) {
+            return "Salle : " + cour.salle + "\n"
+                    + "Matiere : " + cour.matiere + "\n"
+                    + "Horaire : " + cour.horaire + "\n"
+                    + "Eleves : " + cour.etudiants;
+        }
+        return null;
+    }
 
     // Methode set anomalie
+    public void setAnomalie(String type, String description) {
+        Anomalie anomalie = new Anomalie(type, description);
+    }
 
 }

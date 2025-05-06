@@ -49,4 +49,14 @@ public class Administrateur extends Utilisateur {
     public void setMail(String mail) {
         this.mail = mail;
     }
+
+    // Methode setEmploi
+
+    // Methode setEnseignant
+
+    // Methode getSalle
+
+    // Methode getAlerte
+
+    // Methode getStatistiques
 }
