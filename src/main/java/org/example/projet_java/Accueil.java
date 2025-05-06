@@ -53,6 +53,7 @@ public class Accueil extends Application {
                 YearMonth moisActuel = YearMonth.now();
                 VBox afficherDate = new VBox(10);
 
+
                 Label titre = new Label(moisActuel.getMonth()+""+moisActuel.getYear());
                 titre.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
                 titre.setAlignment(Pos.CENTER);
