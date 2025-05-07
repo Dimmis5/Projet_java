@@ -7,10 +7,11 @@ public class Enseignant extends Utilisateur{
     protected String nom;
     protected String prenom;
     protected String mail;
+    protected String mdp;
     protected ArrayList<Cours> cours;
 
-    public Enseignant(int id, String nom, String prenom, String mail) {
-        super(id,nom,prenom,mail);
+    public Enseignant(int id, String nom, String prenom, String mail, String mdp) {
+        super(id,nom,prenom,mail,mdp);
         this.cours = new ArrayList<>();
     }
 
@@ -54,6 +55,16 @@ public class Enseignant extends Utilisateur{
         this.mail = mail;
     }
 
+    @Override
+    public String getMdp() {
+        return mail;
+    }
+
+    @Override
+    public void setMdp(String mail) {
+        this.mail = mail;
+    }
+
     public ArrayList<Cours> getCours() {
         return cours;
     }
@@ -63,14 +74,9 @@ public class Enseignant extends Utilisateur{
     }
 
     // Methode consulter
-    public String consulter() {
-        for (Cours cour : cours) {
-            return "Salle : " + cour.salle + "\n"
-                    + "Matiere : " + cour.matiere + "\n"
-                    + "Horaire : " + cour.horaire + "\n"
-                    + "Eleves : " + cour.etudiants;
-        }
-        return null;
+    @Override
+    public EmploiDuTemps consulter(EmploiDuTemps emploi) {
+        return emploi.getEnseignant(this.id);
     }
 
     // Methode set anomalie

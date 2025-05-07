@@ -7,12 +7,14 @@ public class Utilisateur {
     protected String nom;
     protected String prenom;
     protected String mail;
+    protected String mdp;
 
-    public Utilisateur(int id, String nom, String prenom, String mail) {
+    public Utilisateur(int id, String nom, String prenom, String mail, String mdp) {
         this.id = id;
         this.nom = nom;
         this.prenom = prenom;
         this.mail = mail;
+        this.mdp = mdp;
     }
 
     public int getId() {
@@ -46,4 +48,6 @@ public class Utilisateur {
     public void setMail(String mail) {
         this.mail = mail;
     }
+
+    public abstract EmploiDuTemps consulter(EmploiDuTemps emploi);
 }

@@ -7,10 +7,11 @@ public class Etudiant extends Utilisateur {
     protected String nom;
     protected String prenom;
     protected String mail;
+    protected String mdp;
     protected ArrayList<Cours> cours;
 
-    public Etudiant(int id, String nom, String prenom, String mail) {
-        super(id,nom,prenom,mail);
+    public Etudiant(int id, String nom, String prenom, String mail, String mdp) {
+        super(id,nom,prenom,mail,mdp);
         this.cours = new ArrayList<>();
     }
 
@@ -54,15 +55,20 @@ public class Etudiant extends Utilisateur {
         this.mail = mail;
     }
 
+    @Override
+    public String getMdp() {
+        return mail;
+    }
+
+    @Override
+    public void setMdp(String mail) {
+        this.mail = mail;
+    }
+
     // Méthode consulter
-    public String consulter() {
-        for (Cours cour : cours) {
-            return "Salle : " + cour.salle + "\n"
-                    + "Matiere : " + cour.matiere + "\n"
-                    + "Horaire : " + cour.horaire + "\n"
-                    + "Enseignant : " + cour.enseignant;
-        }
-        return null;
+    @Override
+    public EmploiDuTemps consulter(EmploiDuTemps emploi) {
+        return emploi.getEleve(this.id);
     }
 
     // Methode getSalle
