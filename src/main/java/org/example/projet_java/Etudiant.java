@@ -58,6 +58,9 @@ public class Etudiant extends Utilisateur {
     @Override
     public EmploiDuTemps consulter(EmploiDuTemps emploi) {
         return emploi.getEleve(this.id);
+    }
+
+    // essai
 
     // Methode getSalle
     public Salle getSalle(int id_cours) {
