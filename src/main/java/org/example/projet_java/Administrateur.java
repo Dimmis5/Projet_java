@@ -7,9 +7,10 @@ public class Administrateur extends Utilisateur {
     protected String nom;
     protected String prenom;
     protected String mail;
+    protected String mdp;
 
-    public Administrateur(int id, String nom, String prenom, String mail) {
-        super(id,nom,prenom,mail);
+    public Administrateur(int id, String nom, String prenom, String mail, String mdp) {
+        super(id,nom,prenom,mail,mdp);
     }
 
     @Override
@@ -49,6 +50,14 @@ public class Administrateur extends Utilisateur {
 
     @Override
     public void setMail(String mail) {
+        this.mail = mail;
+    }
+
+    public String getMdp() {
+        return mail;
+    }
+
+    public void setMdp(String mail) {
         this.mail = mail;
     }
 

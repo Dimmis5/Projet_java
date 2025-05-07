@@ -41,7 +41,7 @@ public class Salle {
         this.capacite = capacite;
     }
 
-    public boolean isStatut() {
+    public boolean getStatut() {
         return statut;
     }
 

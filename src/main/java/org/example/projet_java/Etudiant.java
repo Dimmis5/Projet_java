@@ -55,15 +55,11 @@ public class Etudiant extends Utilisateur {
     }
 
     // Méthode consulter
-    public String consulter() {
-        for (Cours cour : cours) {
-            return "Salle : " + cour.salle + "\n"
-                    + "Matiere : " + cour.matiere + "\n"
-                    + "Horaire : " + cour.horaire + "\n"
-                    + "Enseignant : " + cour.enseignant;
-        }return consulter();
-    }
+    @Override
+    public EmploiDuTemps consulter(EmploiDuTemps emploi) {
+        return emploi.getEleve(this.id);
 
+    // Methode getSalle
     public Salle getSalle(int id_cours) {
         for (Cours cour : cours) {
             if (cour.getId_cours() == id_cours) {
@@ -74,4 +70,7 @@ public class Etudiant extends Utilisateur {
     }
 
     // Méthode notification
+    public String notification(String date, String message) {
+        return "Date : " + date + "\n" + "Message : " + message;
+    }
 }
