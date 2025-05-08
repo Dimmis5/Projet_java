@@ -73,7 +73,7 @@ public class Enseignant extends Utilisateur{
     }
 
     // Methode consulter
-    @Override
+
     public EmploiDuTemps consulter(EmploiDuTemps emploi) {
         return emploi.getEnseignant(this.id);
     }

@@ -10,7 +10,7 @@ public class Etudiant extends Utilisateur {
     protected ArrayList<Cours> cours;
 
     public Etudiant(int id, String nom, String prenom, String mail, String mdp) {
-        super(id,nom,prenom,mail,mdp);
+        super(id, nom, prenom, mail, mdp);
         this.cours = new ArrayList<>();
     }
 
@@ -55,12 +55,12 @@ public class Etudiant extends Utilisateur {
     }
 
     // Méthode consulter
-    @Override
+
     public EmploiDuTemps consulter(EmploiDuTemps emploi) {
         return emploi.getEleve(this.id);
 
-    // Methode getSalle
-    Salle getSalle(int id_cours) {
+        // Methode getSalle
+    /*Salle getSalle(int id_cours) {
         for (Cours cour : cours) {
             if (cour.getId_cours() == id_cours) {
                 return cour.getSalle();
@@ -72,5 +72,6 @@ public class Etudiant extends Utilisateur {
     // Méthode notification
     String notification(String date, String message) {
         return "Date : " + date + "\n" + "Message : " + message;
+    }*/
     }
 }

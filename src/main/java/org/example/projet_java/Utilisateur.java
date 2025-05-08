@@ -49,5 +49,5 @@ public class Utilisateur {
         this.mail = mail;
     }
 
-    public abstract EmploiDuTemps consulter(EmploiDuTemps emploi);
+    //public abstract EmploiDuTemps consulter(EmploiDuTemps emploi);
 }

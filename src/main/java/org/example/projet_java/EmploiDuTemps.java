@@ -62,4 +62,9 @@ public class EmploiDuTemps {
 
         return emploi;
     }
+
+
+    public void setCours(EmploiDuTemps edt, Cours cours) {
+        edt.getCours().add(cours);
+    }
 }
