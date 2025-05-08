@@ -62,7 +62,7 @@ public class Administrateur extends Utilisateur {
     }
 
     // Methode setEmploi
-    @Override
+
     public void setEmploi(EmploiDuTemps emploiDuTemps, Cours cours) {
         emploiDuTemps.getCours().add(cours);
     }
@@ -74,7 +74,7 @@ public class Administrateur extends Utilisateur {
         emploiDuTemps.getCours().add(cours);
     }
 
-    @Override
+
     // Methode getSalle
     public Salle getSalle(Cours cours) {
         return cours.getSalle();

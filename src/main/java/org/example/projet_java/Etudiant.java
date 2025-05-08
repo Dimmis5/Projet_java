@@ -9,8 +9,8 @@ public class Etudiant extends Utilisateur {
     protected String mail;
     protected ArrayList<Cours> cours;
 
-    public Etudiant(int id, String nom, String prenom, String mail) {
-        super(id,nom,prenom,mail);
+    public Etudiant(int id, String nom, String prenom, String mail, String mdp) {
+        super(id,nom,prenom,mail,mdp);
         this.cours = new ArrayList<>();
     }
 
@@ -60,7 +60,7 @@ public class Etudiant extends Utilisateur {
         return emploi.getEleve(this.id);
 
     // Methode getSalle
-    public Salle getSalle(int id_cours) {
+    Salle getSalle(int id_cours) {
         for (Cours cour : cours) {
             if (cour.getId_cours() == id_cours) {
                 return cour.getSalle();
@@ -70,7 +70,7 @@ public class Etudiant extends Utilisateur {
     }
 
     // Méthode notification
-    public String notification(String date, String message) {
+    String notification(String date, String message) {
         return "Date : " + date + "\n" + "Message : " + message;
     }
 }

@@ -55,12 +55,11 @@ public class Enseignant extends Utilisateur{
         this.mail = mail;
     }
 
-    @Override
     public String getMdp() {
         return mail;
     }
 
-    @Override
+
     public void setMdp(String mail) {
         this.mail = mail;
     }
