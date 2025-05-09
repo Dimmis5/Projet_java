@@ -12,6 +12,11 @@ public class Etudiant extends Utilisateur {
     public Etudiant(int id, String nom, String prenom, String mail, String mdp) {
         super(id, nom, prenom, mail, mdp);
         this.cours = new ArrayList<>();
+        this.id = id;
+        this.nom = nom;
+        this.prenom = prenom;
+        this.mail = mail;
+        this.mdp = mdp;
     }
 
     public int getId() {
