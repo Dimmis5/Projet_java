@@ -9,6 +9,7 @@ public class Cours {
     protected Horaire horaire;
     protected Enseignant enseignant;
     protected ArrayList<Etudiant> etudiants;
+    protected boolean estAnnule = false;
 
     public Cours(int id_cours, Salle salle, String matiere, Horaire horaire, Enseignant enseignant) {
         this.id_cours = id_cours;
@@ -66,4 +67,13 @@ public class Cours {
     public void setEtudiants(ArrayList<Etudiant> etudiants) {
         this.etudiants = etudiants;
     }
+
+    public boolean isAnnule() {
+        return estAnnule;
+    }
+
+    public void setAnnule(boolean estAnnule) {
+        this.estAnnule = estAnnule;
+    }
+
 }

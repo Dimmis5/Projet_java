@@ -1,5 +1,7 @@
 package org.example.projet_java;
 
+import java.util.HashMap;
+
 public class Administrateur extends Utilisateur {
     protected int id;
     protected String nom;
@@ -61,11 +63,46 @@ public class Administrateur extends Utilisateur {
 
     // Methode setEmploi
 
+    public void setEmploi(EmploiDuTemps emploiDuTemps, Cours cours) {
+        emploiDuTemps.getCours().add(cours);
+    }
+
     // Methode setEnseignant
+    public void setEnseignat(EmploiDuTemps emploiDuTemps, Cours cours, Enseignant id_enseignant){
+        cours.setEnseignant(id_enseignant);
+        id_enseignant.getCours().add(cours);
+        emploiDuTemps.getCours().add(cours);
+    }
+
 
     // Methode getSalle
+    public Salle getSalle(Cours cours) {
+        return cours.getSalle();
+    }
 
     // Methode getAlerte
+    public void getAlerte(Cours cours){
+        if (cours.isAnnule()){
+            System.out.println("Le cours de "+ cours.getMatiere()+" a été annulé");
+        }else{
+            System.out.println("Aucun cours annulé");
+        }
+
+    }
+
 
     // Methode getStatistiques
+    public void getStatistique(EmploiDuTemps emploiDuTemps){
+            HashMap<Integer, Integer> Statistiques = new HashMap<>();
+
+            for (Cours cours : emploiDuTemps.getCours()){
+                int idSalle =  cours.getSalle().getId_salle();
+                Statistiques.put(idSalle, Statistiques.getOrDefault(idSalle, 0) + 1);
+            }
+            System.out.println("Statistiques d'utilisation des salles :");
+            for (Integer idSalle : Statistiques.keySet()) {
+            System.out.println("Salle " + idSalle + " utilisée " + Statistiques.get(idSalle) + " fois.");
+        }
+    }
+
 }
