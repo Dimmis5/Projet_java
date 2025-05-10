@@ -19,6 +19,8 @@ public class Etudiant extends Utilisateur {
         this.mdp = mdp;
     }
 
+
+
     public int getId() {
         return id;
     }
@@ -60,23 +62,24 @@ public class Etudiant extends Utilisateur {
     }
 
     // Méthode consulter
-
     public EmploiDuTemps consulter(EmploiDuTemps emploi) {
         return emploi.getEleve(this.id);
+    }
 
-        // Methode getSalle
-    /*Salle getSalle(int id_cours) {
+    // Méthode getSalle
+    public Salle getSalle(int id_cours) {
         for (Cours cour : cours) {
+            // Vérification si l'id du cours correspond
             if (cour.getId_cours() == id_cours) {
                 return cour.getSalle();
             }
         }
+        // Retourne null si le cours avec cet id n'est pas trouvé
         return null;
     }
 
     // Méthode notification
-    String notification(String date, String message) {
+    public String notification(String date, String message) {
         return "Date : " + date + "\n" + "Message : " + message;
-    }*/
     }
 }

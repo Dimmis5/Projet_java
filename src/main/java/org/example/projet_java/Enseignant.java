@@ -13,6 +13,12 @@ public class Enseignant extends Utilisateur{
     public Enseignant(int id, String nom, String prenom, String mail, String mdp) {
         super(id,nom,prenom,mail,mdp);
         this.cours = new ArrayList<>();
+        this.id = id;
+        this.nom = nom;
+        this.prenom = prenom;
+        this.mail = mail;
+        this.mdp = mdp;
+
     }
 
     @Override
@@ -56,12 +62,12 @@ public class Enseignant extends Utilisateur{
     }
 
     public String getMdp() {
-        return mail;
+        return mdp;
     }
 
 
-    public void setMdp(String mail) {
-        this.mail = mail;
+    public void setMdp(String mdp) {
+        this.mdp = mdp;
     }
 
     public ArrayList<Cours> getCours() {
