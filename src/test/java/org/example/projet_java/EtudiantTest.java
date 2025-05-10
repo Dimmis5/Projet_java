@@ -2,51 +2,55 @@ package org.example.projet_java;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class EtudiantTest {
 
     @Test
-    void getId() {
+    public void testContructeur(){
+        Etudiant etudiant = new Etudiant(5, "Abdou", "Kamy", "abdoukamy@gmail.com", "ak123");
+
+        assertEquals(5, etudiant.id);
+        assertEquals("Abdou", etudiant.nom);
+        assertEquals("Kamy", etudiant.prenom);
+        assertEquals("abdoukamy@gmail.com", etudiant.mail);
+        assertEquals("ak123", etudiant.mdp);
+        assertTrue(etudiant.getCours().isEmpty());
     }
 
     @Test
-    void setId() {
+    public void testSetCours(){
+        Etudiant etudiant = new Etudiant(5, "Abdou", "Kamy", "abdoukamy@gmail.com", "ak123");
+
+        Salle salle1 = new Salle(101,"Salle 101", 40, false);
+        Horaire horaire1 = new Horaire("Lundi", "15h00", "16h00");
+        Cours cours1 = new Cours(1, salle1, "Mathematique", horaire1, new Enseignant(1, "Zhang", "Kelly", "zhangkelly@gmail.com", "kz123"));
+
+        Salle salle2 = new Salle(102, "Salle 102", 45, true);
+        Horaire horaire2 = new Horaire("Mardi", "16h00", "17h00");
+        Cours cours2 = new Cours(2, salle2, "Anglais", horaire2, new Enseignant(2,"Nguyen", "Minh", "NguMin@gmail.com", "nm123"));
+
+        ArrayList<Cours> coursList =new ArrayList<>();
+        coursList.add(cours1);
+        coursList.add(cours2);
+        etudiant.setCours(coursList);
+
+        assertEquals(2, etudiant.getCours().size());
+        assertEquals("Mathematique", etudiant.getCours().get(0).getMatiere());
+        assertEquals("Anglais", etudiant.getCours().get(1).getMatiere());
+
     }
 
     @Test
-    void getNom() {
-    }
+    public void testConsulter(){
+        Etudiant etudiant = new Etudiant(5, "Abdou", "Kamy", "abdoukamy@gmail.com", "ak123");
+        EmploiDuTemps emploi = new EmploiDuTemps(0);
 
-    @Test
-    void setNom() {
-    }
+        EmploiDuTemps result = etudiant.consulter(emploi);
 
-    @Test
-    void getPrenom() {
-    }
-
-    @Test
-    void setPrenom() {
-    }
-
-    @Test
-    void getCours() {
-    }
-
-    @Test
-    void setCours() {
-    }
-
-    @Test
-    void getMail() {
-    }
-
-    @Test
-    void setMail() {
-    }
-
-    @Test
-    void consulter() {
+        assertNotNull(result);
+        assertNotEquals(emploi, result);
     }
 }

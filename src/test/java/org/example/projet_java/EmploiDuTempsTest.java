@@ -46,8 +46,7 @@ class EmploiDuTempsTest {
         assertEquals(2, edt.getCours().size());
         assertEquals("Mathematiques", edt.getCours().get(0).getMatiere());
         assertEquals("Anglais", edt.getCours().get(1).getMatiere());
-        //Revenir dessus
-        //assertEquals("Durand", edt.getCours().get(0).getEnseignant().getNom());
+        assertEquals("Durand", edt.getCours().get(0).getEnseignant().getNom());
 
     }
 

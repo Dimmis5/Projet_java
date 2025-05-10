@@ -1,7 +1,6 @@
 module org.example.projet_java {
     requires javafx.controls;
     requires javafx.fxml;
-    requires jdk.incubator.vector;
     requires java.desktop;
 
 
