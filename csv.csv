@@ -1,0 +1,1 @@
+﻿id_etudiant;nom_etudiant;prenom_etudiant;mail_etudiant;mdp_etudiant;id_cours;id_salle;localisation;capacite;equipement;statut;matiere;jour;heure_debut;heure_fin;annulation;id_enseignant;nom_enseignant;prenom_enseignant;mail_enseignant;mdp_enseignant;type_anomalie;description;message;date_message
