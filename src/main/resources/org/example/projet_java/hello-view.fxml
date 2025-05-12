@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox fx:controller="org.example.projet_java.AccueilController" xmlns:fx="http://javafx.com/fxml" alignment="TOP_CENTER" spacing="10">
+<VBox alignment="TOP_CENTER" spacing="10" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.12" fx:controller="org.example.projet_java.AccueilController">
 
-    <VBox spacing="10" alignment="CENTER" >
-        <Button fx:id="etudiantButton" text="Étudiant" onAction="#choisirProfilEtudiant"/>
-        <Button fx:id="enseignantButton" text="Enseignant" onAction="#choisirProfilEnseignant"/>
-        <Button fx:id="administrateurButton" text="Administrateur" onAction="#choisirProfilAdministrateur"/>
+    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="866.0" spacing="10">
+        <Button fx:id="etudiantButton" onAction="#choisirProfilEtudiant" text="Étudiant" />
+        <Button fx:id="enseignantButton" onAction="#choisirProfilEnseignant" text="Enseignant" />
+        <Button fx:id="administrateurButton" onAction="#choisirProfilAdministrateur" text="Administrateur" />
     </VBox>
 
-    <VBox fx:id="formVBox" alignment="CENTER"/>
-    <GridPane fx:id="edtGrid" alignment="TOP_CENTER"/>
+    <VBox fx:id="formVBox" alignment="CENTER" />
+    <GridPane fx:id="edtGrid" alignment="TOP_CENTER" />
 </VBox>
