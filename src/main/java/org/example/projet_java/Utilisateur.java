@@ -1,7 +1,5 @@
 package org.example.projet_java;
 
-import java.util.ArrayList;
-
 public class Utilisateur {
     protected int id;
     protected String nom;
@@ -49,5 +47,14 @@ public class Utilisateur {
         this.mail = mail;
     }
 
-    //public abstract EmploiDuTemps consulter(EmploiDuTemps emploi);
+    public String getMdp(){
+        return mdp;
+    }
+    public void setMdp(){
+        this.mdp = mdp;
+    }
+
+    public EmploiDuTemps consulter(EmploiDuTemps emploi){
+        return emploi;
+    }
 }

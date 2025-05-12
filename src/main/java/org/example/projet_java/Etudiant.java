@@ -8,6 +8,7 @@ public class Etudiant extends Utilisateur {
     protected String prenom;
     protected String mail;
     protected ArrayList<Cours> cours;
+    protected Salle salle;
 
     public Etudiant(int id, String nom, String prenom, String mail, String mdp) {
         super(id, nom, prenom, mail, mdp);
@@ -82,4 +83,9 @@ public class Etudiant extends Utilisateur {
     public String notification(String date, String message) {
         return "Date : " + date + "\n" + "Message : " + message;
     }
+
+    public void ajouterCours(Cours cours) {
+        this.cours.add(cours);
+    }
+
 }

@@ -53,4 +53,27 @@ class EtudiantTest {
         assertNotNull(result);
         assertNotEquals(emploi, result);
     }
+
+    @Test
+    public void testGetSalle() {
+        Salle salle = new Salle(5, "Salle 1", 30, true);
+        Horaire horaire = new Horaire("Lundi", "14h00", "15h00");
+        Enseignant enseignant = new Enseignant(15,"Talib", "Momo", "tm@gmail.com", "tm123");
+        Cours cours = new Cours(1, salle,"Mathématique", horaire, enseignant);
+        Etudiant etudiant = new Etudiant(15, "Gugas", "Lola", "gl@gmail.com", "gl123");
+
+        etudiant.ajouterCours(cours);
+
+        Salle result = etudiant.getSalle(1);
+        assertNotNull(result);
+        assertEquals("Salle 1", result.getLocalisation());
+    }
+
+    @Test
+    public void testNotification(){
+        Etudiant etudiant = new Etudiant(5, "Abdou", "Kamy", "abdoukamy@gmail.com", "ak123");
+        String notification = etudiant.notification("09/05/2025", "Cours annulé");
+
+        assertEquals("Date : 09/05/2025\nMessage : Cours annulé", notification);
+    }
 }
