@@ -13,12 +13,18 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 public class EdtController {
+    private final String CSV = "C:\\Users\\Oriane\\OneDrive - ISEP\\ALGORITHMIQUE ET PROGRAMMATION\\csv.csv";
 
     @FXML
-    public void connexion(ActionEvent event) {
+    public void connexionetudiant(ActionEvent event) {
         Label identifiant = new Label("Identifiant");
         TextField textidentifiant = new TextField();
+        String id_etudiant = textidentifiant.getText();
 
         HBox hidentifiant = new HBox(20);
         hidentifiant.setAlignment(Pos.CENTER);
@@ -26,15 +32,15 @@ public class EdtController {
 
         Label mdp = new Label("Mot de passe");
         TextField textmdp = new TextField();
+        String mdp_etudiant = textmdp.getText();
 
         HBox hmdp = new HBox(20);
         hmdp.setAlignment(Pos.CENTER);
         hmdp.getChildren().addAll(mdp, textmdp);
 
         Button connexion = new Button("Se connecter");
-        connexion.setOnAction(ouvrir -> {
-            edt();
-        });
+
+        System.out.println(textidentifiant.getText()+ " " + mdp_etudiant);
 
         VBox layout = new VBox(20);
         layout.setAlignment(Pos.CENTER);
@@ -49,6 +55,54 @@ public class EdtController {
         Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         currentStage.close();
     }
+
+    @FXML
+    public void connexionenseignant(ActionEvent event) {
+        Label identifiant = new Label("Identifiant");
+        TextField textidentifiant = new TextField();
+        String id_enseignant = textidentifiant.getText();
+
+        HBox hidentifiant = new HBox(20);
+        hidentifiant.setAlignment(Pos.CENTER);
+        hidentifiant.getChildren().addAll(identifiant, textidentifiant);
+
+        Label mdp = new Label("Mot de passe");
+        TextField textmdp = new TextField();
+        String mdp_enseignant = textmdp.getText();
+
+        HBox hmdp = new HBox(20);
+        hmdp.setAlignment(Pos.CENTER);
+        hmdp.getChildren().addAll(mdp, textmdp);
+
+        Button connexion = new Button("Se connecter");
+        try (BufferedReader br = new BufferedReader(new FileReader(CSV))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] valeurs = line.split(";");
+                if (valeurs[16].equals(id_enseignant) && valeurs[20].equals(mdp_enseignant)) {
+                    connexion.setOnAction(ouvrir -> {
+                        edt();
+                    });
+                }
+            }
+        }catch(IOException ioe){
+            ioe.printStackTrace();
+        }
+
+        VBox layout = new VBox(20);
+        layout.setAlignment(Pos.CENTER);
+        layout.getChildren().addAll(hidentifiant, hmdp, connexion);
+
+        Scene scene = new Scene(layout, 300, 200);
+        Stage stage = new Stage();
+        stage.setTitle("Connexion");
+        stage.setScene(scene);
+        stage.show();
+
+        Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        currentStage.close();
+    }
+
 
     @FXML
     public void edt() {
