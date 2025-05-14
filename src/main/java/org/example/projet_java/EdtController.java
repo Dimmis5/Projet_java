@@ -6,10 +6,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -267,8 +264,8 @@ public class EdtController {
         stage.show();
     }
 
-        @FXML
-    public void connexionadministrateur(ActionEvent event){
+    @FXML
+    public void connexionadministrateur(ActionEvent event) {
         Label identifiant = new Label("Identifiant");
         TextField textidentifiant = new TextField();
 
@@ -317,56 +314,6 @@ public class EdtController {
         currentStage.close();
     }
 
-        @FXML
-    public void connexionadministrateur(ActionEvent event) {
-        Label identifiant = new Label("Identifiant");
-        TextField textidentifiant = new TextField();
-
-        Label mdp = new Label("Mot de passe");
-        PasswordField textmdp = new PasswordField();
-
-        Button connexion = new Button("Se connecter");
-
-        connexion.setOnAction(e -> {
-            String id_administrateur = textidentifiant.getText();
-            String mdp_adm = textmdp.getText();
-
-            try (BufferedReader br = new BufferedReader(new FileReader(CSV))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    String[] valeurs = line.split(";");
-                    if (valeurs[25].equals(id_administrateur) && valeurs[29].equals(mdp_adm)) {
-                        edtEtudiant(id_administrateur);
-                        break;
-                    }
-                }
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            }
-        });
-
-        HBox hidentifiant = new HBox(20);
-        hidentifiant.setAlignment(Pos.CENTER);
-        hidentifiant.getChildren().addAll(identifiant, textidentifiant);
-
-        HBox hmdp = new HBox(20);
-        hmdp.setAlignment(Pos.CENTER);
-        hmdp.getChildren().addAll(mdp, textmdp);
-
-        VBox layout = new VBox(20);
-        layout.setAlignment(Pos.CENTER);
-        layout.getChildren().addAll(hidentifiant, hmdp, connexion);
-
-        Scene scene = new Scene(layout, 300, 200);
-        Stage stage = new Stage();
-        stage.setTitle("Connexion");
-        stage.setScene(scene);
-        stage.show();
-
-        Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        currentStage.close();
-    }
-
     @FXML
     public void edtAdmi(String id_administrateur){
 
@@ -382,8 +329,6 @@ public class EdtController {
                 "Étudiant 6", "Étudiant 7", "Étudiant 8", "Étudiant 9", "Étudiant 10"
         );
         etudiantsComboBox.setPromptText("Choisir un étudiant");
-
-
 
 
         for (int i = 1; i <= 30; i++) {
