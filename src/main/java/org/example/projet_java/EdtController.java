@@ -317,6 +317,56 @@ public class EdtController {
         currentStage.close();
     }
 
+        @FXML
+    public void connexionadministrateur(ActionEvent event) {
+        Label identifiant = new Label("Identifiant");
+        TextField textidentifiant = new TextField();
+
+        Label mdp = new Label("Mot de passe");
+        PasswordField textmdp = new PasswordField();
+
+        Button connexion = new Button("Se connecter");
+
+        connexion.setOnAction(e -> {
+            String id_administrateur = textidentifiant.getText();
+            String mdp_adm = textmdp.getText();
+
+            try (BufferedReader br = new BufferedReader(new FileReader(CSV))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    String[] valeurs = line.split(";");
+                    if (valeurs[25].equals(id_administrateur) && valeurs[29].equals(mdp_adm)) {
+                        edtEtudiant(id_administrateur);
+                        break;
+                    }
+                }
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+        });
+
+        HBox hidentifiant = new HBox(20);
+        hidentifiant.setAlignment(Pos.CENTER);
+        hidentifiant.getChildren().addAll(identifiant, textidentifiant);
+
+        HBox hmdp = new HBox(20);
+        hmdp.setAlignment(Pos.CENTER);
+        hmdp.getChildren().addAll(mdp, textmdp);
+
+        VBox layout = new VBox(20);
+        layout.setAlignment(Pos.CENTER);
+        layout.getChildren().addAll(hidentifiant, hmdp, connexion);
+
+        Scene scene = new Scene(layout, 300, 200);
+        Stage stage = new Stage();
+        stage.setTitle("Connexion");
+        stage.setScene(scene);
+        stage.show();
+
+        Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        currentStage.close();
+    }
+
     @FXML
     public void edtAdmi(String id_administrateur){
 
