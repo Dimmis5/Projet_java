@@ -266,4 +266,114 @@ public class EdtController {
         stage.setScene(scene);
         stage.show();
     }
+
+        @FXML
+    public void connexionadministrateur(ActionEvent event){
+        Label identifiant = new Label("Identifiant");
+        TextField textidentifiant = new TextField();
+
+        Label mdp = new Label("Mot de passe");
+        PasswordField textmdp = new PasswordField();
+
+        Button connexion = new Button("Se connecter");
+
+        connexion.setOnAction(e -> {
+            String id_administrateur = textidentifiant.getText();
+            String mdp_adm = textmdp.getText();
+
+            try (BufferedReader br = new BufferedReader(new FileReader(CSV))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    String[] valeurs = line.split(";");
+                    if (valeurs[25].equals(id_administrateur) && valeurs[29].equals(mdp_adm)) {
+                        edtAdmi(id_administrateur);
+                        break;
+                    }
+                }
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+        });
+
+        HBox hidentifiant = new HBox(20);
+        hidentifiant.setAlignment(Pos.CENTER);
+        hidentifiant.getChildren().addAll(identifiant, textidentifiant);
+
+        HBox hmdp = new HBox(20);
+        hmdp.setAlignment(Pos.CENTER);
+        hmdp.getChildren().addAll(mdp, textmdp);
+
+        VBox layout = new VBox(20);
+        layout.setAlignment(Pos.CENTER);
+        layout.getChildren().addAll(hidentifiant, hmdp, connexion);
+
+        Scene scene = new Scene(layout, 300, 200);
+        Stage stage = new Stage();
+        stage.setTitle("Connexion");
+        stage.setScene(scene);
+        stage.show();
+
+        Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        currentStage.close();
+    }
+
+    @FXML
+    public void edtAdmi(String id_administrateur){
+
+        VBox layout = new VBox(20);
+        layout.setAlignment(Pos.TOP_CENTER);
+
+        HBox semainesSection = new HBox(10);
+        semainesSection.setAlignment(Pos.CENTER);
+
+        ComboBox<String> etudiantsComboBox = new ComboBox<>();
+        etudiantsComboBox.getItems().addAll(
+                "Étudiant 1", "Étudiant 2", "Étudiant 3", "Étudiant 4", "Étudiant 5",
+                "Étudiant 6", "Étudiant 7", "Étudiant 8", "Étudiant 9", "Étudiant 10"
+        );
+        etudiantsComboBox.setPromptText("Choisir un étudiant");
+
+
+
+
+        for (int i = 1; i <= 30; i++) {
+            final int semaineNumber = i;
+            Button semaineButton = new Button(String.valueOf(i));
+            // Ajouter action bouton
+            semainesSection.getChildren().add(semaineButton);
+        }
+
+        layout.getChildren().add(semainesSection);
+
+        GridPane agendaGrid = new GridPane();
+        agendaGrid.setHgap(20);
+        agendaGrid.setVgap(20);
+
+        String[] jours = {"Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"};
+        for (int i = 0; i < jours.length; i++) {
+            Label jourLabel = new Label(jours[i]);
+            agendaGrid.add(jourLabel, i + 1, 0);
+        }
+
+        for (int i = 8; i <= 20; i++) {
+            Label heureLabel = new Label(i + ":00");
+            agendaGrid.add(heureLabel, 0, i - 7);
+
+            for (int j = 0; j < jours.length; j++) {
+                Button cours = new Button("");
+                cours.setPrefWidth(100);
+                agendaGrid.add(cours, j + 1, i - 7);
+            }
+        }
+
+        layout.getChildren().add(agendaGrid);
+        layout.getChildren().add(etudiantsComboBox);
+
+        Scene scene = new Scene(layout, 600, 400);
+        Stage stage = new Stage();
+        stage.setTitle("Emploi du Temps");
+        stage.setScene(scene);
+        stage.show();
+
+    }
 }
