@@ -11,5 +11,5 @@
     </padding>
     <Button text="Etudiant" onAction="#connexionetudiant"/>
     <Button text="Enseignant" onAction="#connexionenseignant"/>
-    <Button text="Administrateur"/>
+    <Button text="Administrateur" onAction="#connexionadministrateur"/>
 </VBox>
