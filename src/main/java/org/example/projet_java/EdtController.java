@@ -19,13 +19,15 @@ import javafx.stage.Stage;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.Array;
+import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class EdtController {
@@ -190,26 +192,18 @@ public class EdtController {
         layout.setAlignment(Pos.TOP_CENTER);
         layout.setPadding(new Insets(20));
 
-        Calendar calendrier = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        calendrier.set(Calendar.DAY_OF_WEEK, calendrier.MONDAY);
-        Date debutSemaine = calendrier.getTime();
-        calendrier.add(Calendar.DAY_OF_YEAR, 6);
-        Date finSemaine = calendrier.getTime();
-
-        Label titreSemaine = new Label("Semaine du " + sdf.format(debutSemaine) + " au " + sdf.format(finSemaine));
-        layout.getChildren().add(titreSemaine);
-
-        GridPane agendaGrid = new GridPane();
-        agendaGrid.setHgap(10);
-        agendaGrid.setVgap(10);
-        agendaGrid.setPadding(new Insets(10));
-
-        String[] jours = {"Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"};
-        for (int i = 0; i < jours.length; i++) {
-            Label jourLabel = new Label(jours[i]);
-            agendaGrid.add(jourLabel, i + 1, 0);
+        LocalDate aujourdhui = LocalDate.now();
+        LocalDate lundi = aujourdhui.with(DayOfWeek.MONDAY);
+        List<String> semaine = new ArrayList<>();
+        DateTimeFormatter dateformatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        for (int i = 0; i < 7; i++) {
+            semaine.add(lundi.plusDays(i).format(dateformatter));
         }
+
+        String[] heures = {"8h00", "9h00", "10h00", "11h00", "12h00", "13h00", "14h00", "15h00", "16h00", "17h00", "18h00", "19h00", "20h00"};
+
+        Label titreSemaine = new Label("Semaine du " + semaine.get(0) + " au " + semaine.get(6));
+        layout.getChildren().add(titreSemaine);
 
         List<String[]> coursList = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(CSV))) {
@@ -217,44 +211,46 @@ public class EdtController {
             br.readLine();
             while ((line = br.readLine()) != null) {
                 String[] cours = line.split(";");
-                if (cours.length >= 15 && cours[0].equals(id_etudiant)) {
+                if (cours[0].equals(id_etudiant)) {
                     coursList.add(cours);
-                    System.out.println("Cours trouvé: " + cours[11] + " le " + cours[12] + " à " + cours[13]);
                 }
             }
         } catch (IOException e) {
-            System.err.println("Erreur de lecture du fichier CSV: " + e.getMessage());
             e.printStackTrace();
         }
 
-        for (int heure = 8; heure <= 20; heure++) {
-            Label heureLabel = new Label(heure + ":00");
-            agendaGrid.add(heureLabel, 0, heure - 7);
+        GridPane agendaGrid = new GridPane();
+        agendaGrid.setHgap(10);
+        agendaGrid.setVgap(10);
+        agendaGrid.setPadding(new Insets(10));
 
-            for (int jour = 0; jour < jours.length; jour++) {
-                Button coursButton = new Button();
-                coursButton.setPrefWidth(100);
+        for (int i = 0; i < 6; i++) {
+            Label jourLabel = new Label(semaine.get(i));
+            agendaGrid.add(jourLabel, i + 1, 0);
+        }
 
+        for (int heure = 0; heure <= 12; heure++) {
+            Label heureLabel = new Label(heures[heure]);
+            agendaGrid.add(heureLabel, 0, heure);
+
+            for (int jour = 0; jour < 6; jour++) {
                 for (String[] cours : coursList) {
-                    try {
-                        Date dateCours = sdf.parse(cours[12]);
-                        System.out.println(dateCours);
-                        Calendar cal = Calendar.getInstance();
-                        cal.setTime(dateCours);
-
-                        int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-                        int ajustedDayIndex = (dayOfWeek + 5) % 7;
-
-                        int heureDebut = Integer.parseInt(cours[13].replace("h", ""));
-                        if (ajustedDayIndex == jour && heureDebut == heure) {
-                            coursButton.setText(cours[11]);
-                            System.out.println("Affichage cours: " + cours[11] + " à " + heure + "h, jour " + jours[jour]);
+                    if (cours[12].equals(semaine.get(jour))) {
+                        if (cours[13].equals(heures[heure])) {
+                            Button coursButton = new Button(cours[11]);
+                            coursButton.setPrefWidth(100);
+                            agendaGrid.add(coursButton, jour + 1, heure);
+                        } else {
+                            Button coursButton = new Button();
+                            coursButton.setPrefWidth(100);
+                            agendaGrid.add(coursButton, jour + 1, heure);
                         }
-                    } catch (ParseException e) {
-                        e.printStackTrace();
+                    } else {
+                        Button coursButton = new Button();
+                        coursButton.setPrefWidth(100);
+                        agendaGrid.add(coursButton, jour + 1, heure);
                     }
                 }
-                agendaGrid.add(coursButton, jour + 1, heure - 7);
             }
         }
 
