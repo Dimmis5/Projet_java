@@ -28,7 +28,7 @@ import java.util.Calendar;
 import java.util.List;
 
 public class EdtController {
-    private final String CSV = "C:\\Users\\Oriane\\OneDrive - ISEP\\ALGORITHMIQUE ET PROGRAMMATION\\csv.csv";
+    private final String CSV = "/home/dimmis/Téléchargements/csv (1).csv";
 
     @FXML
     public void connexionetudiant(ActionEvent event) {
@@ -317,20 +317,37 @@ public class EdtController {
         layout.setAlignment(Pos.TOP_CENTER);
 
         HBox semainesSection = new HBox(10);
-        semainesSection.setAlignment(Pos.CENTER);
+        semainesSection.setAlignment(Pos.TOP_LEFT);
 
         ComboBox<String> etudiantsComboBox = new ComboBox<>();
-        etudiantsComboBox.getItems().addAll(
-                "Étudiant 1", "Étudiant 2", "Étudiant 3", "Étudiant 4", "Étudiant 5",
-                "Étudiant 6", "Étudiant 7", "Étudiant 8", "Étudiant 9", "Étudiant 10"
-        );
         etudiantsComboBox.setPromptText("Choisir un étudiant");
 
+        try (BufferedReader br = new BufferedReader(new FileReader("/home/dimmis/Téléchargements/csv (1).csv"))) {
+            String line;
+            boolean firstLine = true;
+
+            while ((line = br.readLine()) != null) {
+                if (firstLine) {
+                    firstLine = false;
+                    continue;
+                }
+                String[] tokens = line.split(";");
+                if (tokens.length >= 3) {
+                    String nom = tokens[1].trim();
+                    String prenom = tokens[2].trim();
+                    etudiantsComboBox.getItems().add(prenom + " " + nom);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        semainesSection.getChildren().add(etudiantsComboBox);
 
         for (int i = 1; i <= 30; i++) {
             final int semaineNumber = i;
             Button semaineButton = new Button(String.valueOf(i));
-            // Ajouter action bouton
             semainesSection.getChildren().add(semaineButton);
         }
 
@@ -358,7 +375,6 @@ public class EdtController {
         }
 
         layout.getChildren().add(agendaGrid);
-        layout.getChildren().add(etudiantsComboBox);
 
         Scene scene = new Scene(layout, 600, 400);
         Stage stage = new Stage();
