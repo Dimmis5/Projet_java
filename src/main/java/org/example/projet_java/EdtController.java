@@ -12,6 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -26,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 
 public class EdtController {
     private final String CSV = "C:\\Users\\Oriane\\OneDrive - ISEP\\ALGORITHMIQUE ET PROGRAMMATION\\csv.csv";
@@ -191,6 +193,7 @@ public class EdtController {
         }
 
         for (String[] cours : coursList) {
+            String idCours = cours[5];
             String dateCours = cours[12];
             String heureCours = cours[13];
             String heurefinCours = cours[14];
@@ -231,7 +234,58 @@ public class EdtController {
                             + "\nHeure : " + heureCours + " - " + heurefinCours
                             + "\nClasse : " + classe
                             + "\nSalle : " + salle);
-                    alert.showAndWait();
+
+                    ButtonType signalerBtn = new ButtonType("Signaler un problème");
+                    ButtonType okBtn = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+
+                    alert.getButtonTypes().setAll(okBtn, signalerBtn);
+
+                    Optional<ButtonType> result = alert.showAndWait();
+
+                    if (result.isPresent() && result.get() == signalerBtn) {
+                        Dialog<Pair<String, String>> dialog = new Dialog<>();
+                        dialog.setTitle("Signaler un problème");
+                        dialog.setHeaderText("Veuillez remplir les informations suivantes : ");
+
+                        ButtonType envoyerButtonType = new ButtonType("Envoyer", ButtonBar.ButtonData.OK_DONE);
+                        dialog.getDialogPane().getButtonTypes().addAll(envoyerButtonType, ButtonType.CANCEL);
+
+                        TextField idField = new TextField(idCours);
+                        idField.setDisable(true);
+
+                        TextArea messageField = new TextArea();
+
+                        GridPane grid = new GridPane();
+                        grid.setHgap(10);
+                        grid.setVgap(10);
+                        grid.setPadding(new Insets(20, 150, 10, 10));
+
+                        grid.add(new Label("Cours :"), 0, 0);
+                        grid.add(idField, 1, 0);
+                        grid.add(new Label("Message :"), 0, 1);
+                        grid.add(messageField, 1, 1);
+                        dialog.getDialogPane().setContent(grid);
+
+                        dialog.setResultConverter(dialogButton -> {
+                            if (dialogButton == envoyerButtonType) {
+                                return new Pair<>(idField.getText(), messageField.getText());
+                            }
+                            return null;
+                        });
+
+                        Optional<Pair<String, String>> resultMessage = dialog.showAndWait();
+
+                        resultMessage.ifPresent(pair -> {
+                            String id = pair.getKey();
+                            String message = pair.getValue();
+
+                            Alert confirmation = new Alert(Alert.AlertType.INFORMATION);
+                            confirmation.setTitle("Confirmation");
+                            confirmation.setHeaderText(null);
+                            confirmation.setContentText("Votre message a été envoyé.");
+                            confirmation.showAndWait();
+                        });
+                    }
                 });
             }
         }
@@ -349,7 +403,6 @@ public class EdtController {
                             + "\nHeure : " + heureCours + " - " + heurefinCours
                             + "\nEnseignant : " + enseignant_nom + " " + enseignant_prenom
                             + "\nSalle : " + salle);
-
                     alert.showAndWait();
                 });
             }
