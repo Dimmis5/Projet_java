@@ -14,9 +14,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.sql.Array;
 import java.sql.Date;
 import java.text.ParseException;
@@ -24,10 +22,8 @@ import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Optional;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
 
 public class EdtController {
     private final String CSV = "C:\\Users\\Oriane\\OneDrive - ISEP\\ALGORITHMIQUE ET PROGRAMMATION\\csv.csv";
@@ -148,6 +144,23 @@ public class EdtController {
         }
 
         String[] heures = {"8h00", "9h00", "10h00", "11h00", "12h00", "13h00", "14h00", "15h00", "16h00", "17h00", "18h00", "19h00", "20h00"};
+
+        HBox hsemaine = new HBox(20);
+        hsemaine.setAlignment(Pos.TOP_CENTER);
+        hsemaine.setPadding(new Insets(20));
+        LocalDate dateDepart = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'Semaine' w");
+
+        for (int j = 0; j < 30; j++) {
+            LocalDate dateSemaine = dateDepart.plusWeeks(j);
+
+            Button numeroSemaine = new Button(dateSemaine.format(formatter));
+            numeroSemaine.setPrefWidth(100);
+            numeroSemaine.setPrefHeight(30);
+            hsemaine.getChildren().add(numeroSemaine);
+        }
+
+        //layout.getChildren(hsemaine);
 
         Label titreSemaine = new Label("Semaine du " + semaine.get(0) + " au " + semaine.get(6));
         layout.getChildren().add(titreSemaine);
@@ -278,6 +291,35 @@ public class EdtController {
                         resultMessage.ifPresent(pair -> {
                             String id = pair.getKey();
                             String message = pair.getValue();
+
+                            List<String> fileContent = new ArrayList<>();
+
+                            try (BufferedReader br = new BufferedReader(new FileReader(CSV))) {
+                                String header = br.readLine();
+                                fileContent.add(header);
+
+                                String line;
+                                while ((line = br.readLine()) != null) {
+                                    String[] notification = line.split(";");
+                                    if (notification[5].equals(id)) {
+                                        notification[23] = message;
+                                        line = String.join(";", notification);
+                                    }
+                                    fileContent.add(line);
+                                }
+                            } catch (IOException a) {
+                                a.printStackTrace();
+                                return;
+                            }
+
+                            try (BufferedWriter bw = new BufferedWriter(new FileWriter(CSV))) {
+                                for (String line : fileContent) {
+                                    bw.write(line);
+                                    bw.newLine();
+                                }
+                            } catch (IOException a) {
+                                a.printStackTrace();
+                            }
 
                             Alert confirmation = new Alert(Alert.AlertType.INFORMATION);
                             confirmation.setTitle("Confirmation");
@@ -485,6 +527,8 @@ public class EdtController {
         currentStage.close();
     }
 
+    private String id_etudiant;
+
     @FXML
     public void edtAdmi(String id_administrateur) {
         VBox layout = new VBox(20);
@@ -508,7 +552,9 @@ public class EdtController {
         }
 
 
-        try (BufferedReader br = new BufferedReader(new FileReader("/home/dimmis/Téléchargements/csv (1).csv"))) {
+        Map<String, String> etudiantIdMap = new HashMap<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(CSV))) {
             String line;
             boolean firstLine = true;
 
@@ -517,39 +563,29 @@ public class EdtController {
                     firstLine = false;
                     continue;
                 }
+
                 String[] tokens = line.split(";");
                 if (tokens.length >= 3) {
+                    String id = tokens[0].trim();
                     String nom = tokens[1].trim();
                     String prenom = tokens[2].trim();
-                    etudiantsComboBox.getItems().add(prenom + " " + nom);
+                    String fullName = prenom + " " + nom;
+
+                    etudiantsComboBox.getItems().add(fullName);
+                    etudiantIdMap.put(fullName, id);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-
         semainesSection.getChildren().add(etudiantsComboBox);
-
 
         String[] heures = {"8h00", "9h00", "10h00", "11h00", "12h00", "13h00", "14h00", "15h00", "16h00", "17h00", "18h00", "19h00", "20h00"};
 
         Label titreSemaine = new Label("Semaine du " + semaine.get(0) + " au " + semaine.get(6));
         layout.getChildren().add(titreSemaine);
 
-        List<String[]> coursList = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(CSV))) {
-            String line;
-            br.readLine();
-            while ((line = br.readLine()) != null) {
-                String[] cours = line.split(";");
-                if (cours[0].equals(id_administrateur)) {
-                    coursList.add(cours);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         GridPane agendaGrid = new GridPane();
         agendaGrid.setHgap(10);
@@ -576,6 +612,71 @@ public class EdtController {
                 cellules[jour][heure] = celluleVide;
             }
         }
+
+        etudiantsComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                id_etudiant = etudiantIdMap.get(newVal);
+                List<String[]> coursList = new ArrayList<>();
+                try (BufferedReader br = new BufferedReader(new FileReader(CSV))) {
+                    String line;
+                    br.readLine();
+                    while ((line = br.readLine()) != null) {
+                        String[] cours = line.split(";");
+                        if (cours[0].equals(id_etudiant)) {
+                            coursList.add(cours);
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                for (String[] cours : coursList) {
+                    String idCours = cours[5];
+                    String dateCours = cours[12];
+                    String heureCours = cours[13];
+                    String heurefinCours = cours[14];
+                    String matiere = cours[11];
+                    String classe = cours[25];
+                    String salle = cours[6];
+
+                    int jourIndex = -1;
+                    for (int i = 0; i < semaine.size(); i++) {
+                        if (semaine.get(i).equals(dateCours)) {
+                            jourIndex = i;
+                            break;
+                        }
+                    }
+
+                    int heureIndex = -1;
+                    for (int i = 0; i < heures.length; i++) {
+                        if (heures[i].equals(heureCours)) {
+                            heureIndex = i;
+                            break;
+                        }
+                    }
+
+                    if (jourIndex >= 0 && jourIndex < 6 && heureIndex >= 0 && heureIndex <= 12) {
+                        Button coursButton = new Button(matiere);
+                        coursButton.setPrefWidth(100);
+                        coursButton.setPrefHeight(30);
+
+                        agendaGrid.getChildren().remove(cellules[jourIndex][heureIndex]);
+                        agendaGrid.add(coursButton, jourIndex + 1, heureIndex + 1);
+
+                        final String matiereInfo = matiere;
+                        coursButton.setOnAction(e -> {
+                            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                            alert.setTitle("Détails du cours");
+                            alert.setHeaderText("Cours de " + matiereInfo);
+                            alert.setContentText("Date : " + dateCours
+                                    + "\nHeure : " + heureCours + " - " + heurefinCours
+                                    + "\nClasse : " + classe
+                                    + "\nSalle : " + salle);
+                        });
+                    }
+                }
+            }
+        });
 
         layout.getChildren().add(semainesSection);
         layout.getChildren().add(agendaGrid);
