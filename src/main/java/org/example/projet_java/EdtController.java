@@ -13,6 +13,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import org.w3c.dom.Text;
 
 import java.io.*;
 import java.sql.Array;
@@ -37,6 +38,7 @@ public class EdtController {
         PasswordField textmdp = new PasswordField();
 
         Button connexion = new Button("Se connecter");
+        Button inscription = new Button("Inscription");
 
         connexion.setOnAction(e -> {
             String id_etudiant = textidentifiant.getText();
@@ -56,6 +58,63 @@ public class EdtController {
             }
         });
 
+        inscription.setOnAction(e -> {
+            Stage inscriptionStage = new Stage();
+            inscriptionStage.setTitle("Inscription");
+
+            VBox vinscription = new VBox(10);
+            vinscription.setPadding(new Insets(20));
+
+            Label lNom = new Label("Nom");
+            TextField champNom = new TextField();
+
+            HBox hNom = new HBox(20);
+            hNom.setAlignment(Pos.CENTER);
+            hNom.getChildren().addAll(lNom, champNom);
+
+            Label lPrenom = new Label("Prenom");
+            TextField champPrenom = new TextField();
+
+            HBox hPrenom = new HBox(20);
+            hPrenom.setAlignment(Pos.CENTER);
+            hPrenom.getChildren().addAll(lPrenom, champPrenom);
+
+            Label lMail = new Label("Adresse mail");
+            TextField champMail = new TextField();
+
+            HBox hMail = new HBox(20);
+            hMail.setAlignment(Pos.CENTER);
+            hMail.getChildren().addAll(lMail, champMail);
+
+            Label lMdp = new Label("Mot de passe");
+            TextField champMdp = new TextField();
+
+            HBox hMdp = new HBox(20);
+            hMdp.setAlignment(Pos.CENTER);
+            hMdp.getChildren().addAll(lMdp, champMdp);
+
+            Button valider = new Button("Valider");
+            valider.setOnAction(einscription -> {
+                String nom = champNom.getText();
+                String prenom = champPrenom.getText();
+                String mail = champMail.getText();
+                String mdp_inscription = champMdp.getText();
+                String cheminFichier = "etudiants.csv";
+                String id = String.valueOf(System.currentTimeMillis());
+                String nouvelleLigne = id + ";" + nom + ";" + prenom + ";" + mail + ";" + mdp_inscription;
+                try (FileWriter writer = new FileWriter(CSV, true)) {
+                    writer.write(nouvelleLigne + "\n");
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+                inscriptionStage.close();
+            });
+            vinscription.getChildren().addAll(hNom, hPrenom, hMail, hMdp, valider);
+            Scene scene = new Scene(vinscription, 300, 200);
+            inscriptionStage.setScene(scene);
+            inscriptionStage.show();
+        });
+
         HBox hidentifiant = new HBox(20);
         hidentifiant.setAlignment(Pos.CENTER);
         hidentifiant.getChildren().addAll(identifiant, textidentifiant);
@@ -66,7 +125,7 @@ public class EdtController {
 
         VBox layout = new VBox(20);
         layout.setAlignment(Pos.CENTER);
-        layout.getChildren().addAll(hidentifiant, hmdp, connexion);
+        layout.getChildren().addAll(hidentifiant, hmdp, connexion, inscription);
 
         Scene scene = new Scene(layout, 300, 200);
         Stage stage = new Stage();
