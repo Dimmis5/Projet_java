@@ -1,2 +1,2 @@
-id_cours,id_salle,matiere,heure_debut,heure_fin,enseignant,etudiant,annulation
-1,101,mathematique,10h00,11h00,"20001 ,Baton ,Jerome, batonjerome@gmail.com, bj123","10001, Coutand, Oriane, coutantoriane@gmail.com, co123",FALSE
+id_cours,id_salle,matiere,heure_debut,heure_fin,id_enseignant,annulation
+1,101,mathematique,10h00,11h00,"20001 ,3,FALSE
