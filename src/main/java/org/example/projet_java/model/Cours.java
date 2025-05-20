@@ -3,7 +3,7 @@ package org.example.projet_java.model;
 import java.util.ArrayList;
 
 public class Cours {
-    protected int id_cours;
+    protected String id_cours;
     protected Salle salle;
     protected String matiere;
     protected Horaire horaire;
@@ -11,7 +11,7 @@ public class Cours {
     protected ArrayList<Etudiant> etudiants;
     protected boolean estAnnule = false;
 
-    public Cours(int id_cours, Salle salle, String matiere, Horaire horaire, Enseignant enseignant) {
+    public Cours(String id_cours, Salle salle, String matiere, Horaire horaire, Enseignant enseignant) {
         this.id_cours = id_cours;
         this.salle = salle;
         this.matiere = matiere;
@@ -20,11 +20,11 @@ public class Cours {
         this.etudiants = new ArrayList<>();
     }
 
-    public int getId_cours() {
+    public String getId_cours() {
         return id_cours;
     }
 
-    public void setId_cours(int id_cours) {
+    public void setId_cours(String id_cours) {
         this.id_cours = id_cours;
     }
 

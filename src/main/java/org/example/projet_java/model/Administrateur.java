@@ -3,23 +3,23 @@ package org.example.projet_java.model;
 import java.util.HashMap;
 
 public class Administrateur extends Utilisateur {
-    protected int id;
+    protected String id;
     protected String nom;
     protected String prenom;
     protected String mail;
     protected String mdp;
 
-    public Administrateur(int id, String nom, String prenom, String mail, String mdp) {
+    public Administrateur(String id, String nom, String prenom, String mail, String mdp) {
         super(id,nom,prenom,mail,mdp);
     }
 
     @Override
-    public int getId() {
+    public String getId() {
         return id;
     }
 
     @Override
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

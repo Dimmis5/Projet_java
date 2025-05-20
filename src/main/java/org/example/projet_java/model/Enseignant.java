@@ -3,14 +3,14 @@ package org.example.projet_java.model;
 import java.util.ArrayList;
 
 public class Enseignant extends Utilisateur {
-    protected int id;
+    protected String id;
     protected String nom;
     protected String prenom;
     protected String mail;
     protected String mdp;
     protected ArrayList<Cours> cours;
 
-    public Enseignant(int id, String nom, String prenom, String mail, String mdp) {
+    public Enseignant(String id, String nom, String prenom, String mail, String mdp) {
         super(id,nom,prenom,mail,mdp);
         this.cours = new ArrayList<>();
         this.id = id;
@@ -22,12 +22,12 @@ public class Enseignant extends Utilisateur {
     }
 
     @Override
-    public int getId() {
+    public String getId() {
         return id;
     }
 
     @Override
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

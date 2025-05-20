@@ -3,14 +3,14 @@ package org.example.projet_java.model;
 import java.util.ArrayList;
 
 public class Etudiant extends Utilisateur {
-    protected int id;
+    protected String id;
     protected String nom;
     protected String prenom;
     protected String mail;
     protected ArrayList<Cours> cours;
     protected Salle salle;
 
-    public Etudiant(int id, String nom, String prenom, String mail, String mdp) {
+    public Etudiant(String id, String nom, String prenom, String mail, String mdp) {
         super(id, nom, prenom, mail, mdp);
         this.cours = new ArrayList<>();
         this.id = id;
@@ -20,13 +20,11 @@ public class Etudiant extends Utilisateur {
         this.mdp = mdp;
     }
 
-
-
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -68,10 +66,10 @@ public class Etudiant extends Utilisateur {
     }
 
     // Méthode getSalle
-    public Salle getSalle(int id_cours) {
+    public Salle getSalle(String id_cours) {
         for (Cours cour : cours) {
             // Vérification si l'id du cours correspond
-            if (cour.getId_cours() == id_cours) {
+            if (cour.getId_cours().equals(id_cours)) {
                 return cour.getSalle();
             }
         }

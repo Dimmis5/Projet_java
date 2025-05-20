@@ -3,19 +3,19 @@ package org.example.projet_java.model;
 import java.util.ArrayList;
 
 public class EmploiDuTemps {
-    protected int id;
+    protected String id;
     protected ArrayList<Cours> cours;
 
-    public EmploiDuTemps(int id) {
+    public EmploiDuTemps(String id) {
         this.id = id;
         this.cours = new ArrayList<>();
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

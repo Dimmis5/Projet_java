@@ -1,13 +1,13 @@
 package org.example.projet_java.model;
 
 public class Utilisateur {
-    protected int id;
+    protected String id;
     protected String nom;
     protected String prenom;
     protected String mail;
     protected String mdp;
 
-    public Utilisateur(int id, String nom, String prenom, String mail, String mdp) {
+    public Utilisateur(String id, String nom, String prenom, String mail, String mdp) {
         this.id = id;
         this.nom = nom;
         this.prenom = prenom;
@@ -15,11 +15,11 @@ public class Utilisateur {
         this.mdp = mdp;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
