@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.projet_java.controller.EdtAdministrateurController"
+            prefHeight="700.0" prefWidth="1000.0">
+    <top>
+        <VBox>
+            <HBox alignment="CENTER_LEFT" spacing="10" padding="10">
+                <Label text="Emploi du Temps - Administration" style="-fx-font-size: 18px;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Déconnexion" onAction="#onLogoutButtonClick"/>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="10" padding="10">
+                <ToggleButton text="Jour" fx:id="dayViewButton" onAction="#onDayViewButtonClick" selected="true" toggleGroup="$viewToggleGroup"/>
+                <ToggleButton text="Semaine" fx:id="weekViewButton" onAction="#onWeekViewButtonClick" toggleGroup="$viewToggleGroup"/>
+                <ToggleButton text="Mois" fx:id="monthViewButton" onAction="#onMonthViewButtonClick" toggleGroup="$viewToggleGroup"/>
+                <fx:define>
+                    <ToggleGroup fx:id="viewToggleGroup"/>
+                </fx:define>
+                <Separator orientation="VERTICAL"/>
+                <DatePicker fx:id="datePicker" onAction="#onDatePickerAction"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Ajouter Cours" onAction="#onAddCoursButtonClick"/>
+                <Button text="Supprimer Cours" onAction="#onDeleteCoursButtonClick"/>
+                <Button text="Modifier Cours" onAction="#onEditCoursButtonClick"/>
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <SplitPane dividerPositions="0.7" orientation="VERTICAL">
+            <!-- Calendrier -->
+            <BorderPane>
+                <center>
+                    <TabPane fx:id="calendarTabPane">
+                        <Tab text="Vue Jour" fx:id="dayTab">
+                            <ScrollPane fitToWidth="true" fitToHeight="true">
+                                <VBox fx:id="dayViewContainer" spacing="5"/>
+                            </ScrollPane>
+                        </Tab>
+                        <Tab text="Vue Semaine" fx:id="weekTab">
+                            <ScrollPane fitToWidth="true" fitToHeight="true">
+                                <VBox fx:id="weekViewContainer" spacing="5"/>
+                            </ScrollPane>
+                        </Tab>
+                        <Tab text="Vue Mois" fx:id="monthTab">
+                            <ScrollPane fitToWidth="true" fitToHeight="true">
+                                <VBox fx:id="monthViewContainer" spacing="5"/>
+                            </ScrollPane>
+                        </Tab>
+                    </TabPane>
+                </center>
+            </BorderPane>
+            
+            <!-- Gestion des conflits et statistiques -->
+            <TabPane>
+                <Tab text="Gestion des Conflits">
+                    <VBox spacing="10" padding="10">
+                        <Label text="Conflits détectés" style="-fx-font-weight: bold"/>
+                        <TableView fx:id="conflictsTable" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn text="Type" fx:id="conflictTypeColumn"/>
+                                <TableColumn text="Description" fx:id="conflictDescriptionColumn"/>
+                                <TableColumn text="Cours concernés" fx:id="conflictCoursColumn"/>
+                                <TableColumn text="Date" fx:id="conflictDateColumn"/>
+                            </columns>
+                        </TableView>
+                        <HBox spacing="10" alignment="CENTER_RIGHT">
+                            <Button text="Résoudre" onAction="#onResolveConflictButtonClick"/>
+                            <Button text="Ignorer" onAction="#onIgnoreConflictButtonClick"/>
+                        </HBox>
+                    </VBox>
+                </Tab>
+                <Tab text="Statistiques des Salles">
+                    <VBox spacing="10" padding="10">
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="Filtre par salle:"/>
+                            <ComboBox fx:id="roomFilterComboBox"/>
+                            <Button text="Appliquer" onAction="#onApplyRoomFilterButtonClick"/>
+                        </HBox>
+                        <TabPane>
+                            <Tab text="Taux d'occupation">
+                                <Pane fx:id="occupancyChartContainer" VBox.vgrow="ALWAYS"/>
+                            </Tab>
+                            <Tab text="Répartition des cours">
+                                <Pane fx:id="courseDistributionChartContainer" VBox.vgrow="ALWAYS"/>
+                            </Tab>
+                        </TabPane>
+                    </VBox>
+                </Tab>
+            </TabPane>
+        </SplitPane>
+    </center>
+    <right>
+        <VBox prefWidth="250" spacing="10" padding="10" style="-fx-background-color: #f5f5f5;">
+            <Label text="Filtres" style="-fx-font-weight: bold"/>
+            <TitledPane text="Formations" expanded="false">
+                <VBox spacing="5">
+                    <CheckBox text="L1 Informatique" fx:id="l1InfoCheckBox"/>
+                    <CheckBox text="L2 Informatique" fx:id="l2InfoCheckBox"/>
+                    <CheckBox text="L3 Informatique" fx:id="l3InfoCheckBox"/>
+                    <CheckBox text="M1 Informatique" fx:id="m1InfoCheckBox"/>
+                    <CheckBox text="M2 Informatique" fx:id="m2InfoCheckBox"/>
+                </VBox>
+            </TitledPane>
+            <TitledPane text="Enseignants" expanded="false">
+                <VBox spacing="5" fx:id="teachersFilterContainer"/>
+            </TitledPane>
+            <TitledPane text="Salles" expanded="false">
+                <VBox spacing="5" fx:id="roomsFilterContainer"/>
+            </TitledPane>
+            <Button text="Appliquer les filtres" onAction="#onApplyFiltersButtonClick" maxWidth="Infinity"/>
+            <Button text="Réinitialiser les filtres" onAction="#onResetFiltersButtonClick" maxWidth="Infinity"/>
+            <Separator/>
+            <Label text="Légende" style="-fx-font-weight: bold"/>
+            <GridPane hgap="5" vgap="5">
+                <Label text="CM:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <Pane style="-fx-background-color: #ffcccc;" prefWidth="20" prefHeight="10" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                <Label text="TD:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <Pane style="-fx-background-color: #ccffcc;" prefWidth="20" prefHeight="10" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                <Label text="TP:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <Pane style="-fx-background-color: #ccccff;" prefWidth="20" prefHeight="10" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                <Label text="Conflit:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                <Pane style="-fx-background-color: #ff9999;" prefWidth="20" prefHeight="10" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+            </GridPane>
+        </VBox>
+    </right>
+</BorderPane>

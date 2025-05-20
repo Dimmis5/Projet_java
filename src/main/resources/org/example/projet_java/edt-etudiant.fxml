@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.projet_java.controller.EdtEtudiantController"
+            prefHeight="600.0" prefWidth="900.0">
+    <top>
+        <VBox>
+            <HBox alignment="CENTER_LEFT" spacing="10" padding="10">
+                <Label text="Emploi du Temps - Étudiant" style="-fx-font-size: 18px;"/>
+                <Label fx:id="etudiantNameLabel" style="-fx-font-style: italic;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Déconnexion" onAction="#onLogoutButtonClick"/>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="10" padding="10">
+                <ToggleButton text="Jour" fx:id="dayViewButton" onAction="#onDayViewButtonClick" selected="true" toggleGroup="$viewToggleGroup"/>
+                <ToggleButton text="Semaine" fx:id="weekViewButton" onAction="#onWeekViewButtonClick" toggleGroup="$viewToggleGroup"/>
+                <ToggleButton text="Mois" fx:id="monthViewButton" onAction="#onMonthViewButtonClick" toggleGroup="$viewToggleGroup"/>
+                <fx:define>
+                    <ToggleGroup fx:id="viewToggleGroup"/>
+                </fx:define>
+                <Separator orientation="VERTICAL"/>
+                <DatePicker fx:id="datePicker" onAction="#onDatePickerAction"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Exporter" onAction="#onExportButtonClick"/>
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <TabPane fx:id="calendarTabPane">
+            <Tab text="Vue Jour" fx:id="dayTab">
+                <ScrollPane fitToWidth="true" fitToHeight="true">
+                    <VBox fx:id="dayViewContainer" spacing="5"/>
+                </ScrollPane>
+            </Tab>
+            <Tab text="Vue Semaine" fx:id="weekTab">
+                <ScrollPane fitToWidth="true" fitToHeight="true">
+                    <VBox fx:id="weekViewContainer" spacing="5"/>
+                </ScrollPane>
+            </Tab>
+            <Tab text="Vue Mois" fx:id="monthTab">
+                <ScrollPane fitToWidth="true" fitToHeight="true">
+                    <VBox fx:id="monthViewContainer" spacing="5"/>
+                </ScrollPane>
+            </Tab>
+        </TabPane>
+    </center>
+    <right>
+        <VBox prefWidth="250" spacing="10" padding="10" style="-fx-background-color: #f5f5f5;">
+            <Label text="Notifications" style="-fx-font-weight: bold"/>
+            <ListView fx:id="notificationsListView" VBox.vgrow="ALWAYS" prefHeight="200"/>
+            <HBox spacing="5" alignment="CENTER_RIGHT">
+                <Button text="Marquer comme lu" onAction="#onMarkAsReadButtonClick"/>
+                <Button text="Supprimer" onAction="#onDeleteNotificationButtonClick"/>
+            </HBox>
+            <Separator/>
+            <TitledPane text="Prochains cours" expanded="true">
+                <ListView fx:id="upcomingCoursesListView" VBox.vgrow="ALWAYS" prefHeight="150"/>
+            </TitledPane>
+            <Separator/>
+            <Label text="Légende" style="-fx-font-weight: bold"/>
+            <GridPane hgap="5" vgap="5">
+                <Label text="CM:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <Pane style="-fx-background-color: #ffcccc;" prefWidth="20" prefHeight="10" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                <Label text="TD:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <Pane style="-fx-background-color: #ccffcc;" prefWidth="20" prefHeight="10" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                <Label text="TP:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <Pane style="-fx-background-color: #ccccff;" prefWidth="20" prefHeight="10" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                <Label text="Cours annulé:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                <Pane style="-fx-background-color: #ff9999;" prefWidth="20" prefHeight="10" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                <Label text="Cours modifié:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                <Pane style="-fx-background-color: #ffff99;" prefWidth="20" prefHeight="10" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+            </GridPane>
+        </VBox>
+    </right>
+</BorderPane>

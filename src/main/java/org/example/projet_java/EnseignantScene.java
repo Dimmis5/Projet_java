@@ -1,33 +1,57 @@
 package org.example.projet_java;
 
-import javafx.geometry.Pos;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.example.projet_java.model.Enseignant;
+import org.example.projet_java.controller.EdtEnseignantController;
+
+import java.io.IOException;
 
 public class EnseignantScene {
-
-    public static Scene getScene(Stage stage, Scene sceneAccueil) {
-        Label labelEnseignant = new Label("Bienvenue Enseignant");
-
-        Label identifiant = new Label("Identifiant");
-        TextField text1 = new TextField();
-
-        Label motdepasse = new Label("Mot de passe");
-        TextField text2 = new TextField();
-
-        Button connecter = new Button("Se connecter");
-        Button retour = new Button("Retour");
-
-        VBox id = new VBox(1, identifiant, text1);
-        VBox mot = new VBox(1, motdepasse, text2);
-
-        VBox afficher = new VBox(30, labelEnseignant, id, mot, connecter, retour);
-        afficher.setAlignment(Pos.CENTER);
-
-        retour.setOnAction(ev -> stage.setScene(sceneAccueil));
-
-        return new Scene(afficher, 400, 400);
+    
+    private Enseignant enseignant;
+    
+    public EnseignantScene(Enseignant enseignant) {
+        this.enseignant = enseignant;
+    }
+    
+    public static Scene getLoginScene(Stage stage, Scene sceneAccueil) {
+        try {
+            FXMLLoader loader = new FXMLLoader(EnseignantScene.class.getResource("login-enseignant.fxml"));
+            Parent root = loader.load();
+            
+            org.example.projet_java.controller.LoginEnseignantController controller = loader.getController();
+            controller.setStage(stage);
+            controller.setSceneAccueil(sceneAccueil);
+            
+            Scene scene = new Scene(root, 400, 400);
+            String css = EnseignantScene.class.getResource("styles.css").toExternalForm();
+            scene.getStylesheets().add(css);
+            
+            return scene;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    public void show(Stage stage) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("edt-enseignant.fxml"));
+        Parent root = loader.load();
+        
+        // Get the controller and pass the enseignant object
+        EdtEnseignantController controller = loader.getController();
+        controller.setEnseignant(enseignant);
+        controller.initialize();
+        
+        Scene scene = new Scene(root, 1024, 768);
+        String css = this.getClass().getResource("styles.css").toExternalForm();
+        scene.getStylesheets().add(css);
+        
+        stage.setTitle("Emploi du temps - Enseignant");
+        stage.setScene(scene);
+        stage.show();
     }
 }

@@ -1,79 +1,57 @@
 package org.example.projet_java;
 
-import javafx.geometry.Pos;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.example.projet_java.model.Etudiant;
+import org.example.projet_java.controller.EdtEtudiantController;
 
-import java.time.LocalDate;
-import java.time.YearMonth;
+import java.io.IOException;
 
 public class EtudiantScene {
-
-    public static Scene getScene(Stage stage, Scene sceneAccueil) {
-        Label labelEtudiant = new Label("Bienvenue Etudiant");
-
-        Label identifiant = new Label("Identifiant");
-        TextField text1 = new TextField();
-
-        Label mdp = new Label("Mot de passe");
-        TextField text2 = new TextField();
-
-        Button confirmation = new Button("Se connecter");
-        Button retour = new Button("Retour");
-
-        VBox etudiantLayout = new VBox(20, labelEtudiant);
-        etudiantLayout.setAlignment(Pos.CENTER);
-        VBox idEtudiant = new VBox(1, identifiant, text1);
-        VBox mot = new VBox(1, mdp, text2);
-
-        VBox afficher = new VBox(30, etudiantLayout, idEtudiant, mot, confirmation, retour);
-
-        confirmation.setOnAction(evt -> {
-            YearMonth moisActuel = YearMonth.now();
-            VBox afficherDate = new VBox(10);
-
-            Label titre = new Label(moisActuel.getMonth() + " " + moisActuel.getYear());
-            titre.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-            titre.setAlignment(Pos.CENTER);
-
-            GridPane grille = new GridPane();
-            grille.setHgap(10);
-            grille.setVgap(10);
-            grille.setAlignment(Pos.CENTER);
-
-            String[] jourSemaine = {"Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"};
-            for (int i = 0; i < 7; i++) {
-                grille.add(new Label(jourSemaine[i]), i, 0);
-            }
-
-            LocalDate premierJour = moisActuel.atDay(1);
-            int joursemaine = premierJour.getDayOfWeek().getValue();
-            int nbJours = moisActuel.lengthOfMonth();
-            int ligne = 1;
-            int colonne = joursemaine - 1;
-            for (int jour = 1; jour <= nbJours; jour++) {
-                grille.add(new Label(String.valueOf(jour)), colonne, ligne);
-                colonne++;
-                if (colonne > 6) {
-                    colonne = 0;
-                    ligne++;
-                }
-            }
-
-            Button retoure = new Button("Retour");
-            retoure.setOnAction(event -> stage.setScene(sceneAccueil));
-
-            afficherDate.setAlignment(Pos.CENTER);
-            afficherDate.getChildren().addAll(titre, grille, retoure);
-
-            stage.setScene(new Scene(afficherDate, 400, 400));
-        });
-
-        retour.setOnAction(ev -> stage.setScene(sceneAccueil));
-
-        return new Scene(afficher, 400, 400);
+    
+    private Etudiant etudiant;
+    
+    public EtudiantScene(Etudiant etudiant) {
+        this.etudiant = etudiant;
+    }
+    
+    public static Scene getLoginScene(Stage stage, Scene sceneAccueil) {
+        try {
+            FXMLLoader loader = new FXMLLoader(EtudiantScene.class.getResource("login-etudiant.fxml"));
+            Parent root = loader.load();
+            
+            org.example.projet_java.controller.LoginEtudiantController controller = loader.getController();
+            controller.setStage(stage);
+            controller.setSceneAccueil(sceneAccueil);
+            
+            Scene scene = new Scene(root, 400, 400);
+            String css = EtudiantScene.class.getResource("styles.css").toExternalForm();
+            scene.getStylesheets().add(css);
+            
+            return scene;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    public void show(Stage stage) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("edt-etudiant.fxml"));
+        Parent root = loader.load();
+        
+        // Get the controller and pass the etudiant object
+        EdtEtudiantController controller = loader.getController();
+        controller.setEtudiant(etudiant);
+        controller.initialize();
+        
+        Scene scene = new Scene(root, 1024, 768);
+        String css = this.getClass().getResource("styles.css").toExternalForm();
+        scene.getStylesheets().add(css);
+        
+        stage.setTitle("Emploi du temps - Étudiant");
+        stage.setScene(scene);
+        stage.show();
     }
 }

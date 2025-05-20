@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.projet_java.controller.EdtEnseignantController"
+            prefHeight="600.0" prefWidth="900.0">
+    <top>
+        <VBox>
+            <HBox alignment="CENTER_LEFT" spacing="10" padding="10">
+                <Label text="Emploi du Temps - Enseignant" style="-fx-font-size: 18px;"/>
+                <Label fx:id="enseignantNameLabel" style="-fx-font-style: italic;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Déconnexion" onAction="#onLogoutButtonClick"/>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="10" padding="10">
+                <ToggleButton text="Jour" fx:id="dayViewButton" onAction="#onDayViewButtonClick" selected="true" toggleGroup="$viewToggleGroup"/>
+                <ToggleButton text="Semaine" fx:id="weekViewButton" onAction="#onWeekViewButtonClick" toggleGroup="$viewToggleGroup"/>
+                <ToggleButton text="Mois" fx:id="monthViewButton" onAction="#onMonthViewButtonClick" toggleGroup="$viewToggleGroup"/>
+                <fx:define>
+                    <ToggleGroup fx:id="viewToggleGroup"/>
+                </fx:define>
+                <Separator orientation="VERTICAL"/>
+                <DatePicker fx:id="datePicker" onAction="#onDatePickerAction"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Signaler Anomalie" onAction="#onReportIssueButtonClick"/>
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <TabPane fx:id="calendarTabPane">
+            <Tab text="Vue Jour" fx:id="dayTab">
+                <ScrollPane fitToWidth="true" fitToHeight="true">
+                    <VBox fx:id="dayViewContainer" spacing="5"/>
+                </ScrollPane>
+            </Tab>
+            <Tab text="Vue Semaine" fx:id="weekTab">
+                <ScrollPane fitToWidth="true" fitToHeight="true">
+                    <VBox fx:id="weekViewContainer" spacing="5"/>
+                </ScrollPane>
+            </Tab>
+            <Tab text="Vue Mois" fx:id="monthTab">
+                <ScrollPane fitToWidth="true" fitToHeight="true">
+                    <VBox fx:id="monthViewContainer" spacing="5"/>
+                </ScrollPane>
+            </Tab>
+        </TabPane>
+    </center>
+    <right>
+        <VBox prefWidth="250" spacing="10" padding="10" style="-fx-background-color: #f5f5f5;">
+            <Label text="Récapitulatif" style="-fx-font-weight: bold"/>
+            <TitledPane text="Heures d'enseignement" expanded="true">
+                <GridPane hgap="10" vgap="5">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="120.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="60.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                    <Label text="CM effectuées:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <Label fx:id="cmDoneLabel" text="0h" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                    <Label text="TD effectuées:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <Label fx:id="tdDoneLabel" text="0h" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                    <Label text="TP effectuées:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                    <Label fx:id="tpDoneLabel" text="0h" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                    <Label text="Total:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                    <Label fx:id="totalHoursLabel" text="0h" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                </GridPane>
+            </TitledPane>
+            <TitledPane text="Mes cours" expanded="true">
+                <ListView fx:id="myCoursesListView" VBox.vgrow="ALWAYS"/>
+            </TitledPane>
+            <Separator/>
+            <Label text="Légende" style="-fx-font-weight: bold"/>
+            <GridPane hgap="5" vgap="5">
+                <Label text="CM:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <Pane style="-fx-background-color: #ffcccc;" prefWidth="20" prefHeight="10" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                <Label text="TD:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <Pane style="-fx-background-color: #ccffcc;" prefWidth="20" prefHeight="10" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                <Label text="TP:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <Pane style="-fx-background-color: #ccccff;" prefWidth="20" prefHeight="10" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+            </GridPane>
+        </VBox>
+    </right>
+</BorderPane>
