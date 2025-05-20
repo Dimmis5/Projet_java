@@ -1,5 +1,8 @@
 package org.example.projet_java;
 
+import org.example.projet_java.model.Enseignant;
+import org.example.projet_java.model.Salle;
+import org.example.projet_java.model.Statistiques;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;

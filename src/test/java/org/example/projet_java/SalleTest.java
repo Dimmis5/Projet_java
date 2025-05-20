@@ -1,5 +1,6 @@
 package org.example.projet_java;
 
+import org.example.projet_java.model.Salle;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

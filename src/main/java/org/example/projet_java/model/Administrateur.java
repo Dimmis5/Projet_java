@@ -1,4 +1,4 @@
-package org.example.projet_java;
+package org.example.projet_java.model;
 
 import java.util.HashMap;
 

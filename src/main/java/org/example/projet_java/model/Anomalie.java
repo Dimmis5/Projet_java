@@ -1,4 +1,4 @@
-package org.example.projet_java;
+package org.example.projet_java.model;
 
 public class Anomalie {
     protected String type;

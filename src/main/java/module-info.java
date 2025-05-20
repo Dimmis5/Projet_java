@@ -7,4 +7,6 @@ module org.example.projet_java {
 
     opens org.example.projet_java to javafx.fxml;
     exports org.example.projet_java;
+    exports org.example.projet_java.model;
+    opens org.example.projet_java.model to javafx.fxml;
 }

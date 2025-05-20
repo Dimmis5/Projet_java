@@ -1,8 +1,8 @@
-package org.example.projet_java;
+package org.example.projet_java.model;
 
 import java.util.ArrayList;
 
-public class Enseignant extends Utilisateur{
+public class Enseignant extends Utilisateur {
     protected int id;
     protected String nom;
     protected String prenom;

@@ -1,5 +1,7 @@
 package org.example.projet_java;
 
+import org.example.projet_java.model.EmploiDuTemps;
+import org.example.projet_java.model.Enseignant;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
