@@ -3,68 +3,27 @@ package org.example.projet_java.model;
 import java.util.ArrayList;
 
 public class EmploiDuTemps {
-    protected String id;
-    protected ArrayList<Cours> cours;
+    protected String id_etudiant;
+    protected String id_cours;
 
-    public EmploiDuTemps(String id) {
-        this.id = id;
-        this.cours = new ArrayList<>();
+    public EmploiDuTemps(String id_etudiant, String id_cours) {
+        this.id_etudiant = id_cours;
+        this.id_cours = id_cours;
     }
 
-    public String getId() {
-        return id;
+    public String getId_etudiant() {
+        return id_etudiant;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setId_etudiant(String id_etudiant) {
+        this.id_etudiant = id_etudiant;
     }
 
-    public ArrayList<Cours> getCours() {
-        return cours;
+    public String getId_cours() {
+        return id_cours;
     }
 
-    public void setCours(ArrayList<Cours> cours) {
-        this.cours = cours;
-    }
-
-    public EmploiDuTemps getEleve(int id) {
-        EmploiDuTemps emploi = new EmploiDuTemps(id);
-
-        Enseignant enseignant1 = new Enseignant(1, "Durand", "Melanie", "melaniedurand@gmail.com", "123");
-        Salle salle1 = new Salle(101, "Salle 101", 15, false);
-        Horaire horaire1 = new Horaire("09/05/2025", "10:00", "11:00");
-        Cours cours1 = new Cours(1, salle1, "Mathematiques", horaire1, enseignant1);
-
-        Enseignant enseignant2 = new Enseignant(2, "Dupont", "Henri", "henridupont@gmail.com", "123");
-        Salle salle2 = new Salle(102, "Salle 102",20, true);
-        Horaire horaire2 = new Horaire("09/05/2025", "10:00", "11:00");
-        Cours cours2 = new Cours(2, salle2, "Anglais", horaire2, enseignant2);
-
-        emploi.getCours().add(cours1);
-        emploi.getCours().add(cours2);
-
-        return emploi;
-    }
-
-    public EmploiDuTemps getEnseignant(int id) {
-        EmploiDuTemps emploi = new EmploiDuTemps(id);
-
-        Salle salle1 = new Salle(101, "Salle 101", 30, false);
-        Horaire horaire1 = new Horaire("09/05/2025", "10:00", "11:00");
-        Cours cours1 = new Cours(1, salle1, "Mathematiques", horaire1, new Enseignant(id, "Durand", "Melanie", "melaniedurand@gmail.com", "123"));
-
-        Salle salle2 = new Salle(102, "Salle 102", 40, false);
-        Horaire horaire2 = new Horaire("09/05/2025", "10:00", "11:00");
-        Cours cours2 = new Cours(2, salle2, "Anglais", horaire2, new Enseignant(id, "Dupont", "Henri", "henridupont@gmail.com", "123"));
-
-        emploi.getCours().add(cours1);
-        emploi.getCours().add(cours2);
-
-        return emploi;
-    }
-
-
-    public void setCours(EmploiDuTemps edt, Cours cours) {
-        edt.getCours().add(cours);
+    public void setId_cours(String id_cours) {
+        this.id_cours = id_cours;
     }
 }

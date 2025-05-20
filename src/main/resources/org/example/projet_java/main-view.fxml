@@ -5,11 +5,11 @@
 <?import javafx.scene.layout.VBox?>
 
 <?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.projet_java.EdtController">
+<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.projet_java.controller.MainController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>
-    <Button text="Etudiant" onAction="#connexionetudiant"/>
-    <Button text="Enseignant" onAction="#connexionenseignant"/>
-    <Button text="Administrateur" onAction="#connexionadministrateur"/>
+    <Button text="Etudiant" onAction="#connexionEtudiant"/>
+    <Button text="Enseignant" onAction="#connexionEnseignant"/>
+    <Button text="Administrateur" onAction="#connexionAdministrateur"/>
 </VBox>

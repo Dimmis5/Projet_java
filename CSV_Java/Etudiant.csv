@@ -1,2 +1,2 @@
-id_etudiant,nom,prenom,mail,mdp
-10000,Coutand,Oriane,orianecoutand@gmail.com,oc123
+id_etudiant,nom,prenom,mail,mdp,classe
+10000,Coutand,Oriane,orianecoutand@gmail.com,oc123,G4A

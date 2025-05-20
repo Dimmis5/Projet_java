@@ -18,7 +18,7 @@ import java.io.IOException;
 public class LoginEtudiantController {
 
     @FXML
-    private TextField emailField;
+    private TextField identifiantField;
 
     @FXML
     private PasswordField passwordField;
@@ -30,7 +30,7 @@ public class LoginEtudiantController {
 
     @FXML
     protected void onLoginButtonClick(ActionEvent event) {
-        String email = emailField.getText();
+        String email = identifiantField.getText();
         String password = passwordField.getText();
 
         if (email.isEmpty() || password.isEmpty()) {
@@ -42,15 +42,13 @@ public class LoginEtudiantController {
 
         if (loginSuccess) {
             try {
-                // Charger la vue d'emploi du temps étudiant
-                FXMLLoader fxmlLoader = new FXMLLoader(Edt.class.getResource("edt-etudiant.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(Edt.class.getResource("edt-etudiant-view.fxml"));
                 Scene scene = new Scene(fxmlLoader.load(), 400,400);
                 Stage stage = new Stage();
                 stage.setTitle("Connexion Controller");
                 stage.setScene(scene);
                 stage.show();
 
-                // Fermer la fenêtre de connexion
                 Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 currentStage.close();
             } catch (IOException e) {
@@ -58,21 +56,19 @@ public class LoginEtudiantController {
                 errorMessage.setText("Erreur lors du chargement de l'emploi du temps");
             }
         } else {
-            errorMessage.setText("Email ou mot de passe incorrect");
+            errorMessage.setText("Identifiant ou mot de passe incorrect");
         }
     }
 
     @FXML
     protected void onBackButtonClick(ActionEvent event) {
         try {
-            // Revenir à la vue principale
             FXMLLoader fxmlLoader = new FXMLLoader(Edt.class.getResource("main-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load(), 400, 300);
             Stage stage = new Stage();
             stage.setScene(scene);
             stage.show();
 
-            // Fermer la fenêtre actuelle
             Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             currentStage.close();
         } catch (IOException e) {

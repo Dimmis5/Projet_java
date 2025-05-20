@@ -22,17 +22,14 @@ public class MainController {
     private Button btnAdministrateur;
 
     @FXML
-    protected void onEtudiantButtonClick(ActionEvent event) {
+    protected void connexionEtudiant(ActionEvent event) {
         try {
-            // Charger la vue de connexion étudiant
-            FXMLLoader fxmlLoader = new FXMLLoader(Edt.class.getResource("login-etudiant.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(Edt.class.getResource("login-etudiant-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load(), 400, 300);
             Stage stage = new Stage();
             stage.setTitle("Connexion Étudiant");
             stage.setScene(scene);
             stage.show();
-
-            // Fermer la fenêtre actuelle
             Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             currentStage.close();
         } catch (IOException e) {
@@ -41,17 +38,14 @@ public class MainController {
     }
 
     @FXML
-    protected void onEnseignantButtonClick(ActionEvent event) {
+    protected void connexionEnseignant(ActionEvent event) {
         try {
-            // Charger la vue de connexion enseignant
-            FXMLLoader fxmlLoader = new FXMLLoader(Edt.class.getResource("login-enseignant.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(Edt.class.getResource("login-enseignant-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load(), 400, 300);
             Stage stage = new Stage();
             stage.setTitle("Connexion Enseignant");
             stage.setScene(scene);
             stage.show();
-
-            // Fermer la fenêtre actuelle
             Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             currentStage.close();
         } catch (IOException e) {
@@ -60,17 +54,14 @@ public class MainController {
     }
 
     @FXML
-    protected void onAdministrateurButtonClick(ActionEvent event) {
+    protected void connexionAdministrateur(ActionEvent event) {
         try {
-            // Charger la vue de connexion administrateur
-            FXMLLoader fxmlLoader = new FXMLLoader(Edt.class.getResource("login-administrateur.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(Edt.class.getResource("login-administrateur-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load(), 400, 300);
             Stage stage = new Stage();
             stage.setTitle("Connexion Administrateur");
             stage.setScene(scene);
             stage.show();
-
-            // Fermer la fenêtre actuelle
             Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             currentStage.close();
         } catch (IOException e) {

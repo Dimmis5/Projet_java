@@ -24,46 +24,35 @@ public class AuthentificationService {
         return instance;
     }
 
-    /**
-     * Authentifie un étudiant avec email et mot de passe
-     */
-    public boolean loginEtudiant(String email, String motDePasse) {
-        List<Etudiant> etudiants = csvService.loadEtudiants();
+    public boolean loginEtudiant(String identifiant, String motDePasse) {
+        List<Etudiant> etudiants = csvService.Etudiants();
 
         for (Etudiant etudiant : etudiants) {
-            if (etudiant.getMail().equals(email) && etudiant.getMdp().equals(motDePasse)) {
+            if (etudiant.getId().equals(identifiant) && etudiant.getMdp().equals(motDePasse)) {
                 this.currentUser = etudiant;
                 return true;
             }
         }
-
         return false;
     }
 
-    /**
-     * Authentifie un enseignant avec email et mot de passe
-     */
-    public boolean loginEnseignant(String email, String motDePasse) {
-        List<Enseignant> enseignants = csvService.loadEnseignants();
+    public boolean loginEnseignant(String identifiant, String motDePasse) {
+        List<Enseignant> enseignants = csvService.Enseignants();
 
         for (Enseignant enseignant : enseignants) {
-            if (enseignant.getMail().equals(email) && enseignant.getMdp().equals(motDePasse)) {
+            if (enseignant.getId().equals(identifiant) && enseignant.getMdp().equals(motDePasse)) {
                 this.currentUser = enseignant;
                 return true;
             }
         }
-
         return false;
     }
 
-    /**
-     * Authentifie un administrateur avec email et mot de passe
-     */
-    public boolean loginAdministrateur(String email, String motDePasse) {
-        List<Administrateur> administrateurs = csvService.loadAdministrateurs();
+    public boolean loginAdministrateur(String identifiant, String motDePasse) {
+        List<Administrateur> administrateurs = csvService.Administrateurs();
 
         for (Administrateur administrateur : administrateurs) {
-            if (administrateur.getMail().equals(email) && administrateur.getMdp().equals(motDePasse)) {
+            if (administrateur.getId().equals(identifiant) && administrateur.getMdp().equals(motDePasse)) {
                 this.currentUser = administrateur;
                 return true;
             }
@@ -72,16 +61,10 @@ public class AuthentificationService {
         return false;
     }
 
-    /**
-     * Déconnecte l'utilisateur courant
-     */
     public void logout() {
         this.currentUser = null;
     }
 
-    /**
-     * Récupère l'utilisateur actuellement connecté
-     */
     public Utilisateur getCurrentUser() {
         return currentUser;
     }

@@ -4,19 +4,25 @@ import java.util.ArrayList;
 
 public class Cours {
     protected String id_cours;
-    protected Salle salle;
+    protected String id_salle;
     protected String matiere;
-    protected Horaire horaire;
-    protected Enseignant enseignant;
+    protected String date;
+    protected String heure_debut;
+    protected String heure_fin;
+    protected String id_enseignant;
+    protected String classe;
     protected ArrayList<Etudiant> etudiants;
-    protected boolean estAnnule = false;
+    protected boolean annulation = false;
 
-    public Cours(String id_cours, Salle salle, String matiere, Horaire horaire, Enseignant enseignant) {
+    public Cours(String id_cours, String id_salle, String matiere, String date, String heure_debut, String heure_fin, String id_enseignant, String classe, Boolean annulation) {
         this.id_cours = id_cours;
-        this.salle = salle;
+        this.id_salle = id_salle;
         this.matiere = matiere;
-        this.horaire = horaire;
-        this.enseignant = enseignant;
+        this.date = date;
+        this.heure_debut = heure_debut;
+        this.heure_fin = heure_fin;
+        this.id_enseignant = id_enseignant;
+        this.classe = classe;
         this.etudiants = new ArrayList<>();
     }
 
@@ -28,12 +34,12 @@ public class Cours {
         this.id_cours = id_cours;
     }
 
-    public Salle getSalle() {
-        return salle;
+    public String getId_salle() {
+        return id_salle;
     }
 
-    public void setSalle(Salle salle) {
-        this.salle = salle;
+    public void setId_salle(String id_salle) {
+        this.id_salle = id_salle;
     }
 
     public String getMatiere() {
@@ -44,21 +50,25 @@ public class Cours {
         this.matiere = matiere;
     }
 
-    public Horaire getHoraire() {
-        return horaire;
+    public String getDate() {
+        return date;
     }
 
-    public void setHoraire(Horaire horaire) {
-        this.horaire = horaire;
+    public void setDate(String date) {
+        this.date = date;
     }
 
-    public Enseignant getEnseignant() {
-        return enseignant;
+    public String getId_enseignant() {
+        return id_enseignant;
     }
 
-    public void setEnseignant(Enseignant enseignant) {
-        this.enseignant = enseignant;
+    public void setEnseignant(String id_enseignant) {
+        this.id_enseignant = id_enseignant;
     }
+
+    public String getClasse() { return classe;}
+
+    public void setClasse(String classe) { this.classe = classe;}
 
     public ArrayList<Etudiant> getEtudiants() {
         return etudiants;
@@ -68,12 +78,12 @@ public class Cours {
         this.etudiants = etudiants;
     }
 
-    public boolean isAnnule() {
-        return estAnnule;
+    public boolean isAnnulation() {
+        return annulation;
     }
 
-    public void setAnnule(boolean estAnnule) {
-        this.estAnnule = estAnnule;
+    public void setAnnulation(boolean annulation) {
+        this.annulation = annulation;
     }
 
 }

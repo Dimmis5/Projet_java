@@ -7,10 +7,10 @@ public class Etudiant extends Utilisateur {
     protected String nom;
     protected String prenom;
     protected String mail;
+    protected String classe;
     protected ArrayList<Cours> cours;
-    protected Salle salle;
 
-    public Etudiant(String id, String nom, String prenom, String mail, String mdp) {
+    public Etudiant(String id, String nom, String prenom, String mail, String mdp, String classe) {
         super(id, nom, prenom, mail, mdp);
         this.cours = new ArrayList<>();
         this.id = id;
@@ -18,6 +18,7 @@ public class Etudiant extends Utilisateur {
         this.prenom = prenom;
         this.mail = mail;
         this.mdp = mdp;
+        this.classe = classe;
     }
 
     public String getId() {
@@ -60,26 +61,22 @@ public class Etudiant extends Utilisateur {
         this.mail = mail;
     }
 
-    // Méthode consulter
-    public EmploiDuTemps consulter(EmploiDuTemps emploi) {
-        return emploi.getEleve(this.id);
-    }
+    public String getClasse() { return classe; }
+
+    public void setClasse(String classe) { this.classe = classe; }
 
     // Méthode getSalle
-    public Salle getSalle(String id_cours) {
+    public String getSalle(String id_cours) {
         for (Cours cour : cours) {
-            // Vérification si l'id du cours correspond
             if (cour.getId_cours().equals(id_cours)) {
-                return cour.getSalle();
+                return cour.getId_salle();
             }
         }
-        // Retourne null si le cours avec cet id n'est pas trouvé
         return null;
     }
 
-    // Méthode notification
-    public String notification(String date, String message) {
-        return "Date : " + date + "\n" + "Message : " + message;
+    public String notification(String id_cours, String notification) {
+        return "Id cours : " + id_cours + "\n" + "Notification : " + notification;
     }
 
     public void ajouterCours(Cours cours) {

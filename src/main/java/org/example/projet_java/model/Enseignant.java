@@ -78,12 +78,6 @@ public class Enseignant extends Utilisateur {
         this.cours = cours;
     }
 
-    // Methode consulter
-
-    public EmploiDuTemps consulter(EmploiDuTemps emploi) {
-        return emploi.getEnseignant(this.id);
-    }
-
     // Methode set anomalie
     public void setAnomalie(String type, String description) {
         Anomalie anomalie = new Anomalie(type, description);
