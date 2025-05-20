@@ -52,7 +52,7 @@
           <mxGeometry x="80" y="690" width="30" height="60" as="geometry" />
         </mxCell>
         <mxCell id="THR2WXkA3Ao64jfVhWQ7-6" value="" style="whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="1">
-          <mxGeometry x="220" y="130" width="300" height="770" as="geometry" />
+          <mxGeometry x="220" y="40" width="300" height="860" as="geometry" />
         </mxCell>
         <mxCell id="THR2WXkA3Ao64jfVhWQ7-9" value="Consulter Edt" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="290" y="130" width="120" height="70" as="geometry" />
@@ -105,6 +105,9 @@
               <mxPoint x="270" y="345" />
             </Array>
           </mxGeometry>
+        </mxCell>
+        <mxCell id="THR2WXkA3Ao64jfVhWQ7-35" value="Application gestion emploi du temps&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="270" y="60" width="200" height="40" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
