@@ -26,6 +26,22 @@ public class Cours {
         this.etudiants = new ArrayList<>();
     }
 
+    public String getHeure_debut(){
+        return heure_debut;
+    }
+
+    public void setHeure_debut(String heureDebut){
+        this.heure_debut = heureDebut;
+    }
+
+    public String getHeure_fin(){
+        return heure_fin;
+    }
+
+    public void setHeure_fin(String heureFin){
+        this.heure_fin = heureFin;
+    }
+
     public String getId_cours() {
         return id_cours;
     }

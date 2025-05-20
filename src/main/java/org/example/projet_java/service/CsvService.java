@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CsvService {
-    private static final String CSV_ADMINISTRATEUR = "src/main/resources/org/example/Projet_java/CSV_Java/Administrateur.csv";
-    private static final String CSV_ANOMALIE = "src/main/resources/org/example/Projet_java/CSV_Java/Anomalie.csv";
-    private static final String CSV_COURS = "src/main/resources/org/example/Projet_java/CSV_Java/Cours.csv";
-    private static final String CSV_EDT = "src/main/resources/org/example/Projet_java/CSV_Java/edt.csv";
-    private static final String CSV_ENSEIGNANT = "src/main/resources/org/example/Projet_java/CSV_Java/Enseignant.csv";
-    private static final String CSV_ETUDIANT = "C:/Users/Oriane/IdeaProjects/Projet_java/CSV_Java/Etudiant.csv";
-    private static final String CSV_NOTIFICATION = "src/main/resources/org/example/Projet_java/CSV_Java/Notification.csv";
+    private static final String CSV_ADMINISTRATEUR = "CSV_Java/Administrateur.csv";
+    private static final String CSV_ANOMALIE = "CSV_Java/Anomalie.csv";
+    private static final String CSV_COURS = "CSV_Java/Cours.csv";
+    private static final String CSV_EDT = "CSV_Java/edt.csv";
+    private static final String CSV_ENSEIGNANT = "CSV_Java/Enseignant.csv";
+    private static final String CSV_ETUDIANT = "CSV_Java/Etudiant.csv";
+    private static final String CSV_NOTIFICATION = "CSV_Java/Notification.csv";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("H'h'mm");
 
