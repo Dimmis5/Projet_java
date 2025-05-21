@@ -4,30 +4,25 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.example.projet_java.model.Cours;
-import org.example.projet_java.model.Enseignant;
-import org.example.projet_java.service.AuthentificationService;
 import org.example.projet_java.service.CsvService;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-
+import java.time.format.DateTimeParseException;
+import java.util.List;
 
 public class EdtEnseignantController {
-    private static final DateTimeFormatter FORMAT_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    private static final DateTimeFormatter FORMAT_HEURE = DateTimeFormatter.ofPattern("H:mm");
-
-    private static final String CSV_EDT = "CSV_Java/edt.csv";
-    private static final String CSV_COURS = "CSV_Java/Cours.csv";
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("H'h'mm");
+    private static final DateTimeFormatter HEADER_DATE_FORMAT = DateTimeFormatter.ofPattern("E dd/MM");
 
     private final LocalTime heureDebut = LocalTime.of(8, 0);
     private final LocalTime heureFin = LocalTime.of(18, 0);
     private final int intervalMinutes = 60;
 
-    private LocalDate dateDebutSemaineCourante;
-
-    private CsvService csvService;
-    private AuthentificationService authService;
+    private LocalDate dateDebutSemaine;
+    private final CsvService csvService = CsvService.getInstance();
+    private String idEnseignant;
 
     @FXML private GridPane grilleCalendrier;
     @FXML private Label etiquetteMoisAnnee;
@@ -35,215 +30,226 @@ public class EdtEnseignantController {
     @FXML private Button boutonSemaineSuivante;
     @FXML private Button boutonSemaineCourante;
 
-    private String idEtudiantConnecte;
-    private List<Cours> coursDeLEtudiant = new ArrayList<>();
-
-    public EdtEnseignantController() {
-        this.csvService = CsvService.getInstance();
-        this.authService = AuthentificationService.getInstance();
-    }
-
     @FXML
     public void initialize() {
-        configurerControlesCalendrier();
-        dateDebutSemaineCourante = LocalDate.now().with(DayOfWeek.MONDAY);
-    }
+        System.out.println("[DEBUG] Initialisation du contrôleur EDT Enseignant");
+        dateDebutSemaine = LocalDate.now().with(DayOfWeek.MONDAY);
+        configurerBoutons();
 
-    public void setIdEtudiantConnecte(String idEtudiant) {
-        System.out.println("ID Etudiant reçu: " + idEtudiant); // Debug
-        this.idEtudiantConnecte = idEtudiant;
-        this.coursDeLEtudiant = csvService.CoursEtudiant(idEtudiantConnecte);
-
-        // Debug supplémentaire
-        System.out.println("Fichier EDT: " + CSV_EDT);
-        System.out.println("Fichier Cours: " + CSV_COURS);
-        System.out.println("Cours trouvés: " + coursDeLEtudiant.size());
-
-        afficherSemaine(dateDebutSemaineCourante);
-    }
-
-    private void afficherSemaine(LocalDate debutSemaine) {
-        mettreAJourEtiquetteMoisAnnee(debutSemaine);
-        grilleCalendrier.getChildren().clear();
-
-        configurerDispositionCalendrier();
-        ajouterEnTetesJours(debutSemaine);
-        ajouterEnTetesHeures();
-
-        int nombreCreneaux = (int) Duration.between(heureDebut, heureFin).toMinutes() / intervalMinutes;
-        for (int ligne = 1; ligne <= nombreCreneaux; ligne++) {
-            for (int col = 1; col <= 7; col++) {
-                grilleCalendrier.add(new Pane(), col, ligne);
-            }
+        // Solution temporaire pour test - À remplacer par l'appel depuis votre code principal
+        if (this.idEnseignant == null) {
+            this.idEnseignant = "20000"; // À supprimer après test
+            System.out.println("[DEBUG] ID enseignant défini en dur pour test: " + this.idEnseignant);
         }
 
-        afficherCoursPourSemaine(debutSemaine);
+        afficherSemaine(dateDebutSemaine);
     }
 
-    private void afficherCoursPourSemaine(LocalDate debutSemaine) {
-        LocalDate finSemaine = debutSemaine.plusDays(6);
-        List<Cours> coursSemaine = new ArrayList<>();
-
-        for (Cours c : coursDeLEtudiant) {
-            try {
-                LocalDate dateCours = LocalDate.parse(c.getDate(), FORMAT_DATE);
-                if (!dateCours.isBefore(debutSemaine) && !dateCours.isAfter(finSemaine)) {
-                    coursSemaine.add(c);
-                }
-            } catch (Exception e) {
-                System.err.println("Erreur parsing date pour cours: " + c);
-                e.printStackTrace();
-            }
+    public void setIdEnseignant(String id) {
+        if (id == null || id.isEmpty()) {
+            System.err.println("[ERREUR] ID enseignant non valide");
+            return;
         }
 
-        System.out.println("Cours cette semaine: " + coursSemaine.size()); // Debug
-        afficherCoursDansGrille(coursSemaine);
-    }
+        this.idEnseignant = id.trim();
+        System.out.println("[DEBUG] ID enseignant défini: " + this.idEnseignant);
 
-// Modification pour la méthode afficherCoursDansGrille dans EdtEtudiantController.java
-
-    private void afficherCoursDansGrille(List<Cours> coursSemaine) {
-        for (Cours cours : coursSemaine) {
-            try {
-                LocalDate dateCours = LocalDate.parse(cours.getDate(), FORMAT_DATE);
-                LocalTime heureDebutCours = LocalTime.parse(
-                        cours.getHeure_debut().replace("h", ":"), FORMAT_HEURE);
-                LocalTime heureFinCours = LocalTime.parse(
-                        cours.getHeure_fin().replace("h", ":"), FORMAT_HEURE);
-
-                int colonne = dateCours.getDayOfWeek().getValue();
-                int ligneDebut = (int) Duration.between(heureDebut, heureDebutCours).toMinutes() / intervalMinutes + 2 ;
-                int hauteur = (int) Duration.between(heureDebutCours, heureFinCours).toMinutes() / intervalMinutes;
-
-                // Debug - Afficher l'ID de l'enseignant tel qu'il est dans le cours
-                System.out.println("ID enseignant dans le cours: '" + cours.getId_enseignant() + "'");
-
-                // Récupérer l'enseignant avec trim sur l'ID pour éliminer les espaces
-                String enseignantId = cours.getId_enseignant().trim();
-                System.out.println("ID enseignant après trim: '" + enseignantId + "'");
-
-                Enseignant enseignant = csvService.getEnseignantById(enseignantId);
-
-                // Debug - Vérifier si l'enseignant a été trouvé
-                if (enseignant != null) {
-                    System.out.println("Enseignant trouvé: " + enseignant.getNom() + " " + enseignant.getPrenom());
-                } else {
-                    System.out.println("ATTENTION: Enseignant non trouvé pour l'ID: '" + enseignantId + "'");
-                }
-
-                String nomEnseignant = (enseignant != null)
-                        ? enseignant.getNom() + " " + enseignant.getPrenom()
-                        : "Enseignant inconnu (ID: " + enseignantId + ")";
-
-                // Créer un VBox pour mieux organiser le contenu
-                VBox contenuCours = new VBox(5); // 5 pixels de spacing entre les éléments
-
-                Label matiere = new Label(cours.getMatiere());
-                matiere.setStyle("-fx-font-weight: bold; -fx-font-size: 12px;");
-
-                Label salle = new Label("Salle: " + cours.getId_salle());
-                Label horaire = new Label(cours.getHeure_debut() + "-" + cours.getHeure_fin());
-                Label prof = new Label("Professeur: " + nomEnseignant);
-
-                contenuCours.getChildren().addAll(matiere, salle, horaire, prof);
-                contenuCours.setAlignment(javafx.geometry.Pos.CENTER);
-
-                // Créer un Pane pour contenir le VBox
-                StackPane celluleCours = new StackPane(contenuCours);
-                celluleCours.setStyle(
-                        "-fx-background-color: lightblue; " +
-                                "-fx-border-color: black; " +
-                                "-fx-border-width: 1px; " +
-                                "-fx-padding: 5px;"
-                );
-
-                // Définir les contraintes pour positionner correctement la cellule
-                GridPane.setRowIndex(celluleCours, ligneDebut);
-                GridPane.setColumnIndex(celluleCours, colonne);
-                GridPane.setRowSpan(celluleCours, hauteur);
-
-                // S'assurer que le contenu s'adapte à l'espace disponible
-                celluleCours.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-
-                // Ajouter la cellule à la grille
-                grilleCalendrier.getChildren().add(celluleCours);
-
-            } catch (Exception e) {
-                System.err.println("Erreur affichage cours: " + cours);
-                e.printStackTrace();
-            }
+        if (grilleCalendrier != null) {
+            afficherSemaine(dateDebutSemaine);
         }
     }
 
-    private void configurerControlesCalendrier() {
-        boutonSemainePrecedente.setOnAction(e -> naviguerSemaine(-1));
-        boutonSemaineSuivante.setOnAction(e -> naviguerSemaine(1));
+    private void configurerBoutons() {
+        boutonSemainePrecedente.setOnAction(e -> {
+            System.out.println("[DEBUG] Clic sur Semaine précédente");
+            changerSemaine(-1);
+        });
+
+        boutonSemaineSuivante.setOnAction(e -> {
+            System.out.println("[DEBUG] Clic sur Semaine suivante");
+            changerSemaine(1);
+        });
+
         boutonSemaineCourante.setOnAction(e -> {
-            dateDebutSemaineCourante = LocalDate.now().with(DayOfWeek.MONDAY);
-            afficherSemaine(dateDebutSemaineCourante);
+            System.out.println("[DEBUG] Clic sur Semaine actuelle");
+            dateDebutSemaine = LocalDate.now().with(DayOfWeek.MONDAY);
+            afficherSemaine(dateDebutSemaine);
         });
     }
 
-    private void naviguerSemaine(int decalage) {
-        dateDebutSemaineCourante = dateDebutSemaineCourante.plusWeeks(decalage);
-        afficherSemaine(dateDebutSemaineCourante);
+    private void changerSemaine(int delta) {
+        dateDebutSemaine = dateDebutSemaine.plusWeeks(delta);
+        afficherSemaine(dateDebutSemaine);
     }
 
-    private void mettreAJourEtiquetteMoisAnnee(LocalDate debutSemaine) {
+    private void afficherSemaine(LocalDate debutSemaine) {
+        System.out.println("[DEBUG] Affichage semaine du " + debutSemaine.format(DATE_FORMAT));
+
+        if (idEnseignant == null || idEnseignant.isEmpty()) {
+            System.err.println("[ERREUR] Aucun ID enseignant défini !");
+            showAlert("Erreur", "Aucun enseignant sélectionné", "Veuillez vous connecter");
+            return;
+        }
+
+        grilleCalendrier.getChildren().clear();
+        configurerGrille();
+        afficherEnTetes(debutSemaine);
+
+        List<Cours> cours = csvService.CoursEnseignant(idEnseignant);
+        System.out.println("[DEBUG] Nombre de cours trouvés: " + cours.size());
+
+        if (cours.isEmpty()) {
+            System.out.println("[DEBUG] Aucun cours trouvé pour cet enseignant");
+        }
+
         LocalDate finSemaine = debutSemaine.plusDays(6);
-        etiquetteMoisAnnee.setText("Semaine du " + debutSemaine.format(FORMAT_DATE) +
-                " au " + finSemaine.format(FORMAT_DATE));
+        cours.stream()
+                .filter(c -> estDansSemaine(c, debutSemaine, finSemaine))
+                .forEach(this::afficherCours);
+
+        etiquetteMoisAnnee.setText("Semaine du " + debutSemaine.format(DATE_FORMAT) +
+                " au " + finSemaine.format(DATE_FORMAT));
     }
 
-    private void configurerDispositionCalendrier() {
+    private boolean estDansSemaine(Cours cours, LocalDate debut, LocalDate fin) {
+        try {
+            // Debug: Afficher la date originale
+            System.out.println("[DEBUG] Date du cours à parser: " + cours.getDate());
+
+            LocalDate dateCours = LocalDate.parse(cours.getDate(), DATE_FORMAT);
+            boolean dansSemaine = !dateCours.isBefore(debut) && !dateCours.isAfter(fin);
+
+            System.out.println("[DEBUG] Cours " + cours.getMatiere() + " le " + dateCours +
+                    " - Dans semaine: " + dansSemaine);
+            return dansSemaine;
+        } catch (DateTimeParseException e) {
+            System.err.println("[ERREUR] Format de date invalide pour le cours: " + cours.getMatiere());
+            System.err.println("Date problématique: '" + cours.getDate() + "'");
+            System.err.println("Format attendu: dd/MM/yyyy");
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private void configurerGrille() {
         grilleCalendrier.getColumnConstraints().clear();
         grilleCalendrier.getRowConstraints().clear();
 
-        // Colonne pour les heures
-        ColumnConstraints colHeures = new ColumnConstraints(80);
-        grilleCalendrier.getColumnConstraints().add(colHeures);
+        // Colonne heures
+        ColumnConstraints colHeure = new ColumnConstraints(80);
+        grilleCalendrier.getColumnConstraints().add(colHeure);
 
-        // Colonnes pour les jours
+        // Colonnes jours
         for (int i = 0; i < 7; i++) {
             ColumnConstraints col = new ColumnConstraints();
             col.setHgrow(Priority.ALWAYS);
-            col.setFillWidth(true);
             grilleCalendrier.getColumnConstraints().add(col);
         }
 
-        // Ligne d'en-tête
+        // Ligne en-tête
         RowConstraints rowHeader = new RowConstraints(30);
         grilleCalendrier.getRowConstraints().add(rowHeader);
 
-        // Lignes pour les créneaux horaires
-        int nombreCreneaux = (int) Duration.between(heureDebut, heureFin).toMinutes() / intervalMinutes;
-        for (int i = 0; i < nombreCreneaux; i++) {
+        // Lignes créneaux
+        int nbCreneaux = (int) Duration.between(heureDebut, heureFin).toMinutes() / intervalMinutes;
+        for (int i = 0; i < nbCreneaux; i++) {
             RowConstraints row = new RowConstraints(60);
             row.setVgrow(Priority.ALWAYS);
             grilleCalendrier.getRowConstraints().add(row);
         }
     }
 
-    private void ajouterEnTetesJours(LocalDate debutSemaine) {
-        DateTimeFormatter formatterJour = DateTimeFormatter.ofPattern("E dd/MM");
+    private void afficherEnTetes(LocalDate debutSemaine) {
+        // En-têtes jours
         for (int i = 0; i < 7; i++) {
             LocalDate date = debutSemaine.plusDays(i);
-            Label etiquetteJour = new Label(date.format(formatterJour));
-            etiquetteJour.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-            etiquetteJour.setStyle("-fx-alignment: center;");
-            grilleCalendrier.add(etiquetteJour, i + 1, 0);
+            Label label = new Label(date.format(HEADER_DATE_FORMAT));
+            label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            label.setStyle("-fx-alignment: center; -fx-font-weight: bold; -fx-background-color: #f0f0f0;");
+            grilleCalendrier.add(label, i + 1, 0);
+        }
+
+        // En-têtes heures
+        LocalTime heure = heureDebut;
+        int row = 1;
+        while (!heure.isAfter(heureFin.minusMinutes(intervalMinutes))) {
+            Label label = new Label(heure.format(TIME_FORMAT));
+            label.setStyle("-fx-alignment: center-right; -fx-font-size: 11; -fx-background-color: #f0f0f0;");
+            grilleCalendrier.add(label, 0, row);
+            heure = heure.plusMinutes(intervalMinutes);
+            row++;
         }
     }
 
-    private void ajouterEnTetesHeures() {
-        LocalTime heure = heureDebut;
-        int ligne = 1;
-        while (!heure.isAfter(heureFin.minusMinutes(intervalMinutes))) {
-            Label etiquetteHeure = new Label(heure.format(FORMAT_HEURE));
-            etiquetteHeure.setStyle("-fx-alignment: center-right;");
-            grilleCalendrier.add(etiquetteHeure, 0, ligne);
-            heure = heure.plusMinutes(intervalMinutes);
-            ligne++;
+    private void afficherCours(Cours cours) {
+        try {
+            System.out.println("\n[DEBUG] Tentative d'affichage du cours: " + cours.getMatiere());
+
+            // Nettoyage plus précis des heures
+            String heureDebutNettoyee = cours.getHeure_debut()
+                    .replaceAll("h0+", "h")  // Remplace h000... par h
+                    .replaceAll("h$", "h00") // Si finit par h seul
+                    .replaceAll("h(\\d)$", "h0$1"); // Si un seul chiffre après h
+
+            String heureFinNettoyee = cours.getHeure_fin()
+                    .replaceAll("h0+", "h")
+                    .replaceAll("h$", "h00")
+                    .replaceAll("h(\\d)$", "h0$1");
+
+            // Validation finale du format
+            if (!heureDebutNettoyee.matches("\\d+h\\d{2}") || !heureFinNettoyee.matches("\\d+h\\d{2}")) {
+                System.err.println("[ERREUR] Format d'heure invalide après nettoyage");
+                System.err.println("Début: " + heureDebutNettoyee + ", Fin: " + heureFinNettoyee);
+                return;
+            }
+
+            System.out.println("[DEBUG] Heure début nettoyée: " + heureDebutNettoyee);
+            System.out.println("[DEBUG] Heure fin nettoyée: " + heureFinNettoyee);
+
+            LocalDate date = LocalDate.parse(cours.getDate(), DATE_FORMAT);
+            LocalTime debut = LocalTime.parse(heureDebutNettoyee, TIME_FORMAT);
+            LocalTime fin = LocalTime.parse(heureFinNettoyee, TIME_FORMAT);
+
+            int col = date.getDayOfWeek().getValue();
+            int row = ((int) Duration.between(heureDebut, debut).toMinutes() / intervalMinutes) + 1;
+            int span = ((int) Duration.between(debut, fin).toMinutes() / intervalMinutes);
+
+            System.out.printf("[DEBUG] Positionnement - Colonne: %d, Ligne: %d, Span: %d%n", col, row, span);
+
+            VBox box = new VBox(3);
+            box.setStyle("-fx-background-color: #e3f2fd; -fx-border-color: #bbdefb; -fx-border-radius: 3; -fx-padding: 5;");
+            box.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+            Label lblMatiere = new Label(cours.getMatiere());
+            lblMatiere.setStyle("-fx-font-weight: bold; -fx-font-size: 12;");
+
+            Label lblSalle = new Label("Salle: " + cours.getId_salle());
+            lblSalle.setStyle("-fx-font-size: 11;");
+
+            Label lblClasse = new Label("Classe: " + cours.getClasse());
+            lblClasse.setStyle("-fx-font-size: 11;");
+
+            Label lblHoraire = new Label(debut.format(TIME_FORMAT) + "-" + fin.format(TIME_FORMAT));
+            lblHoraire.setStyle("-fx-font-size: 10; -fx-text-fill: #555;");
+
+            box.getChildren().addAll(lblMatiere, lblSalle, lblClasse, lblHoraire);
+            GridPane.setConstraints(box, col, row, 1, span);
+            grilleCalendrier.getChildren().add(box);
+
+        } catch (Exception e) {
+            System.err.println("[ERREUR CRITIQUE] Impossible d'afficher le cours: " + cours.getMatiere());
+            System.err.println("Date: " + cours.getDate());
+            System.err.println("Heure début: " + cours.getHeure_debut());
+            System.err.println("Heure fin: " + cours.getHeure_fin());
+            e.printStackTrace();
         }
+    }
+
+    private void showAlert(String title, String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }
