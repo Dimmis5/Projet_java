@@ -325,4 +325,38 @@ public class CsvService {
             bw.newLine();
         }
     }
+
+    /**
+     * Récupère la liste des IDs des enseignants à partir du fichier CSV.
+     *
+     * @return Une liste contenant tous les IDs des enseignants disponibles
+     */
+    public List<String> getEnseignantIds() {
+        List<String> ids = new ArrayList<>();
+        String csvFile = "CSV_Java/Enseignant.csv"; // Ajustez le chemin selon votre structure
+
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+            String line;
+            boolean headerSkipped = false;
+
+            while ((line = br.readLine()) != null) {
+                if (!headerSkipped) {
+                    headerSkipped = true;
+                    continue;
+                }
+
+                String[] data = line.split(",");
+                if (data.length >= 1 && data[0] != null && !data[0].trim().isEmpty()) {
+                    ids.add(data[0].trim());
+                }
+            }
+
+            System.out.println("[INFO] " + ids.size() + " IDs d'enseignants trouvés dans le CSV");
+        } catch (IOException e) {
+            System.err.println("[ERREUR] Impossible de lire le fichier CSV des enseignants: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return ids;
+    }
 }

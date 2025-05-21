@@ -37,13 +37,29 @@ public class EdtEnseignantController {
         dateDebutSemaine = LocalDate.now().with(DayOfWeek.MONDAY);
         configurerBoutons();
 
-        // Solution temporaire pour test - À remplacer par l'appel depuis votre code principal
-        if (this.idEnseignant == null) {
-            this.idEnseignant = "20000";
-            System.out.println("[DEBUG] ID enseignant défini en dur pour test: " + this.idEnseignant);
-        }
+        // Récupérer automatiquement le premier ID d'enseignant disponible dans le CSV
+        initEnseignantDepuisCsv();
 
         afficherSemaine(dateDebutSemaine);
+    }
+
+    private void initEnseignantDepuisCsv() {
+        try {
+            // On part du principe que le CsvService peut nous fournir une liste d'IDs d'enseignants
+            List<String> idsEnseignants = csvService.getEnseignantIds();
+
+            if (idsEnseignants != null && !idsEnseignants.isEmpty()) {
+                this.idEnseignant = idsEnseignants.get(0); // Prendre le premier enseignant disponible
+                System.out.println("[DEBUG] ID enseignant récupéré depuis CSV: " + this.idEnseignant);
+            } else {
+                System.err.println("[ERREUR] Aucun enseignant trouvé dans le CSV");
+                showAlert("Erreur", "Aucun enseignant disponible",
+                        "Aucun enseignant n'a été trouvé dans les données");
+            }
+        } catch (Exception e) {
+            System.err.println("[ERREUR] Impossible de récupérer la liste des enseignants: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void setIdEnseignant(String id) {
