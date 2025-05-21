@@ -62,7 +62,7 @@
                                 style="-fx-background-color: #4a87e8; -fx-text-fill: white;"/>
                     </HBox>
 
-                    <VBox fx:id="enseignantInfoContainer" spacing="10">
+                    <VBox fx:id="enseignantInfoContainers" spacing="10">
                         <padding>
                             <Insets top="20" right="0" bottom="0" left="0"/>
                         </padding>

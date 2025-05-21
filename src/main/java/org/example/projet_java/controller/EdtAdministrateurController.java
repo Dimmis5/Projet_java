@@ -184,7 +184,7 @@ public class EdtAdministrateurController implements Initializable {
         Label titreLabel = new Label("Emploi du temps de " + etudiant.getPrenom() + " " + etudiant.getNom());
         titreLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
-        Button ajoutBtn = new Button("Ajouter un cours");
+        Button ajoutBtn = new Button("Ajouter un cours hhh");
         ajoutBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
         ajoutBtn.setOnAction(e -> ouvrirPopupAjoutCours(etudiant));
 
