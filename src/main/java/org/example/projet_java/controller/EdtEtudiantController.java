@@ -143,7 +143,7 @@ public class EdtEtudiantController {
 
                 Label salle = new Label("Salle: " + cours.getId_salle());
                 Label horaire = new Label(cours.getHeure_debut() + "-" + cours.getHeure_fin());
-                Label prof = new Label("Professeur: " + nomEnseignant);
+                Label prof = new Label("Enseignant: " + nomEnseignant);
 
                 contenuCours.getChildren().addAll(matiere, salle, horaire, prof);
                 contenuCours.setAlignment(javafx.geometry.Pos.CENTER);
