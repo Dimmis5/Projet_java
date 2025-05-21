@@ -170,13 +170,31 @@ public class CsvService {
             br.readLine(); // ignore header
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
-                if (values.length >= 8 && values[6].equals(id_enseignant)) {
+                if (values.length >= 8 && values[6].trim().equals(id_enseignant.trim())) {
+                    // Debug: Afficher les valeurs lues
+                    System.out.println("[CSV] Ligne brute: " + line);
+
+                    // Nettoyage des données
+                    String date = values[3].trim();
+                    String heureDebut = values[4].trim().replace("h", "h0").replace(" ", "");
+                    String heureFin = values[5].trim().replace("h", "h0").replace(" ", "");
+
+                    // Validation du format
+                    if (!date.matches("\\d{2}/\\d{2}/\\d{4}")) {
+                        System.err.println("[ERREUR] Format de date invalide: " + date);
+                        continue;
+                    }
+
                     Cours c = new Cours(
-                            values[0], values[1], values[2],
-                            LocalDate.parse(values[3], DATE_FORMATTER).toString(),
-                            LocalTime.parse(values[4], TIME_FORMATTER).toString(),
-                            LocalTime.parse(values[5], TIME_FORMATTER).toString(),
-                            values[6], values[7], false);
+                            values[0].trim(),
+                            values[1].trim(),
+                            values[2].trim(),
+                            date,
+                            heureDebut,
+                            heureFin,
+                            values[6].trim(),
+                            values[7].trim(),
+                            false);
                     cours.add(c);
                 }
             }
@@ -202,4 +220,9 @@ public class CsvService {
             return false;
         }
     }
+
+    // POUR ENSEIGNANT
+
+
+
 }
