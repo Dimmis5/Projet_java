@@ -359,4 +359,87 @@ public class CsvService {
 
         return ids;
     }
+
+    private List<Cours> lireTousLesCours() {
+        List<Cours> cours = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(CSV_COURS))) {
+            String ligne;
+            boolean premiereLigne = true;
+            while ((ligne = br.readLine()) != null) {
+                if (premiereLigne) {
+                    premiereLigne = false;
+                    continue; // Saute l'en-tête
+                }
+                String[] valeurs = ligne.split(",");
+                if (valeurs.length >= 8) {
+                    Cours c = new Cours(
+                            valeurs[0], // id_cours
+                            valeurs[1], // salle
+                            valeurs[2], // matière
+                            valeurs[3], // date
+                            valeurs[4], // heure_debut
+                            valeurs[5], // heure_fin
+                            valeurs[6], // id_enseignant
+                            valeurs[7], // classe
+                            Boolean.parseBoolean(valeurs[8]) // estAnnule
+                    );
+                    cours.add(c);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return cours;
+    }
+
+    private boolean reecrireTousLesCours(List<Cours> cours) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(CSV_COURS))) {
+            // Écrire l'en-tête
+            bw.write("id_cours,id_salle,matiere,date,heure_debut,heure_fin,id_enseignant,classe,estAnnule");
+            bw.newLine();
+
+            // Écrire chaque cours
+            for (Cours c : cours) {
+                String ligne = String.join(",",
+                        c.getId_cours(),
+                        c.getId_salle(),
+                        c.getMatiere(),
+                        c.getDate(),
+                        c.getHeure_debut(),
+                        c.getHeure_fin(),
+                        c.getId_enseignant(),
+                        c.getClasse()
+                );
+                bw.write(ligne);
+                bw.newLine();
+            }
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean modifierCours(Cours coursModifie) {
+        List<Cours> tousLesCours = lireTousLesCours(); // Méthode existante qui lit tous les cours
+
+        // Trouver l'index du cours à modifier
+        int index = -1;
+        for (int i = 0; i < tousLesCours.size(); i++) {
+            if (tousLesCours.get(i).getId_cours().equals(coursModifie.getId_cours())) {
+                index = i;
+                break;
+            }
+        }
+
+        if (index == -1) {
+            return false; // Cours non trouvé
+        }
+
+        // Remplacer l'ancien cours par le cours modifié
+        tousLesCours.set(index, coursModifie);
+
+        // Réécrire tous les cours dans le fichier
+        return reecrireTousLesCours(tousLesCours); // Méthode qui écrit la liste complète
+    }
 }
