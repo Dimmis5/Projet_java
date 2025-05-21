@@ -258,4 +258,86 @@ public class CsvService {
 
         return true;
     }
+
+    /**
+     * Génère un nouvel ID unique pour un cours
+     */
+    public String genererNouvelIdCours() {
+        return "CRS" + System.currentTimeMillis();
+    }
+
+    /**
+     * Ajoute un nouveau cours dans le fichier CSV
+     */
+    public boolean ajouterCours(Cours nouveauCours) {
+        // Formatage de la ligne pour CSV_COURS
+        String ligneCours = String.join(",",
+                nouveauCours.getId_cours(),
+                nouveauCours.getMatiere(),
+                nouveauCours.getDate(),
+                nouveauCours.getHeure_debut(),
+                nouveauCours.getHeure_fin(),
+                nouveauCours.getId_salle(),
+                nouveauCours.getId_enseignant(),
+                nouveauCours.getClasse()
+        );
+
+        // Formatage de la ligne pour CSV_EDT (à faire pour chaque étudiant de la classe)
+        List<String> lignesEdt = new ArrayList<>();
+        for (Etudiant etudiant : getEtudiantsParClasse(nouveauCours.getClasse())) {
+            lignesEdt.add(etudiant.getId() + "," + nouveauCours.getId_cours());
+        }
+
+        // Écriture dans les fichiers
+        try {
+            // Écrire dans CSV_COURS
+            ecrireLigne(CSV_COURS, ligneCours,
+                    "id_cours,id_salle,matiere,date,heure_debut,heure_fin,id_enseignant,classe");
+
+            // Écrire dans CSV_EDT
+            for (String ligne : lignesEdt) {
+                ecrireLigne(CSV_EDT, ligne, "id_etudiant,id_cours");
+            }
+
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Récupère tous les étudiants d'une classe donnée
+     */
+    private List<Etudiant> getEtudiantsParClasse(String classe) {
+        List<Etudiant> result = new ArrayList<>();
+        for (Etudiant etudiant : Etudiants()) {
+            if (etudiant.getClasse().equals(classe)) {
+                result.add(etudiant);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Méthode utilitaire pour écrire une ligne dans un fichier CSV
+     */
+    private void ecrireLigne(String fichier, String ligne, String entete) throws IOException {
+        File file = new File(fichier);
+        boolean fichierExiste = file.exists() && file.length() > 0;
+
+        try (FileWriter fw = new FileWriter(file, true);
+             BufferedWriter bw = new BufferedWriter(fw)) {
+
+            // Écrire l'en-tête si le fichier est vide
+            if (!fichierExiste) {
+                bw.write(entete);
+                bw.newLine();
+            }
+
+            // Écrire la ligne
+            bw.write(ligne);
+            bw.newLine();
+        }
+    }
 }

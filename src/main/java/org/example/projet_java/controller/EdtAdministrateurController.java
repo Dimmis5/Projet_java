@@ -8,16 +8,21 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.stage.Modality;
 import javafx.stage.Popup;
+import javafx.scene.Scene;
 
+import javafx.stage.Stage;
 import org.example.projet_java.model.*;
 import org.example.projet_java.service.CsvService;
+import org.w3c.dom.Text;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class EdtAdministrateurController implements Initializable {
 
@@ -179,10 +184,14 @@ public class EdtAdministrateurController implements Initializable {
         Label titreLabel = new Label("Emploi du temps de " + etudiant.getPrenom() + " " + etudiant.getNom());
         titreLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
+        Button ajoutBtn = new Button("Ajouter un cours");
+        ajoutBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+        ajoutBtn.setOnAction(e -> ouvrirPopupAjoutCours(etudiant));
+
         if (coursEtudiant.isEmpty()) {
             Label emptyLabel = new Label("Aucun cours trouvé pour cet étudiant.");
             emptyLabel.setStyle("-fx-font-style: italic;");
-            container.getChildren().addAll(titreLabel, emptyLabel);
+            container.getChildren().addAll(titreLabel, emptyLabel, ajoutBtn);
         } else {
             VBox coursContainer = new VBox(5);
             coursContainer.setPadding(new Insets(10, 0, 0, 0));
@@ -466,5 +475,121 @@ public class EdtAdministrateurController implements Initializable {
         popupContent.getChildren().add(titleLabel);
         popup.getContent().add(popupContent);
         return popup;
+    }
+
+    private void ouvrirPopupAjoutCours(Etudiant etudiant) {
+        // Création de la fenêtre popup
+        Stage popup = new Stage();
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.setTitle("Ajouter un nouveau cours");
+
+        // Création du formulaire
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(20));
+        grid.setVgap(10);
+        grid.setHgap(10);
+
+        // Champs du formulaire
+        TextField salleField = new TextField();
+        TextField matiereField = new TextField();
+        TextField dateField = new TextField();
+        TextField heureDebutField = new TextField();
+        TextField heureFinField = new TextField();
+        TextField classeField  = new TextField();
+
+        // ComboBox pour les enseignants
+        ComboBox<String> enseignantCombo = new ComboBox<>();
+        enseignantCombo.setItems(FXCollections.observableArrayList(
+                csvService.Enseignants().stream()
+                        .map(e -> e.getId() + " - " + e.getNom() + " " + e.getPrenom())
+                        .collect(Collectors.toList())
+        ));
+
+        // Ajout des champs au formulaire
+        grid.add(new Label("Matière:"), 0, 0);
+        grid.add(matiereField, 1, 0);
+        grid.add(new Label("Date:"), 0, 2);
+        grid.add(dateField, 1, 2);
+        grid.add(new Label("Heure début (HH:MM):"), 0, 3);
+        grid.add(heureDebutField, 1, 3);
+        grid.add(new Label("Heure fin (HH:MM):"), 0, 4);
+        grid.add(heureFinField, 1, 4);
+        grid.add(new Label("Salle:"), 0, 5);
+        grid.add(salleField, 1, 5);
+        grid.add(new Label("Enseignant:"), 0, 6);
+        grid.add(enseignantCombo, 1, 6);
+
+        // Boutons
+        Button validerBtn = new Button("Valider");
+        validerBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+        validerBtn.setOnAction(e -> {
+            if (validerEtAjouterCours(etudiant, matiereField.getText(),dateField.getText(), heureDebutField.getText(), heureFinField.getText(), salleField.getText(), enseignantCombo.getValue())) {
+                popup.close();
+                afficherEmploiDuTempsEtudiant(etudiant); // Rafraîchir l'affichage
+            }
+        });
+
+        Button annulerBtn = new Button("Annuler");
+        annulerBtn.setOnAction(e -> popup.close());
+
+        HBox boutonsBox = new HBox(10, validerBtn, annulerBtn);
+        boutonsBox.setAlignment(Pos.CENTER_RIGHT);
+
+        VBox popupContent = new VBox(10, grid, boutonsBox);
+        popupContent.setPadding(new Insets(10));
+
+        // Configuration de la scène
+        Scene scene = new Scene(popupContent, 400, 450);
+        popup.setScene(scene);
+        popup.showAndWait();
+    }
+
+    private boolean validerEtAjouterCours(Etudiant etudiant, String matiere, String date, String heureDebut, String heureFin, String salle, String enseignantSelectionne) {
+        if (matiere == null || matiere.isEmpty() ||
+                date == null ||
+                heureDebut == null || heureDebut.isEmpty() ||
+                heureFin == null || heureFin.isEmpty() ||
+                salle == null || salle.isEmpty() ||
+                enseignantSelectionne == null || enseignantSelectionne.isEmpty()) {
+            afficherAlerte("Erreur", "Tous les champs doivent être remplis");
+            return false;
+        }
+
+        // Validation du format des heures
+        if (!heureDebut.matches("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$") ||
+                !heureFin.matches("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$")) {
+            afficherAlerte("Erreur", "Format des heures invalide (utiliser HH:MM)");
+            return false;
+        }
+
+        // Extraire l'ID de l'enseignant
+        String idEnseignant = enseignantSelectionne.split(" - ")[0];
+
+        // Création du nouveau cours
+        Cours nouveauCours = new Cours(
+                csvService.genererNouvelIdCours(), salle, matiere, date, heureDebut, heureFin, idEnseignant, etudiant.getClasse(), false);
+
+        // Ajout via le service CSV
+        try {
+            boolean succes = csvService.ajouterCours(nouveauCours);
+            if (succes) {
+                afficherAlerte("Succès", "Le cours a été ajouté avec succès");
+                return true;
+            } else {
+                afficherAlerte("Erreur", "Échec de l'ajout du cours");
+                return false;
+            }
+        } catch (Exception e) {
+            afficherAlerte("Erreur", "Une erreur est survenue: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private void afficherAlerte(String titre, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(titre);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
