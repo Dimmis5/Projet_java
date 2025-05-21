@@ -172,11 +172,16 @@ public class CsvService {
                 String[] values = line.split(",");
                 if (values.length >= 8 && values[6].equals(id_enseignant)) {
                     Cours c = new Cours(
-                            values[0], values[1], values[2],
-                            LocalDate.parse(values[3], DATE_FORMATTER).toString(),
-                            LocalTime.parse(values[4], TIME_FORMATTER).toString(),
-                            LocalTime.parse(values[5], TIME_FORMATTER).toString(),
-                            values[6], values[7], false);
+                            values[0].trim(),
+                            values[1].trim(),
+                            values[2].trim(),
+                            values[3].trim(), // On garde la date en string
+                            values[4].trim(), // heure_debut
+                            values[5].trim(), // heure_fin
+                            values[6].trim(),
+                            values[7].trim(),
+                            false);
+                    cours.add(c);
                     cours.add(c);
                 }
             }

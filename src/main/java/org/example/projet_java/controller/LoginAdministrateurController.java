@@ -10,7 +10,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.example.projet_java.Edt;
-import org.example.projet_java.model.Etudiant;
+import org.example.projet_java.model.Administrateur;
 import org.example.projet_java.service.AuthentificationService;
 
 import java.io.IOException;
@@ -38,14 +38,18 @@ public class LoginAdministrateurController {
             return;
         }
 
-        boolean loginSuccess = authService.loginAdministrateur(identifiant, password);
+        Administrateur admin = authService.loginAdministrateur(identifiant, password);
 
-        if (loginSuccess) {
+        if (admin != null) {
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(Edt.class.getResource("edt-administrateur-view.fxml"));
-                Scene scene = new Scene(fxmlLoader.load(), 400,400);
+                Scene scene = new Scene(fxmlLoader.load(), 800, 600);
+                EdtAdministrateurController controller = fxmlLoader.getController();
+
+                controller.setAdministrateur(admin);
+
                 Stage stage = new Stage();
-                stage.setTitle("Connexion Controller");
+                stage.setTitle("Emploi du temps - Administrateur");
                 stage.setScene(scene);
                 stage.show();
 

@@ -4,21 +4,6 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<ScrollPane fx:id="scrollPane" xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.projet_java.controller.EdtAdministrateurController">
-    <content>
-        <VBox fx:id="layout" spacing="20" alignment="TOP_CENTER" >
-            <Label fx:id="titreSemaine"/>
-            <GridPane fx:id="agendaGrid" hgap="10" vgap="10" />
-            <VBox spacing="10">
-                <HBox spacing="10">
-                    <Label text="Date :"/>
-                    <TextField fx:id="textDate"/>
-                </HBox>
-                <HBox spacing="10">
-                    <Label text="Message :"/>
-                    <TextField fx:id="textMessage"/>
-                </HBox>
-            </VBox>
-        </VBox>
-    </content>
+<ScrollPane fx:id="scrollPane" fitToWidth="true" fitToHeight="true" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.projet_java.controller.EdtAdministrateurController">
 </ScrollPane>

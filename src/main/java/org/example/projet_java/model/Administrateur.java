@@ -3,24 +3,29 @@ package org.example.projet_java.model;
 import java.util.HashMap;
 
 public class Administrateur extends Utilisateur {
-    protected String id;
+    protected String id_administrateur;
     protected String nom;
     protected String prenom;
     protected String mail;
     protected String mdp;
 
-    public Administrateur(String id, String nom, String prenom, String mail, String mdp) {
-        super(id,nom,prenom,mail,mdp);
+    public Administrateur(String id_administrateur, String nom, String prenom, String mail, String mdp) {
+        super(id_administrateur,nom,prenom,mail,mdp);
+        this.id_administrateur = id_administrateur;
+        this.nom = nom;
+        this.prenom = prenom;
+        this.mail = mail;
+        this.mdp = mdp;
     }
 
     @Override
     public String getId() {
-        return id;
+        return id_administrateur;
     }
 
     @Override
-    public void setId(String id) {
-        this.id = id;
+    public void setId(String id_administrateur) {
+        this.id_administrateur = id_administrateur;
     }
 
     @Override
@@ -53,11 +58,13 @@ public class Administrateur extends Utilisateur {
         this.mail = mail;
     }
 
+    @Override
     public String getMdp() {
-        return mail;
+        return mdp;
     }
 
-    public void setMdp(String mail) {
-        this.mail = mail;
+    @Override
+    public void setMdp(String mdp) {
+        this.mdp = mdp;
     }
 }

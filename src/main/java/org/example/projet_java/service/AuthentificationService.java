@@ -48,17 +48,16 @@ public class AuthentificationService {
         return false;
     }
 
-    public boolean loginAdministrateur(String identifiant, String motDePasse) {
+    public Administrateur loginAdministrateur(String identifiant, String motDePasse) {
         List<Administrateur> administrateurs = csvService.Administrateurs();
 
         for (Administrateur administrateur : administrateurs) {
             if (identifiant.equals(administrateur.getId()) && motDePasse.equals(administrateur.getMdp())) {
                 this.currentUser = administrateur;
-                return true;
+                return administrateur;
             }
         }
-
-        return false;
+        return null;
     }
 
     public void logout() {
