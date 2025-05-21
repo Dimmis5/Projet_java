@@ -61,6 +61,17 @@ public class CsvService {
         return null;
     }
 
+
+    public Enseignant getEnseignantById(String id) {
+        for (Enseignant e : Enseignants()) {
+            if (e.getId().trim().equals(id.trim())) {
+                return e;
+            }
+        }
+        return null;
+    }
+
+
     public List<Enseignant> Enseignants() {
         List<Enseignant> enseignants = new ArrayList<>();
 
@@ -71,7 +82,11 @@ public class CsvService {
                 String[] values = line.split(",");
                 if (values.length >= 5) {
                     Enseignant enseignant = new Enseignant(
-                            values[0], values[1], values[2], values[3], values[4]);
+                            values[0].trim(),
+                            values[1].trim(),
+                            values[2].trim(),
+                            values[3].trim(),
+                            values[4].trim());
                     enseignants.add(enseignant);
                 }
             }

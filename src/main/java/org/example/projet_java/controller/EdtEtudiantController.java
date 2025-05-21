@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.example.projet_java.model.Cours;
+import org.example.projet_java.model.Enseignant;
 import org.example.projet_java.service.AuthentificationService;
 import org.example.projet_java.service.CsvService;
 
@@ -99,6 +100,8 @@ public class EdtEtudiantController {
         afficherCoursDansGrille(coursSemaine);
     }
 
+// Modification pour la méthode afficherCoursDansGrille dans EdtEtudiantController.java
+
     private void afficherCoursDansGrille(List<Cours> coursSemaine) {
         for (Cours cours : coursSemaine) {
             try {
@@ -112,17 +115,59 @@ public class EdtEtudiantController {
                 int ligneDebut = (int) Duration.between(heureDebut, heureDebutCours).toMinutes() / intervalMinutes + 1;
                 int hauteur = (int) Duration.between(heureDebutCours, heureFinCours).toMinutes() / intervalMinutes;
 
-                Label labelCours = new Label(cours.getMatiere() + "\n" + cours.getId_salle() +
-                        "\n" + cours.getHeure_debut() + "-" + cours.getHeure_fin());
-                labelCours.setStyle("-fx-background-color: lightblue; -fx-border-color: black; " +
-                        "-fx-alignment: center; -fx-text-alignment: center;");
-                labelCours.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-                labelCours.setMinSize(100, 60 * hauteur);
+                // Debug - Afficher l'ID de l'enseignant tel qu'il est dans le cours
+                System.out.println("ID enseignant dans le cours: '" + cours.getId_enseignant() + "'");
 
-                GridPane.setRowIndex(labelCours, ligneDebut);
-                GridPane.setColumnIndex(labelCours, colonne);
-                GridPane.setRowSpan(labelCours, hauteur);
-                grilleCalendrier.getChildren().add(labelCours);
+                // Récupérer l'enseignant avec trim sur l'ID pour éliminer les espaces
+                String enseignantId = cours.getId_enseignant().trim();
+                System.out.println("ID enseignant après trim: '" + enseignantId + "'");
+
+                Enseignant enseignant = csvService.getEnseignantById(enseignantId);
+
+                // Debug - Vérifier si l'enseignant a été trouvé
+                if (enseignant != null) {
+                    System.out.println("Enseignant trouvé: " + enseignant.getNom() + " " + enseignant.getPrenom());
+                } else {
+                    System.out.println("ATTENTION: Enseignant non trouvé pour l'ID: '" + enseignantId + "'");
+                }
+
+                String nomEnseignant = (enseignant != null)
+                        ? enseignant.getNom() + " " + enseignant.getPrenom()
+                        : "Enseignant inconnu (ID: " + enseignantId + ")";
+
+                // Créer un VBox pour mieux organiser le contenu
+                VBox contenuCours = new VBox(5); // 5 pixels de spacing entre les éléments
+
+                Label matiere = new Label(cours.getMatiere());
+                matiere.setStyle("-fx-font-weight: bold; -fx-font-size: 12px;");
+
+                Label salle = new Label("Salle: " + cours.getId_salle());
+                Label horaire = new Label(cours.getHeure_debut() + "-" + cours.getHeure_fin());
+                Label prof = new Label("Professeur: " + nomEnseignant);
+
+                contenuCours.getChildren().addAll(matiere, salle, horaire, prof);
+                contenuCours.setAlignment(javafx.geometry.Pos.CENTER);
+
+                // Créer un Pane pour contenir le VBox
+                StackPane celluleCours = new StackPane(contenuCours);
+                celluleCours.setStyle(
+                        "-fx-background-color: lightblue; " +
+                                "-fx-border-color: black; " +
+                                "-fx-border-width: 1px; " +
+                                "-fx-padding: 5px;"
+                );
+
+                // Définir les contraintes pour positionner correctement la cellule
+                GridPane.setRowIndex(celluleCours, ligneDebut);
+                GridPane.setColumnIndex(celluleCours, colonne);
+                GridPane.setRowSpan(celluleCours, hauteur);
+
+                // S'assurer que le contenu s'adapte à l'espace disponible
+                celluleCours.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+                // Ajouter la cellule à la grille
+                grilleCalendrier.getChildren().add(celluleCours);
+
             } catch (Exception e) {
                 System.err.println("Erreur affichage cours: " + cours);
                 e.printStackTrace();
