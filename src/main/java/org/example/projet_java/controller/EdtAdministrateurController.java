@@ -171,7 +171,6 @@ public class EdtAdministrateurController implements Initializable {
         enseignantInfoContainer.getChildren().add(btnVoirEmploiDuTemps);
     }
 
-
     private void afficherEmploiDuTempsEtudiant(Etudiant etudiant) {
         List<Cours> coursEtudiant = csvService.CoursEtudiant(etudiant.getId());
 
@@ -295,7 +294,6 @@ public class EdtAdministrateurController implements Initializable {
     }
 
     private void afficherEmploiDuTempsEnseignant(Enseignant enseignant) {
-
         List<Cours> coursEnseignant = csvService.CoursEnseignant(enseignant.getId());
 
         edtEnseignantContainer.getChildren().clear();
@@ -307,10 +305,14 @@ public class EdtAdministrateurController implements Initializable {
         Label titreLabel = new Label("Emploi du temps de " + enseignant.getPrenom() + " " + enseignant.getNom());
         titreLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
+        Button ajoutBtn = new Button("Ajouter un cours");
+        ajoutBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+        ajoutBtn.setOnAction(e -> ouvrirPopupAjoutCoursEnseignant(enseignant));
+
         if (coursEnseignant.isEmpty()) {
             Label emptyLabel = new Label("Aucun cours trouvé pour cet enseignant.");
             emptyLabel.setStyle("-fx-font-style: italic;");
-            container.getChildren().addAll(titreLabel, emptyLabel);
+            container.getChildren().addAll(titreLabel, emptyLabel, ajoutBtn);
         } else {
             VBox coursContainer = new VBox(5);
             coursContainer.setPadding(new Insets(10, 0, 0, 0));
@@ -324,15 +326,16 @@ public class EdtAdministrateurController implements Initializable {
             Label heureHeader = new Label("Horaires");
             Label salleHeader = new Label("Salle");
             Label classeHeader = new Label("Classe");
-            Label supprimerHeader = new Label("");
+            Label actionsHeader = new Label("Actions");
 
             matiereHeader.setPrefWidth(150);
             dateHeader.setPrefWidth(100);
             heureHeader.setPrefWidth(100);
             salleHeader.setPrefWidth(80);
             classeHeader.setPrefWidth(150);
+            actionsHeader.setPrefWidth(150);
 
-            header.getChildren().addAll(matiereHeader, dateHeader, heureHeader, salleHeader, classeHeader, supprimerHeader);
+            header.getChildren().addAll(matiereHeader, dateHeader, heureHeader, salleHeader, classeHeader, actionsHeader);
             coursContainer.getChildren().add(header);
 
             for (Cours cours : coursEnseignant) {
@@ -346,12 +349,13 @@ public class EdtAdministrateurController implements Initializable {
                 Label salle = new Label(cours.getId_salle());
                 Label classe = new Label(cours.getClasse());
 
+                Button modifierBtn = new Button("Modifier");
+                modifierBtn.setStyle("-fx-background-color: #ffbb33; -fx-text-fill: white;");
+                modifierBtn.setOnAction(event -> ouvrirPopupModificationCoursEnseignant(cours, enseignant));
+
                 Button supprimerBtn = new Button("Supprimer");
                 supprimerBtn.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white;");
-
-                // Ajout de l'action pour le bouton supprimer
                 supprimerBtn.setOnAction(event -> {
-                    // Confirmation avant suppression
                     Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
                     confirmation.setTitle("Confirmation de suppression");
                     confirmation.setHeaderText("Supprimer le cours");
@@ -359,11 +363,9 @@ public class EdtAdministrateurController implements Initializable {
 
                     Optional<ButtonType> result = confirmation.showAndWait();
                     if (result.isPresent() && result.get() == ButtonType.OK) {
-                        // Suppression du cours
                         boolean suppressionReussie = csvService.supprimerCours(cours.getId_cours());
 
                         if (suppressionReussie) {
-                            // Rafraîchir l'affichage
                             afficherEmploiDuTempsEnseignant(enseignant);
                             Alert success = new Alert(Alert.AlertType.INFORMATION);
                             success.setTitle("Succès");
@@ -371,7 +373,6 @@ public class EdtAdministrateurController implements Initializable {
                             success.setContentText("Le cours a été supprimé avec succès.");
                             success.showAndWait();
                         } else {
-                            // Afficher un message d'erreur
                             Alert error = new Alert(Alert.AlertType.ERROR);
                             error.setTitle("Erreur");
                             error.setHeaderText(null);
@@ -381,17 +382,21 @@ public class EdtAdministrateurController implements Initializable {
                     }
                 });
 
+                HBox boutonsContainer = new HBox(5, modifierBtn, supprimerBtn);
+                boutonsContainer.setAlignment(Pos.CENTER);
+
                 matiere.setPrefWidth(150);
                 date.setPrefWidth(100);
                 horaires.setPrefWidth(100);
                 salle.setPrefWidth(80);
                 classe.setPrefWidth(150);
+                boutonsContainer.setPrefWidth(150);
 
-                coursLine.getChildren().addAll(matiere, date, horaires, salle, classe, supprimerBtn);
+                coursLine.getChildren().addAll(matiere, date, horaires, salle, classe, boutonsContainer);
                 coursContainer.getChildren().add(coursLine);
             }
 
-            container.getChildren().addAll(titreLabel, coursContainer);
+            container.getChildren().addAll(titreLabel, coursContainer, ajoutBtn);
         }
 
         edtEnseignantContainer.getChildren().add(container);
@@ -698,6 +703,209 @@ public class EdtAdministrateurController implements Initializable {
                 heureFin,
                 idEnseignant,
                 etudiant.getClasse(),
+                estAnnule);
+
+        try {
+            boolean succes = csvService.modifierCours(coursModifie);
+            if (succes) {
+                afficherAlerte("Succès", "Le cours a été modifié avec succès");
+                return true;
+            } else {
+                afficherAlerte("Erreur", "Échec de la modification du cours");
+                return false;
+            }
+        } catch (Exception e) {
+            afficherAlerte("Erreur", "Une erreur est survenue: " + e.getMessage());
+            return false;
+        }
+    }
+
+
+    private void ouvrirPopupAjoutCoursEnseignant(Enseignant enseignant) {
+        Stage popup = new Stage();
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.setTitle("Ajouter un nouveau cours");
+
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(20));
+        grid.setVgap(10);
+        grid.setHgap(10);
+
+        TextField coursField = new TextField();
+        TextField salleField = new TextField();
+        TextField matiereField = new TextField();
+        TextField dateField = new TextField();
+        TextField heureDebutField = new TextField();
+        TextField heureFinField = new TextField();
+        TextField classeField = new TextField();
+
+        grid.add(new Label("ID Cours:"), 0, 0);
+        grid.add(coursField, 1, 0);
+        grid.add(new Label("Matière:"), 0, 1);
+        grid.add(matiereField, 1, 1);
+        grid.add(new Label("Date:"), 0, 2);
+        grid.add(dateField, 1, 2);
+        grid.add(new Label("Heure début:"), 0, 3);
+        grid.add(heureDebutField, 1, 3);
+        grid.add(new Label("Heure fin:"), 0, 4);
+        grid.add(heureFinField, 1, 4);
+        grid.add(new Label("Salle:"), 0, 5);
+        grid.add(salleField, 1, 5);
+        grid.add(new Label("Classe:"), 0, 6);
+        grid.add(classeField, 1, 6);
+
+        Button validerBtn = new Button("Valider");
+        validerBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+        validerBtn.setOnAction(e -> {
+            if (validerEtAjouterCoursEnseignant(enseignant, coursField.getText(), matiereField.getText(),
+                    dateField.getText(), heureDebutField.getText(), heureFinField.getText(),
+                    salleField.getText(), classeField.getText())) {
+                popup.close();
+                afficherEmploiDuTempsEnseignant(enseignant);
+            }
+        });
+
+        Button annulerBtn = new Button("Annuler");
+        annulerBtn.setOnAction(e -> popup.close());
+
+        HBox boutonsBox = new HBox(10, validerBtn, annulerBtn);
+        boutonsBox.setAlignment(Pos.CENTER_RIGHT);
+
+        VBox popupContent = new VBox(10, grid, boutonsBox);
+        popupContent.setPadding(new Insets(10));
+
+        Scene scene = new Scene(popupContent, 400, 400);
+        popup.setScene(scene);
+        popup.showAndWait();
+    }
+
+    private boolean validerEtAjouterCoursEnseignant(Enseignant enseignant, String idCours, String matiere,
+                                                    String date, String heureDebut, String heureFin,
+                                                    String salle, String classe) {
+        if (idCours == null || idCours.isEmpty() ||
+                matiere == null || matiere.isEmpty() ||
+                date == null || date.isEmpty() ||
+                heureDebut == null || heureDebut.isEmpty() ||
+                heureFin == null || heureFin.isEmpty() ||
+                salle == null || salle.isEmpty() ||
+                classe == null || classe.isEmpty()) {
+            afficherAlerte("Erreur", "Tous les champs doivent être remplis");
+            return false;
+        }
+
+        // Créer un nouvel objet Cours
+        Cours nouveauCours = new Cours(
+                idCours,
+                salle,
+                matiere,
+                date,
+                heureDebut,
+                heureFin,
+                enseignant.getId(),
+                classe,
+                false);
+
+        try {
+            boolean succes = csvService.ajouterCours(nouveauCours);
+            if (succes) {
+                afficherAlerte("Succès", "Le cours a été ajouté avec succès");
+                return true;
+            } else {
+                afficherAlerte("Erreur", "Échec de l'ajout du cours");
+                return false;
+            }
+        } catch (Exception e) {
+            afficherAlerte("Erreur", "Une erreur est survenue: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private void ouvrirPopupModificationCoursEnseignant(Cours cours, Enseignant enseignant) {
+        Stage popup = new Stage();
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.setTitle("Modifier le cours");
+
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(20));
+        grid.setVgap(10);
+        grid.setHgap(10);
+
+        TextField matiereField = new TextField(cours.getMatiere());
+        TextField dateField = new TextField(cours.getDate());
+        TextField heureDebutField = new TextField(cours.getHeure_debut());
+        TextField heureFinField = new TextField(cours.getHeure_fin());
+        TextField salleField = new TextField(cours.getId_salle());
+        TextField classeField = new TextField(cours.getClasse());
+
+        ComboBox<Boolean> annuleCombo = new ComboBox<>();
+        annuleCombo.setItems(FXCollections.observableArrayList(true, false));
+        annuleCombo.setValue(cours.isAnnulation());
+
+        grid.add(new Label("Matière:"), 0, 0);
+        grid.add(matiereField, 1, 0);
+        grid.add(new Label("Date:"), 0, 1);
+        grid.add(dateField, 1, 1);
+        grid.add(new Label("Heure début:"), 0, 2);
+        grid.add(heureDebutField, 1, 2);
+        grid.add(new Label("Heure fin:"), 0, 3);
+        grid.add(heureFinField, 1, 3);
+        grid.add(new Label("Salle:"), 0, 4);
+        grid.add(salleField, 1, 4);
+        grid.add(new Label("Classe:"), 0, 5);
+        grid.add(classeField, 1, 5);
+        grid.add(new Label("Statut:"), 0, 6);
+        grid.add(annuleCombo, 1, 6);
+
+        Button validerBtn = new Button("Valider");
+        validerBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+        validerBtn.setOnAction(e -> {
+            if (validerEtModifierCoursEnseignant(cours, enseignant, matiereField.getText(),
+                    dateField.getText(), heureDebutField.getText(),
+                    heureFinField.getText(), salleField.getText(),
+                    classeField.getText(), annuleCombo.getValue())) {
+                popup.close();
+                afficherEmploiDuTempsEnseignant(enseignant);
+            }
+        });
+
+        Button annulerBtn = new Button("Annuler");
+        annulerBtn.setOnAction(e -> popup.close());
+
+        HBox boutonsBox = new HBox(10, validerBtn, annulerBtn);
+        boutonsBox.setAlignment(Pos.CENTER_RIGHT);
+
+        VBox popupContent = new VBox(10, grid, boutonsBox);
+        popupContent.setPadding(new Insets(10));
+
+        Scene scene = new Scene(popupContent, 400, 450);
+        popup.setScene(scene);
+        popup.showAndWait();
+    }
+
+    private boolean validerEtModifierCoursEnseignant(Cours cours, Enseignant enseignant, String matiere,
+                                                     String date, String heureDebut, String heureFin,
+                                                     String salle, String classe, Boolean estAnnule) {
+        if (matiere == null || matiere.isEmpty() ||
+                date == null || date.isEmpty() ||
+                heureDebut == null || heureDebut.isEmpty() ||
+                heureFin == null || heureFin.isEmpty() ||
+                salle == null || salle.isEmpty() ||
+                classe == null || classe.isEmpty() ||
+                estAnnule == null) {
+            afficherAlerte("Erreur", "Tous les champs doivent être remplis");
+            return false;
+        }
+
+        // Créer un nouvel objet Cours avec les modifications
+        Cours coursModifie = new Cours(
+                cours.getId_cours(),
+                salle,
+                matiere,
+                date,
+                heureDebut,
+                heureFin,
+                enseignant.getId(),
+                classe,
                 estAnnule);
 
         try {
