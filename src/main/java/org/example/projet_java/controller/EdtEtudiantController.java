@@ -152,7 +152,7 @@ public class EdtEtudiantController {
                 LocalTime heureDebutCours = LocalTime.parse(c.getHeure_debut().replace("h", ":"), FORMAT_HEURE);
                 LocalTime heureFinCours = LocalTime.parse(c.getHeure_fin().replace("h", ":"), FORMAT_HEURE);
 
-                int ligneDebut = (int) Duration.between(heureDebut, heureDebutCours).toMinutes() / intervalMinutes + 1;
+                int ligneDebut = (int) Duration.between(heureDebut, heureDebutCours).toMinutes() / intervalMinutes + 2;
                 int hauteur = (int) Duration.between(heureDebutCours, heureFinCours).toMinutes() / intervalMinutes;
 
                 VBox contenuCours = creerContenuCours(c);
