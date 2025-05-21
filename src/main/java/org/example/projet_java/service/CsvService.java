@@ -65,7 +65,7 @@ public class CsvService {
             br.readLine();
 
             while ((line = br.readLine()) != null) {
-                String[] values = line.split(";");
+                String[] values = line.split(",");
                 String id_enseignant = values[0];
                 String nom = values[1];
                 String prenom = values[2];
@@ -90,7 +90,7 @@ public class CsvService {
             br.readLine();
 
             while ((line = br.readLine()) != null) {
-                String[] values = line.split(";");
+                String[] values = line.split(",");
                 String id_administrateur = values[0];
                 String nom = values[1];
                 String prenom = values[2];
@@ -111,18 +111,19 @@ public class CsvService {
         List<Cours> cours = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(CSV_EDT))) {
-            String line;
-            br.readLine();
+            String line = br.readLine();
             while ((line = br.readLine()) != null) {
-                String[] values = line.split(";");
+                String[] values = line.split(",");
                 if (values[0].equals(id_etudiant)) {
                     String id_cours = values[1];
+
                     try (BufferedReader br2 = new BufferedReader(new FileReader(CSV_COURS))) {
-                        String line2;
                         br2.readLine();
-                        while ((line2 = br.readLine()) != null) {
-                            String[] values2 = line.split(";");
-                            if (values[0].equals(id_etudiant)) {
+                        String line2;
+                        while ((line2 = br2.readLine()) != null) {
+                            String[] values2 = line2.split(",");
+
+                            if (values2[0].equals(id_cours)) {
                                 String id_salle = values2[1];
                                 String matiere = values2[2];
                                 String date = LocalDate.parse(values2[3], DATE_FORMATTER).toString();
@@ -130,7 +131,8 @@ public class CsvService {
                                 String heureFin = LocalTime.parse(values2[5], TIME_FORMATTER).toString();
                                 String id_enseignant = values2[6];
                                 String classe = values2[7];
-                                Cours c = new Cours(id_cours,id_salle, matiere, date, heureDebut, heureFin, id_enseignant, classe, false);
+
+                                Cours c = new Cours(id_cours, id_salle, matiere, date, heureDebut, heureFin, id_enseignant, classe, false);
                                 cours.add(c);
                             }
                         }
@@ -151,7 +153,7 @@ public class CsvService {
             String line;
             br.readLine();
             while ((line = br.readLine()) != null) {
-                String[] values = line.split(";");
+                String[] values = line.split(",");
                 if (values[6].equals(id_enseignant)) {
                     String id_cours = values[0];
                     String id_salle = values[1];

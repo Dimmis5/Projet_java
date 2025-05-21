@@ -52,7 +52,7 @@ public class AuthentificationService {
         List<Administrateur> administrateurs = csvService.Administrateurs();
 
         for (Administrateur administrateur : administrateurs) {
-            if (administrateur.getId().equals(identifiant) && administrateur.getMdp().equals(motDePasse)) {
+            if (identifiant.equals(administrateur.getId()) && motDePasse.equals(administrateur.getMdp())) {
                 this.currentUser = administrateur;
                 return true;
             }

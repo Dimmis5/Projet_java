@@ -30,22 +30,25 @@ public class LoginEtudiantController {
 
     @FXML
     protected void onLoginButtonClick(ActionEvent event) {
-        String email = identifiantField.getText();
+        String identifiant = identifiantField.getText();
         String password = passwordField.getText();
 
-        if (email.isEmpty() || password.isEmpty()) {
+        if (identifiant.isEmpty() || password.isEmpty()) {
             errorMessage.setText("Veuillez remplir tous les champs");
             return;
         }
 
-        boolean loginSuccess = authService.loginEtudiant(email, password);
+        boolean loginSuccess = authService.loginEtudiant(identifiant, password);
 
         if (loginSuccess) {
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(Edt.class.getResource("edt-etudiant-view.fxml"));
-                Scene scene = new Scene(fxmlLoader.load(), 400,400);
+                Scene scene = new Scene(fxmlLoader.load(), 800, 600);
+                EdtEtudiantController controller = fxmlLoader.getController();
+                controller.setIdEtudiantConnecte(identifiant);
+
                 Stage stage = new Stage();
-                stage.setTitle("Connexion Controller");
+                stage.setTitle("Emploi du temps");
                 stage.setScene(scene);
                 stage.show();
 
