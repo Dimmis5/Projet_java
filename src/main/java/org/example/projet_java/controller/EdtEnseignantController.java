@@ -12,8 +12,9 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 
 public class EdtEnseignantController {
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("H'h'mm");
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE;
+    private static final DateTimeFormatter TIME_FORMAT_H = DateTimeFormatter.ofPattern("H'h'mm");
+    private static final DateTimeFormatter TIME_FORMAT_COLON = DateTimeFormatter.ofPattern("H:mm");
     private static final DateTimeFormatter HEADER_DATE_FORMAT = DateTimeFormatter.ofPattern("E dd/MM");
 
     private final LocalTime heureDebut = LocalTime.of(8, 0);
@@ -173,7 +174,7 @@ public class EdtEnseignantController {
         LocalTime heure = heureDebut;
         int row = 1;
         while (!heure.isAfter(heureFin.minusMinutes(intervalMinutes))) {
-            Label label = new Label(heure.format(TIME_FORMAT));
+            Label label = new Label(heure.format(TIME_FORMAT_H));
             label.setStyle("-fx-alignment: center-right; -fx-font-size: 11; -fx-background-color: #f0f0f0;");
             grilleCalendrier.add(label, 0, row);
             heure = heure.plusMinutes(intervalMinutes);
@@ -184,31 +185,11 @@ public class EdtEnseignantController {
     private void afficherCours(Cours cours) {
         try {
             System.out.println("\n[DEBUG] Tentative d'affichage du cours: " + cours.getMatiere());
-
-            // Nettoyage plus précis des heures
-            String heureDebutNettoyee = cours.getHeure_debut()
-                    .replaceAll("h0+", "h")  // Remplace h000... par h
-                    .replaceAll("h$", "h00") // Si finit par h seul
-                    .replaceAll("h(\\d)$", "h0$1"); // Si un seul chiffre après h
-
-            String heureFinNettoyee = cours.getHeure_fin()
-                    .replaceAll("h0+", "h")
-                    .replaceAll("h$", "h00")
-                    .replaceAll("h(\\d)$", "h0$1");
-
-            // Validation finale du format
-            if (!heureDebutNettoyee.matches("\\d+h\\d{2}") || !heureFinNettoyee.matches("\\d+h\\d{2}")) {
-                System.err.println("[ERREUR] Format d'heure invalide après nettoyage");
-                System.err.println("Début: " + heureDebutNettoyee + ", Fin: " + heureFinNettoyee);
-                return;
-            }
-
-            System.out.println("[DEBUG] Heure début nettoyée: " + heureDebutNettoyee);
-            System.out.println("[DEBUG] Heure fin nettoyée: " + heureFinNettoyee);
+            System.out.println("[DEBUG] Date du cours à parser: " + cours.getDate());
 
             LocalDate date = LocalDate.parse(cours.getDate(), DATE_FORMAT);
-            LocalTime debut = LocalTime.parse(heureDebutNettoyee, TIME_FORMAT);
-            LocalTime fin = LocalTime.parse(heureFinNettoyee, TIME_FORMAT);
+            LocalTime debut = parseHeure(cours.getHeure_debut());
+            LocalTime fin = parseHeure(cours.getHeure_fin());
 
             int col = date.getDayOfWeek().getValue();
             int row = ((int) Duration.between(heureDebut, debut).toMinutes() / intervalMinutes) + 1;
@@ -229,7 +210,7 @@ public class EdtEnseignantController {
             Label lblClasse = new Label("Classe: " + cours.getClasse());
             lblClasse.setStyle("-fx-font-size: 11;");
 
-            Label lblHoraire = new Label(debut.format(TIME_FORMAT) + "-" + fin.format(TIME_FORMAT));
+            Label lblHoraire = new Label(debut.format(DateTimeFormatter.ofPattern("HH:mm")) + "-" + fin.format(DateTimeFormatter.ofPattern("HH:mm")));
             lblHoraire.setStyle("-fx-font-size: 10; -fx-text-fill: #555;");
 
             box.getChildren().addAll(lblMatiere, lblSalle, lblClasse, lblHoraire);
@@ -242,6 +223,36 @@ public class EdtEnseignantController {
             System.err.println("Heure début: " + cours.getHeure_debut());
             System.err.println("Heure fin: " + cours.getHeure_fin());
             e.printStackTrace();
+        }
+    }
+
+    private LocalTime parseHeure(String heureStr) throws DateTimeParseException {
+        // Supprimer les espaces et normaliser le format
+        String heureNettoyee = heureStr.trim();
+
+        try {
+            // Essayer d'abord le format avec deux-points (10:00)
+            return LocalTime.parse(heureNettoyee, TIME_FORMAT_COLON);
+        } catch (DateTimeParseException e1) {
+            try {
+                // Si échec, essayer le format avec h (10h00)
+                return LocalTime.parse(heureNettoyee, TIME_FORMAT_H);
+            } catch (DateTimeParseException e2) {
+                // Si les deux échouent, essayer le format HHmm (1000)
+                try {
+                    if (heureNettoyee.matches("\\d{3,4}")) {
+                        if (heureNettoyee.length() == 3) {
+                            heureNettoyee = "0" + heureNettoyee;
+                        }
+                        return LocalTime.parse(heureNettoyee.substring(0, 2) + ":" + heureNettoyee.substring(2),
+                                TIME_FORMAT_COLON);
+                    }
+                    throw e2;
+                } catch (DateTimeParseException e3) {
+                    System.err.println("[ERREUR] Format d'heure invalide: " + heureStr);
+                    throw new DateTimeParseException("Format d'heure invalide (attendu HH:mm ou Hhmm)", heureStr, 0);
+                }
+            }
         }
     }
 
