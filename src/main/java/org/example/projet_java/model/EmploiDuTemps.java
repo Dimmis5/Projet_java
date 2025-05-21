@@ -7,7 +7,7 @@ public class EmploiDuTemps {
     protected String id_cours;
 
     public EmploiDuTemps(String id_etudiant, String id_cours) {
-        this.id_etudiant = id_cours;
+        this.id_etudiant = id_etudiant;
         this.id_cours = id_cours;
     }
 
