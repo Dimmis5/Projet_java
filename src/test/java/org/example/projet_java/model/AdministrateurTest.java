@@ -8,7 +8,7 @@ class AdministrateurTest {
 
     @Test
     void testGetId() {
-        Administrateur admin = new Administrateur("A001", "Dupont", "Jean", "jean.dupont@example.com", "password123");
+        Administrateur admin = new Administrateur("A001", "Dupodnt", "Jean", "jean.dupont@example.com", "password123");
         assertEquals("A001", admin.getId());
     }
 
