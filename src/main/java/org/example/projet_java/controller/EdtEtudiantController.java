@@ -112,7 +112,7 @@ public class EdtEtudiantController {
                         cours.getHeure_fin().replace("h", ":"), FORMAT_HEURE);
 
                 int colonne = dateCours.getDayOfWeek().getValue();
-                int ligneDebut = (int) Duration.between(heureDebut, heureDebutCours).toMinutes() / intervalMinutes + 1;
+                int ligneDebut = (int) Duration.between(heureDebut, heureDebutCours).toMinutes() / intervalMinutes + 2 ;
                 int hauteur = (int) Duration.between(heureDebutCours, heureFinCours).toMinutes() / intervalMinutes;
 
                 // Debug - Afficher l'ID de l'enseignant tel qu'il est dans le cours
