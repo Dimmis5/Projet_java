@@ -27,11 +27,9 @@
             </HBox>
 
             <HBox alignment="CENTER" spacing="20">
-                <Button fx:id="boutonJourPrecedent" text="JourPrecedent" style="-fx-min-width: 40;"/>
                 <Button fx:id="boutonPeriodePrecedente" text="Période précédente" style="-fx-min-width: 150;"/>
                 <Button fx:id="boutonAujourdhui" text="Aujourd'hui" style="-fx-min-width: 150;"/>
                 <Button fx:id="boutonPeriodeSuivante" text="Période suivante" style="-fx-min-width: 150;"/>
-                <Button fx:id="boutonJourSuivant" text="JourSuivant" style="-fx-min-width: 40;"/>
             </HBox>
 
             <Label fx:id="etiquetteMoisAnnee" alignment="CENTER" maxWidth="Infinity"

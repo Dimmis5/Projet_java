@@ -39,8 +39,7 @@ public class EdtEnseignantController {
     @FXML private Button boutonModeJour;
     @FXML private Button boutonModeSemaine;
     @FXML private Button boutonModeMois;
-    @FXML private Button boutonJourPrecedent;
-    @FXML private Button boutonJourSuivant;
+
 
     @FXML
     public void initialize() {
@@ -114,15 +113,6 @@ public class EdtEnseignantController {
             mettreAJourStyleBoutons();
         });
 
-        boutonJourPrecedent.setOnAction(e -> {
-            dateCourante = dateCourante.minusDays(1);
-            rafraichirAffichage();
-        });
-
-        boutonJourSuivant.setOnAction(e -> {
-            dateCourante = dateCourante.plusDays(1);
-            rafraichirAffichage();
-        });
     }
 
     private void mettreAJourStyleBoutons() {
