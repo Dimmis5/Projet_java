@@ -2,27 +2,16 @@ package org.example.projet_java.controller;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
-import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Priority;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import org.example.projet_java.model.Administrateur;
-import org.example.projet_java.model.Enseignant;
-import org.example.projet_java.model.Etudiant;
-import org.example.projet_java.model.Cours;
-import org.example.projet_java.service.CsvService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ComboBox;
 import javafx.stage.Popup;
-import javafx.stage.Stage;
-import javafx.stage.Window;
+
+import org.example.projet_java.model.*;
+import org.example.projet_java.service.CsvService;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -31,28 +20,82 @@ import java.util.ResourceBundle;
 
 public class EdtAdministrateurController implements Initializable {
 
-    @FXML
-    private ScrollPane scrollPane;
+    // UI Elements
+    @FXML private ScrollPane scrollPane;
+    @FXML private BorderPane mainContainer;
+    @FXML private VBox infoContainer;
+    @FXML private Label titreLabel;
+    @FXML private VBox detailsContainer;
+    @FXML private VBox contentContainer;
+    @FXML private Label edtLabel;
+
+    @FXML private HBox etudiantSection;
+    @FXML private ComboBox<String> etudiantComboBox;
+    @FXML private Button btnListeEtudiants;
+    @FXML private VBox etudiantInfoContainer;
+
+    @FXML private HBox enseignantSection;
+    @FXML private ComboBox<String> enseignantComboBox;
+    @FXML private Button btnListeEnseignants;
+    @FXML private VBox enseignantInfoContainer;
+
+    @FXML private VBox edtContainer;
+    @FXML private VBox edtEnseignantContainer;
 
     private Administrateur administrateur;
-
     private List<Etudiant> listeEtudiants = new ArrayList<>();
-
     private List<Enseignant> listeEnseignants = new ArrayList<>();
+    private final CsvService csvService = CsvService.getInstance();
 
-    private CsvService csvService = CsvService.getInstance();
+    // Styles réutilisables
+    private static final String STYLE_BOLD_LABEL = "-fx-font-weight: bold;";
+    private static final String STYLE_POPUP = "-fx-background-color: white; -fx-border-color: #cccccc; -fx-border-width: 1; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0);";
+    private static final String STYLE_BUTTON_PRIMARY = "-fx-background-color: #4a87e8; -fx-text-fill: white;";
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        BorderPane mainContainer = new BorderPane();
-        mainContainer.setPadding(new Insets(20));
-
-        scrollPane.setContent(mainContainer);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
-
         listeEtudiants = csvService.Etudiants();
         listeEnseignants = csvService.Enseignants();
+
+        initializeEtudiantComboBox();
+        initializeEnseignantComboBox();
+
+        btnListeEtudiants.setOnAction(e -> ouvrirListeEtudiants());
+        btnListeEnseignants.setOnAction(e -> ouvrirListeEnseignants());
+    }
+
+    private void initializeEtudiantComboBox() {
+        ObservableList<String> items = FXCollections.observableArrayList();
+        for (Etudiant e : listeEtudiants) {
+            items.add(e.getNom() + " " + e.getPrenom() + " (" + e.getId() + ")");
+        }
+        etudiantComboBox.setItems(items);
+
+        etudiantComboBox.setOnAction(e -> {
+            String selected = etudiantComboBox.getValue();
+            if (selected != null) {
+                String id = selected.substring(selected.lastIndexOf("(") + 1, selected.lastIndexOf(")"));
+                Etudiant etudiant = csvService.getEtudiantById(id);
+                if (etudiant != null) afficherDetailsEtudiant(etudiant);
+            }
+        });
+    }
+
+    private void initializeEnseignantComboBox() {
+        ObservableList<String> items = FXCollections.observableArrayList();
+        for (Enseignant e : listeEnseignants) {
+            items.add(e.getNom() + " " + e.getPrenom() + " (" + e.getId() + ")");
+        }
+        enseignantComboBox.setItems(items);
+
+        enseignantComboBox.setOnAction(e -> {
+            String selected = enseignantComboBox.getValue();
+            if (selected != null) {
+                String id = selected.substring(selected.lastIndexOf("(") + 1, selected.lastIndexOf(")"));
+                Enseignant enseignant = csvService.getEnseignantById(id);
+                if (enseignant != null) afficherDetailsEnseignant(enseignant);
+            }
+        });
     }
 
     public void setAdministrateur(Administrateur administrateur) {
@@ -62,258 +105,70 @@ public class EdtAdministrateurController implements Initializable {
 
     private void afficherInformationsAdministrateur() {
         if (administrateur == null) return;
-        VBox infoContainer = new VBox(10);
-        infoContainer.setPadding(new Insets(20));
-        infoContainer.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #cccccc; -fx-border-radius: 5;");
 
-        Label titreLabel = new Label("Informations de l'administrateur");
-        titreLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-
-        VBox detailsContainer = new VBox(8);
-        detailsContainer.setPadding(new Insets(10, 0, 0, 0));
-
-        detailsContainer.getChildren().addAll(
+        titreLabel.setText("Informations de l'administrateur");
+        detailsContainer.getChildren().setAll(
                 createInfoLine("Identifiant", administrateur.getId()),
                 createInfoLine("Nom", administrateur.getNom()),
                 createInfoLine("Prénom", administrateur.getPrenom()),
                 createInfoLine("Email", administrateur.getMail())
         );
-
-        infoContainer.getChildren().addAll(titreLabel, detailsContainer);
-
-        BorderPane mainContainer = new BorderPane();
-        mainContainer.setTop(infoContainer);
-        mainContainer.setPadding(new Insets(20));
-
-        VBox contentContainer = new VBox(20);
-        contentContainer.setPadding(new Insets(20, 0, 0, 0));
-
-        Label edtLabel = new Label("Gestion de l'emploi du temps");
-        edtLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-
-        contentContainer.getChildren().add(edtLabel);
-
-        HBox etudiantSection = createEtudiantsSelector();
-        contentContainer.getChildren().add(etudiantSection);
-
-        VBox etudiantInfoContainer = new VBox(10);
-        etudiantInfoContainer.setId("etudiantInfoContainer");
-        etudiantInfoContainer.setPadding(new Insets(20, 0, 0, 0));
-        contentContainer.getChildren().add(etudiantInfoContainer);
-
-        HBox enseignantSection = createEnseignantsSelector();
-        contentContainer.getChildren().add(enseignantSection);
-
-        VBox enseignantInfoContainer = new VBox(10);
-        enseignantInfoContainer.setId("enseignantInfoContainer");
-        enseignantInfoContainer.setPadding(new Insets(20, 0, 0, 0));
-        contentContainer.getChildren().add(enseignantInfoContainer);
-
-        mainContainer.setCenter(contentContainer);
-
-        scrollPane.setContent(mainContainer);
     }
 
     private HBox createInfoLine(String libelle, String valeur) {
-        HBox hbox = new HBox(10);
-        hbox.setAlignment(Pos.CENTER_LEFT);
-
         Label libelleLabel = new Label(libelle + " :");
-        libelleLabel.setStyle("-fx-font-weight: bold;");
+        libelleLabel.setStyle(STYLE_BOLD_LABEL);
         libelleLabel.setPrefWidth(100);
 
         Label valeurLabel = new Label(valeur);
         HBox.setHgrow(valeurLabel, Priority.ALWAYS);
 
-        hbox.getChildren().addAll(libelleLabel, valeurLabel);
+        HBox hbox = new HBox(10, libelleLabel, valeurLabel);
+        hbox.setAlignment(Pos.CENTER_LEFT);
         return hbox;
     }
 
-    private HBox createEtudiantsSelector() {
-        HBox container = new HBox(15);
-        container.setAlignment(Pos.CENTER_LEFT);
-        container.setPadding(new Insets(10));
-        container.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #dddddd; -fx-border-radius: 5;");
+    private void afficherDetailsEtudiant(Etudiant e) {
+        etudiantInfoContainer.getChildren().clear();
+        edtContainer.getChildren().clear(); // Nettoyer l'emploi du temps précédent
 
-        Label label = new Label("Sélectionner un étudiant:");
-        label.setStyle("-fx-font-weight: bold;");
-
-        ComboBox<String> etudiantComboBox = new ComboBox<>();
-        ObservableList<String> observableEtudiants = FXCollections.observableArrayList();
-
-        for (Etudiant etudiant : listeEtudiants) {
-            observableEtudiants.add(etudiant.getNom() + " " + etudiant.getPrenom() + " (" + etudiant.getId() + ")");
-        }
-
-        etudiantComboBox.setItems(observableEtudiants);
-        etudiantComboBox.setPromptText("Choisir un étudiant");
-
-        etudiantComboBox.setOnAction(event -> {
-            String etudiantSelectionne = etudiantComboBox.getValue();
-            if (etudiantSelectionne != null) {
-                String id = etudiantSelectionne.substring(
-                        etudiantSelectionne.lastIndexOf("(") + 1,
-                        etudiantSelectionne.lastIndexOf(")")
-                );
-                Etudiant etudiant = csvService.getEtudiantById(id);
-                if (etudiant != null) {
-                    afficherDetailsEtudiant(etudiant);
-                }
-            }
-        });
-
-        Button btnListeEtudiants = new Button("Liste complète des étudiants");
-        btnListeEtudiants.setStyle("-fx-background-color: #4a87e8; -fx-text-fill: white;");
-
-        btnListeEtudiants.setOnAction(event -> {
-            ouvrirListeEtudiants();
-        });
-
-        container.getChildren().addAll(label, etudiantComboBox, btnListeEtudiants);
-        return container;
-    }
-
-    private HBox createEnseignantsSelector() {
-        HBox container = new HBox(15);
-        container.setAlignment(Pos.CENTER_LEFT);
-        container.setPadding(new Insets(10));
-        container.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #dddddd; -fx-border-radius: 5;");
-
-        Label label = new Label("Sélectionner un enseignant:");
-        label.setStyle("-fx-font-weight: bold;");
-
-        ComboBox<String> enseignantComboBox = new ComboBox<>();
-        ObservableList<String> observableEnseignant = FXCollections.observableArrayList();
-
-        for (Enseignant enseignant : listeEnseignants) {
-            observableEnseignant.add(enseignant.getNom() + " " + enseignant.getPrenom() + " (" + enseignant.getId() + ")");
-        }
-
-        enseignantComboBox.setItems(observableEnseignant);
-        enseignantComboBox.setPromptText("Choisir un enseignant");
-
-        enseignantComboBox.setOnAction(event -> {
-            String enseignantSelectionne = enseignantComboBox.getValue();
-            if (enseignantSelectionne != null) {
-                String id = enseignantSelectionne.substring(
-                        enseignantSelectionne.lastIndexOf("(") + 1,
-                        enseignantSelectionne.lastIndexOf(")")
-                );
-                Enseignant enseignant = csvService.getEnseignantById(id);
-                if (enseignant != null) {
-                    System.out.println("Enseignant sélectionné: " + enseignant.getNom() + " " + enseignant.getPrenom());
-                    afficherDetailsEnseignant(enseignant);
-                }
-            }
-        });
-
-        Button btnListeEnseignants = new Button("Liste complète des enseignants");
-        btnListeEnseignants.setStyle("-fx-background-color: #4a87e8; -fx-text-fill: white;");
-
-        btnListeEnseignants.setOnAction(event -> {
-            ouvrirListeEtudiants();
-        });
-
-        container.getChildren().addAll(label, enseignantComboBox, btnListeEnseignants);
-        return container;
-    }
-
-    private void afficherDetailsEtudiant(Etudiant etudiant) {
-        VBox contentContainer = (VBox) scrollPane.getContent().lookup("#etudiantInfoContainer");
-        if (contentContainer == null) return;
-
-        contentContainer.getChildren().clear();
-
-        VBox infoContainer = new VBox(10);
-        infoContainer.setPadding(new Insets(15));
-        infoContainer.setStyle("-fx-background-color: #f0f8ff; -fx-border-color: #4a87e8; -fx-border-radius: 5;");
-
-        Label titreLabel = new Label("Informations de l'étudiant");
-        titreLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-
-        VBox detailsContainer = new VBox(8);
-        detailsContainer.setPadding(new Insets(10, 0, 0, 0));
-
-        detailsContainer.getChildren().addAll(
-                createInfoLine("Identifiant", etudiant.getId()),
-                createInfoLine("Nom", etudiant.getNom()),
-                createInfoLine("Prénom", etudiant.getPrenom()),
-                createInfoLine("Email", etudiant.getMail()),
-                createInfoLine("Classe", etudiant.getClasse())
+        etudiantInfoContainer.getChildren().addAll(
+                createInfoLine("ID", e.getId()),
+                createInfoLine("Nom", e.getNom()),
+                createInfoLine("Prénom", e.getPrenom()),
+                createInfoLine("Email", e.getMail()),
+                createInfoLine("Classe", e.getClasse())
         );
 
-        Button btnEdtEtudiant = new Button("Voir l'emploi du temps");
-        btnEdtEtudiant.setStyle("-fx-background-color: #4a87e8; -fx-text-fill: white;");
-        btnEdtEtudiant.setPrefWidth(200);
+        Button btnVoirEmploiDuTemps = new Button("Voir l'emploi du temps");
+        btnVoirEmploiDuTemps.setStyle(STYLE_BUTTON_PRIMARY);
+        btnVoirEmploiDuTemps.setOnAction(event -> afficherEmploiDuTempsEtudiant(e));
 
-        HBox buttonContainer = new HBox();
-        buttonContainer.setAlignment(Pos.CENTER);
-        buttonContainer.setPadding(new Insets(10, 0, 0, 0));
-        buttonContainer.getChildren().add(btnEdtEtudiant);
-
-        btnEdtEtudiant.setOnAction(e -> {
-            afficherEmploiDuTempsEtudiant(etudiant);
-        });
-
-        infoContainer.getChildren().addAll(titreLabel, detailsContainer, buttonContainer);
-        contentContainer.getChildren().add(infoContainer);
-
-        VBox edtContainer = new VBox(10);
-        edtContainer.setId("edtContainer");
-        edtContainer.setPadding(new Insets(15, 0, 0, 0));
-        contentContainer.getChildren().add(edtContainer);
+        etudiantInfoContainer.getChildren().add(btnVoirEmploiDuTemps);
     }
 
-    private void afficherDetailsEnseignant(Enseignant enseignant) {
-        VBox contentContainer = (VBox) scrollPane.getContent().lookup("#enseignantInfoContainer");
-        if (contentContainer == null) return;
 
-        contentContainer.getChildren().clear();
+    private void afficherDetailsEnseignant(Enseignant e) {
+        enseignantInfoContainer.getChildren().clear();
+        edtEnseignantContainer.getChildren().clear();
 
-        VBox infoContainer = new VBox(10);
-        infoContainer.setPadding(new Insets(15));
-        infoContainer.setStyle("-fx-background-color: #f0f8ff; -fx-border-color: #4a87e8; -fx-border-radius: 5;");
-
-        Label titreLabel = new Label("Informations de l'enseignants");
-        titreLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-
-        VBox detailsContainer = new VBox(8);
-        detailsContainer.setPadding(new Insets(10, 0, 0, 0));
-
-        detailsContainer.getChildren().addAll(
-                createInfoLine("Identifiant", enseignant.getId()),
-                createInfoLine("Nom", enseignant.getNom()),
-                createInfoLine("Prénom", enseignant.getPrenom()),
-                createInfoLine("Email", enseignant.getMail())
+        enseignantInfoContainer.getChildren().addAll(
+                createInfoLine("ID", e.getId()),
+                createInfoLine("Nom", e.getNom()),
+                createInfoLine("Prénom", e.getPrenom()),
+                createInfoLine("Email", e.getMail())
         );
 
-        Button btnEdtEnseignant = new Button("Voir l'emploi du temps");
-        btnEdtEnseignant.setStyle("-fx-background-color: #4a87e8; -fx-text-fill: white;");
-        btnEdtEnseignant.setPrefWidth(200);
+        Button btnVoirEmploiDuTemps = new Button("Voir l'emploi du temps");
+        btnVoirEmploiDuTemps.setStyle(STYLE_BUTTON_PRIMARY);
+        btnVoirEmploiDuTemps.setOnAction(event -> afficherEmploiDuTempsEnseignant(e));
 
-        HBox buttonContainer = new HBox();
-        buttonContainer.setAlignment(Pos.CENTER);
-        buttonContainer.setPadding(new Insets(10, 0, 0, 0));
-        buttonContainer.getChildren().add(btnEdtEnseignant);
-
-        btnEdtEnseignant.setOnAction(e -> {
-            afficherEmploiDuTempsEnseignant(enseignant);
-        });
-
-        infoContainer.getChildren().addAll(titreLabel, detailsContainer, buttonContainer);
-        contentContainer.getChildren().add(infoContainer);
-
-        VBox edtContainer = new VBox(10);
-        edtContainer.setId("edtContainer");
-        edtContainer.setPadding(new Insets(15, 0, 0, 0));
-        contentContainer.getChildren().add(edtContainer);
+        enseignantInfoContainer.getChildren().add(btnVoirEmploiDuTemps);
     }
+
 
     private void afficherEmploiDuTempsEtudiant(Etudiant etudiant) {
         List<Cours> coursEtudiant = csvService.CoursEtudiant(etudiant.getId());
-
-        VBox edtContainer = (VBox) scrollPane.getContent().lookup("#edtContainer");
-        if (edtContainer == null) return;
 
         edtContainer.getChildren().clear();
 
@@ -392,12 +247,10 @@ public class EdtAdministrateurController implements Initializable {
     }
 
     private void afficherEmploiDuTempsEnseignant(Enseignant enseignant) {
+
         List<Cours> coursEnseignant = csvService.CoursEnseignant(enseignant.getId());
 
-        VBox edtContainer = (VBox) scrollPane.getContent().lookup("#edtContainer");
-        if (edtContainer == null) return;
-
-        edtContainer.getChildren().clear();
+        edtEnseignantContainer.getChildren().clear();
 
         VBox container = new VBox(10);
         container.setPadding(new Insets(15));
@@ -457,48 +310,29 @@ public class EdtAdministrateurController implements Initializable {
             container.getChildren().addAll(titreLabel, coursContainer);
         }
 
-        edtContainer.getChildren().add(container);
+        edtEnseignantContainer.getChildren().add(container);
     }
 
     private void ouvrirListeEtudiants() {
-        // Créer une fenêtre popup
-        Popup popup = new Popup();
-        popup.setAutoHide(true);
-
-        VBox popupContent = new VBox(10);
-        popupContent.setPadding(new Insets(15));
-        popupContent.setStyle("-fx-background-color: white; -fx-border-color: #cccccc; -fx-border-width: 1; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0);");
-        popupContent.setMinWidth(400);
-        popupContent.setMaxHeight(500);
-
-        Label titleLabel = new Label("Liste des étudiants");
-        titleLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
-
-        // Créer une liste avec les noms complets des étudiants
+        Popup popup = creerPopup("Liste des étudiants");
         ListView<String> listView = new ListView<>();
-        ObservableList<String> observableItems = FXCollections.observableArrayList();
+        ObservableList<String> items = FXCollections.observableArrayList();
 
-        for (Etudiant etudiant : listeEtudiants) {
-            observableItems.add(etudiant.getNom() + " " + etudiant.getPrenom() + " - " + etudiant.getClasse() + " (" + etudiant.getId() + ")");
+        for (Etudiant e : listeEtudiants) {
+            items.add(e.getNom() + " " + e.getPrenom() + " - " + e.getClasse() + " (" + e.getId() + ")");
         }
 
-        listView.setItems(observableItems);
+        listView.setItems(items);
         VBox.setVgrow(listView, Priority.ALWAYS);
 
         Button btnSelectionner = new Button("Sélectionner");
-        btnSelectionner.setStyle("-fx-background-color: #4a87e8; -fx-text-fill: white;");
-
+        btnSelectionner.setStyle(STYLE_BUTTON_PRIMARY);
         btnSelectionner.setOnAction(e -> {
             String selected = listView.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                // Extraire l'ID de l'étudiant sélectionné
                 String id = selected.substring(selected.lastIndexOf("(") + 1, selected.lastIndexOf(")"));
-                Etudiant etudiant = csvService.getEtudiantById(id);
-
-                if (etudiant != null) {
-                    System.out.println("Étudiant sélectionné depuis la liste: " + etudiant.getNom() + " " + etudiant.getPrenom());
-                    afficherDetailsEtudiant(etudiant);
-                }
+                Etudiant etu = csvService.getEtudiantById(id);
+                if (etu != null) afficherDetailsEtudiant(etu);
                 popup.hide();
             }
         });
@@ -506,53 +340,31 @@ public class EdtAdministrateurController implements Initializable {
         Button btnFermer = new Button("Fermer");
         btnFermer.setOnAction(e -> popup.hide());
 
-        HBox buttonsBox = new HBox(10, btnSelectionner, btnFermer);
-        buttonsBox.setAlignment(Pos.CENTER_RIGHT);
-
-        popupContent.getChildren().addAll(titleLabel, listView, buttonsBox);
-
-        popup.getContent().add(popupContent);
-
-        // Afficher la popup à côté du bouton
-        Window window = scrollPane.getScene().getWindow();
-        popup.show(window, window.getX() + 100, window.getY() + 100);
+        VBox popupContent = (VBox) popup.getContent().get(0);
+        popupContent.getChildren().addAll(listView, new HBox(10, btnSelectionner, btnFermer));
+        popup.show(scrollPane.getScene().getWindow(), scrollPane.getScene().getWindow().getX() + 100, scrollPane.getScene().getWindow().getY() + 100);
     }
 
     private void ouvrirListeEnseignants() {
-        Popup popup = new Popup();
-        popup.setAutoHide(true);
-
-        VBox popupContent = new VBox(10);
-        popupContent.setPadding(new Insets(15));
-        popupContent.setStyle("-fx-background-color: white; -fx-border-color: #cccccc; -fx-border-width: 1; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0);");
-        popupContent.setMinWidth(400);
-        popupContent.setMaxHeight(500);
-
-        Label titleLabel = new Label("Liste des enseignants");
-        titleLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
-
+        Popup popup = creerPopup("Liste des enseignants");
         ListView<String> listView = new ListView<>();
-        ObservableList<String> observableItems = FXCollections.observableArrayList();
+        ObservableList<String> items = FXCollections.observableArrayList();
 
-        for (Enseignant enseignant : listeEnseignants) {
-            observableItems.add(enseignant.getNom() + " " + enseignant.getPrenom() + " (" + enseignant.getId() + ")");
+        for (Enseignant e : listeEnseignants) {
+            items.add(e.getNom() + " " + e.getPrenom() + " (" + e.getId() + ")");
         }
 
-        listView.setItems(observableItems);
+        listView.setItems(items);
         VBox.setVgrow(listView, Priority.ALWAYS);
 
         Button btnSelectionner = new Button("Sélectionner");
-        btnSelectionner.setStyle("-fx-background-color: #4a87e8; -fx-text-fill: white;");
-
+        btnSelectionner.setStyle(STYLE_BUTTON_PRIMARY);
         btnSelectionner.setOnAction(e -> {
             String selected = listView.getSelectionModel().getSelectedItem();
             if (selected != null) {
                 String id = selected.substring(selected.lastIndexOf("(") + 1, selected.lastIndexOf(")"));
-                Enseignant enseignant = csvService.getEnseignantById(id);
-
-                if (enseignant != null) {
-                    afficherDetailsEnseignant(enseignant);
-                }
+                Enseignant ens = csvService.getEnseignantById(id);
+                if (ens != null) afficherDetailsEnseignant(ens);
                 popup.hide();
             }
         });
@@ -560,14 +372,26 @@ public class EdtAdministrateurController implements Initializable {
         Button btnFermer = new Button("Fermer");
         btnFermer.setOnAction(e -> popup.hide());
 
-        HBox buttonsBox = new HBox(10, btnSelectionner, btnFermer);
-        buttonsBox.setAlignment(Pos.CENTER_RIGHT);
+        VBox popupContent = (VBox) popup.getContent().get(0);
+        popupContent.getChildren().addAll(listView, new HBox(10, btnSelectionner, btnFermer));
+        popup.show(scrollPane.getScene().getWindow(), scrollPane.getScene().getWindow().getX() + 100, scrollPane.getScene().getWindow().getY() + 100);
+    }
 
-        popupContent.getChildren().addAll(titleLabel, listView, buttonsBox);
+    private Popup creerPopup(String titre) {
+        Popup popup = new Popup();
+        popup.setAutoHide(true);
 
+        VBox popupContent = new VBox(10);
+        popupContent.setPadding(new Insets(15));
+        popupContent.setStyle(STYLE_POPUP);
+        popupContent.setMinWidth(400);
+        popupContent.setMaxHeight(500);
+
+        Label titleLabel = new Label(titre);
+        titleLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+
+        popupContent.getChildren().add(titleLabel);
         popup.getContent().add(popupContent);
-
-        Window window = scrollPane.getScene().getWindow();
-        popup.show(window, window.getX() + 100, window.getY() + 100);
+        return popup;
     }
 }
