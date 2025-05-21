@@ -16,6 +16,7 @@ import org.example.projet_java.service.CsvService;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class EdtAdministrateurController implements Initializable {
@@ -47,7 +48,6 @@ public class EdtAdministrateurController implements Initializable {
     private List<Enseignant> listeEnseignants = new ArrayList<>();
     private final CsvService csvService = CsvService.getInstance();
 
-    // Styles réutilisables
     private static final String STYLE_BOLD_LABEL = "-fx-font-weight: bold;";
     private static final String STYLE_POPUP = "-fx-background-color: white; -fx-border-color: #cccccc; -fx-border-width: 1; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0);";
     private static final String STYLE_BUTTON_PRIMARY = "-fx-background-color: #4a87e8; -fx-text-fill: white;";
@@ -130,7 +130,7 @@ public class EdtAdministrateurController implements Initializable {
 
     private void afficherDetailsEtudiant(Etudiant e) {
         etudiantInfoContainer.getChildren().clear();
-        edtContainer.getChildren().clear(); // Nettoyer l'emploi du temps précédent
+        edtContainer.getChildren().clear();
 
         etudiantInfoContainer.getChildren().addAll(
                 createInfoLine("ID", e.getId()),
@@ -196,14 +196,16 @@ public class EdtAdministrateurController implements Initializable {
             Label heureHeader = new Label("Horaires");
             Label salleHeader = new Label("Salle");
             Label enseignantHeader = new Label("Enseignant");
+            Label supprimerHeader = new Label("");
 
             matiereHeader.setPrefWidth(150);
             dateHeader.setPrefWidth(100);
             heureHeader.setPrefWidth(100);
             salleHeader.setPrefWidth(80);
             enseignantHeader.setPrefWidth(150);
+            supprimerHeader.setPrefWidth(100);
 
-            header.getChildren().addAll(matiereHeader, dateHeader, heureHeader, salleHeader, enseignantHeader);
+            header.getChildren().addAll(matiereHeader, dateHeader, heureHeader, salleHeader, enseignantHeader, supprimerHeader);
             coursContainer.getChildren().add(header);
 
             for (Cours cours : coursEtudiant) {
@@ -229,14 +231,49 @@ public class EdtAdministrateurController implements Initializable {
                 }
 
                 Label enseignantLabel = new Label(enseignantNom);
+                Button supprimerBtn = new Button("Supprimer");
+                supprimerBtn.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white;");
+
+                // Ajout de l'action pour le bouton supprimer
+                supprimerBtn.setOnAction(event -> {
+                    // Confirmation avant suppression
+                    Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+                    confirmation.setTitle("Confirmation de suppression");
+                    confirmation.setHeaderText("Supprimer le cours");
+                    confirmation.setContentText("Êtes-vous sûr de vouloir supprimer ce cours de " + cours.getMatiere() + " ?");
+
+                    Optional<ButtonType> result = confirmation.showAndWait();
+                    if (result.isPresent() && result.get() == ButtonType.OK) {
+                        // Suppression du cours
+                        boolean suppressionReussie = csvService.supprimerCours(cours.getId_cours());
+
+                        if (suppressionReussie) {
+                            // Rafraîchir l'affichage
+                            afficherEmploiDuTempsEtudiant(etudiant);
+                            Alert success = new Alert(Alert.AlertType.INFORMATION);
+                            success.setTitle("Succès");
+                            success.setHeaderText(null);
+                            success.setContentText("Le cours a été supprimé avec succès.");
+                            success.showAndWait();
+                        } else {
+                            // Afficher un message d'erreur
+                            Alert error = new Alert(Alert.AlertType.ERROR);
+                            error.setTitle("Erreur");
+                            error.setHeaderText(null);
+                            error.setContentText("Une erreur est survenue lors de la suppression du cours.");
+                            error.showAndWait();
+                        }
+                    }
+                });
 
                 matiere.setPrefWidth(150);
                 date.setPrefWidth(100);
                 horaires.setPrefWidth(100);
                 salle.setPrefWidth(80);
                 enseignantLabel.setPrefWidth(150);
+                supprimerBtn.setPrefWidth(100);
 
-                coursLine.getChildren().addAll(matiere, date, horaires, salle, enseignantLabel);
+                coursLine.getChildren().addAll(matiere, date, horaires, salle, enseignantLabel, supprimerBtn);
                 coursContainer.getChildren().add(coursLine);
             }
 
@@ -276,6 +313,7 @@ public class EdtAdministrateurController implements Initializable {
             Label heureHeader = new Label("Horaires");
             Label salleHeader = new Label("Salle");
             Label classeHeader = new Label("Classe");
+            Label supprimerHeader = new Label("");
 
             matiereHeader.setPrefWidth(150);
             dateHeader.setPrefWidth(100);
@@ -283,7 +321,7 @@ public class EdtAdministrateurController implements Initializable {
             salleHeader.setPrefWidth(80);
             classeHeader.setPrefWidth(150);
 
-            header.getChildren().addAll(matiereHeader, dateHeader, heureHeader, salleHeader, classeHeader);
+            header.getChildren().addAll(matiereHeader, dateHeader, heureHeader, salleHeader, classeHeader, supprimerHeader);
             coursContainer.getChildren().add(header);
 
             for (Cours cours : coursEnseignant) {
@@ -297,13 +335,48 @@ public class EdtAdministrateurController implements Initializable {
                 Label salle = new Label(cours.getId_salle());
                 Label classe = new Label(cours.getClasse());
 
+                Button supprimerBtn = new Button("Supprimer");
+                supprimerBtn.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white;");
+
+                // Ajout de l'action pour le bouton supprimer
+                supprimerBtn.setOnAction(event -> {
+                    // Confirmation avant suppression
+                    Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+                    confirmation.setTitle("Confirmation de suppression");
+                    confirmation.setHeaderText("Supprimer le cours");
+                    confirmation.setContentText("Êtes-vous sûr de vouloir supprimer ce cours de " + cours.getMatiere() + " ?");
+
+                    Optional<ButtonType> result = confirmation.showAndWait();
+                    if (result.isPresent() && result.get() == ButtonType.OK) {
+                        // Suppression du cours
+                        boolean suppressionReussie = csvService.supprimerCours(cours.getId_cours());
+
+                        if (suppressionReussie) {
+                            // Rafraîchir l'affichage
+                            afficherEmploiDuTempsEnseignant(enseignant);
+                            Alert success = new Alert(Alert.AlertType.INFORMATION);
+                            success.setTitle("Succès");
+                            success.setHeaderText(null);
+                            success.setContentText("Le cours a été supprimé avec succès.");
+                            success.showAndWait();
+                        } else {
+                            // Afficher un message d'erreur
+                            Alert error = new Alert(Alert.AlertType.ERROR);
+                            error.setTitle("Erreur");
+                            error.setHeaderText(null);
+                            error.setContentText("Une erreur est survenue lors de la suppression du cours.");
+                            error.showAndWait();
+                        }
+                    }
+                });
+
                 matiere.setPrefWidth(150);
                 date.setPrefWidth(100);
                 horaires.setPrefWidth(100);
                 salle.setPrefWidth(80);
                 classe.setPrefWidth(150);
 
-                coursLine.getChildren().addAll(matiere, date, horaires, salle, classe);
+                coursLine.getChildren().addAll(matiere, date, horaires, salle, classe, supprimerBtn);
                 coursContainer.getChildren().add(coursLine);
             }
 

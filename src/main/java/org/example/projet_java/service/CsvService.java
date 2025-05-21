@@ -172,11 +172,15 @@ public class CsvService {
                 String[] values = line.split(",");
                 if (values.length >= 8 && values[6].equals(id_enseignant)) {
                     Cours c = new Cours(
-                            values[0], values[1], values[2],
-                            LocalDate.parse(values[3], DATE_FORMATTER).toString(),
-                            LocalTime.parse(values[4], TIME_FORMATTER).toString(),
-                            LocalTime.parse(values[5], TIME_FORMATTER).toString(),
-                            values[6], values[7], false);
+                            values[0].trim(),
+                            values[1].trim(),
+                            values[2].trim(),
+                            values[3].trim(), // On garde la date en string
+                            values[4].trim(), // heure_debut
+                            values[5].trim(), // heure_fin
+                            values[6].trim(),
+                            values[7].trim(),
+                            false);
                     cours.add(c);
                 }
             }
@@ -201,5 +205,57 @@ public class CsvService {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public boolean supprimerCours(String idCours) {
+        // 1. Supprimer le cours du fichier CSV_COURS
+        boolean coursSupprime = supprimerLignesDansFichier(CSV_COURS, 0, idCours);
+
+        // 2. Supprimer les références dans le fichier CSV_EDT
+        boolean edtMisAJour = supprimerLignesDansFichier(CSV_EDT, 1, idCours);
+
+        return coursSupprime && edtMisAJour;
+    }
+
+    private boolean supprimerLignesDansFichier(String fichier, int colonneId, String idCours) {
+        File file = new File(fichier);
+        File tempFile = new File(fichier + ".tmp");
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file));
+             BufferedWriter bw = new BufferedWriter(new FileWriter(tempFile))) {
+
+            String line;
+            boolean headerProcessed = false;
+            boolean found = false;
+
+            while ((line = br.readLine()) != null) {
+                if (!headerProcessed) {
+                    bw.write(line + "\n");
+                    headerProcessed = true;
+                    continue;
+                }
+
+                String[] values = line.split(",");
+                if (values.length > colonneId && values[colonneId].trim().equals(idCours.trim())) {
+                    found = true; // On a trouvé la ligne à supprimer
+                    continue; // On ne l'écrit pas dans le fichier temporaire
+                }
+                bw.write(line + "\n");
+            }
+
+            if (!found) {
+                System.err.println("Aucune correspondance trouvée pour l'ID " + idCours + " dans " + fichier);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        if (!file.delete() || !tempFile.renameTo(file)) {
+            System.err.println("Erreur lors du remplacement du fichier " + fichier);
+            return false;
+        }
+
+        return true;
     }
 }
