@@ -372,6 +372,13 @@ public class CsvService {
                 }
                 String[] valeurs = ligne.split(",");
                 if (valeurs.length >= 8) {
+                    // Par défaut, le cours n'est pas annulé
+                    boolean estAnnule = false;
+                    // Si le champ estAnnule est présent (9ème colonne), on le lit
+                    if (valeurs.length >= 9) {
+                        estAnnule = Boolean.parseBoolean(valeurs[8]);
+                    }
+
                     Cours c = new Cours(
                             valeurs[0], // id_cours
                             valeurs[1], // salle
@@ -381,7 +388,7 @@ public class CsvService {
                             valeurs[5], // heure_fin
                             valeurs[6], // id_enseignant
                             valeurs[7], // classe
-                            Boolean.parseBoolean(valeurs[8])
+                            estAnnule
                     );
                     cours.add(c);
                 }
@@ -408,7 +415,8 @@ public class CsvService {
                         c.getHeure_debut(),
                         c.getHeure_fin(),
                         c.getId_enseignant(),
-                        c.getClasse()
+                        c.getClasse(),
+                        String.valueOf(c.isAnnulation())
                 );
                 bw.write(ligne);
                 bw.newLine();
@@ -441,5 +449,53 @@ public class CsvService {
 
         // Réécrire tous les cours dans le fichier
         return reecrireTousLesCours(tousLesCours); // Méthode qui écrit la liste complète
+    }
+
+    public boolean isSalleDisponible(String idSalle, String date, String heureDebut, String heureFin, String idCoursExclu) {
+        List<Cours> tousLesCours = lireTousLesCours();
+
+        for (Cours cours : tousLesCours) {
+            // Ignorer le cours qu'on est en train de modifier
+            if (idCoursExclu != null && cours.getId_cours().equals(idCoursExclu)) {
+                continue;
+            }
+
+            if (cours.getId_salle().equals(idSalle) && cours.getDate().equals(date)) {
+                if (plagesHorairesSeChevauchent(
+                        cours.getHeure_debut(), cours.getHeure_fin(),
+                        heureDebut, heureFin)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    // Surcharge pour la création de nouveau cours
+    public boolean isSalleDisponible(String idSalle, String date, String heureDebut, String heureFin) {
+        return isSalleDisponible(idSalle, date, heureDebut, heureFin, null);
+    }
+
+    private boolean plagesHorairesSeChevauchent(String debut1, String fin1, String debut2, String fin2) {
+        try {
+            // Normaliser les formats d'heure (supprimer 'h' si présent)
+            debut1 = debut1.replace("h", ":");
+            fin1 = fin1.replace("h", ":");
+            debut2 = debut2.replace("h", ":");
+            fin2 = fin2.replace("h", ":");
+
+            // Parse en LocalTime
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm");
+            LocalTime d1 = LocalTime.parse(debut1, formatter);
+            LocalTime f1 = LocalTime.parse(fin1, formatter);
+            LocalTime d2 = LocalTime.parse(debut2, formatter);
+            LocalTime f2 = LocalTime.parse(fin2, formatter);
+
+            // Vérifier le chevauchement
+            return !(f1.isBefore(d2) || f2.isBefore(d1));
+        } catch (Exception e) {
+            System.err.println("Erreur lors de la comparaison des horaires: " + e.getMessage());
+            return true; // En cas d'erreur, on considère qu'il y a chevauchement par sécurité
+        }
     }
 }

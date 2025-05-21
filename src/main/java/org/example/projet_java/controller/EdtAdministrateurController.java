@@ -18,6 +18,8 @@ import org.example.projet_java.service.CsvService;
 import org.w3c.dom.Text;
 
 import java.net.URL;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -564,6 +566,11 @@ public class EdtAdministrateurController implements Initializable {
             return false;
         }
 
+        if (!csvService.isSalleDisponible(salle, date, heureDebut, heureFin)) {
+            afficherAlerte("Erreur", "La salle " + salle + " est déjà occupée à cette date et heure");
+            return false;
+        }
+
         String idEnseignant = enseignantSelectionne.split(" - ")[0];
 
         // Créer un nouvel objet Cours
@@ -793,6 +800,11 @@ public class EdtAdministrateurController implements Initializable {
             return false;
         }
 
+        if (!csvService.isSalleDisponible(salle, date, heureDebut, heureFin)) {
+            afficherAlerte("Erreur", "La salle " + salle + " est déjà occupée à cette date et heure");
+            return false;
+        }
+
         // Créer un nouvel objet Cours
         Cours nouveauCours = new Cours(
                 idCours,
@@ -929,5 +941,62 @@ public class EdtAdministrateurController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private boolean plagesHorairesSeChevauchent(String debut1, String fin1, String debut2, String fin2) {
+        try {
+            // Normaliser les formats d'heure (supprimer 'h' si présent et ajouter : si nécessaire)
+            debut1 = debut1.replace("h", ":").replace("H", ":");
+            fin1 = fin1.replace("h", ":").replace("H", ":");
+            debut2 = debut2.replace("h", ":").replace("H", ":");
+            fin2 = fin2.replace("h", ":").replace("H", ":");
+
+            // S'assurer qu'il y a deux chiffres pour les minutes
+            debut1 = normaliserHeure(debut1);
+            fin1 = normaliserHeure(fin1);
+            debut2 = normaliserHeure(debut2);
+            fin2 = normaliserHeure(fin2);
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm");
+            LocalTime d1 = LocalTime.parse(debut1, formatter);
+            LocalTime f1 = LocalTime.parse(fin1, formatter);
+            LocalTime d2 = LocalTime.parse(debut2, formatter);
+            LocalTime f2 = LocalTime.parse(fin2, formatter);
+
+            // Vérifier le chevauchement
+            return !(f1.isBefore(d2) || f2.isBefore(d1));
+        } catch (Exception e) {
+            System.err.println("Erreur lors de la comparaison des horaires: " + e.getMessage());
+            return true; // En cas d'erreur, on considère qu'il y a chevauchement par sécurité
+        }
+    }
+
+    private String normaliserHeure(String heure) {
+        if (heure.length() == 4 && heure.contains(":")) { // format H:mm
+            return heure;
+        }
+        if (heure.length() == 1) { // format H
+            return heure + ":00";
+        }
+        if (heure.length() == 2) {
+            if (heure.contains(":")) { // format H:
+                return heure + "00";
+            } else { // format HH
+                return heure + ":00";
+            }
+        }
+        if (heure.length() == 3) {
+            if (heure.contains(":")) { // format H:mm ou HH:m
+                String[] parts = heure.split(":");
+                if (parts[1].length() == 1) {
+                    return parts[0] + ":0" + parts[1];
+                } else {
+                    return heure;
+                }
+            } else { // format HHmm
+                return heure.substring(0, 2) + ":" + heure.substring(2);
+            }
+        }
+        return heure;
     }
 }
