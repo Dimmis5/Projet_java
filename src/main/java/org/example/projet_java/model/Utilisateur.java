@@ -51,7 +51,7 @@ public class Utilisateur {
         return mdp;
     }
 
-    public void setMdp(){
+    public void setMdp(String mdp){
         this.mdp = mdp;
     }
 

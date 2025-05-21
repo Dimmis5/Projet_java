@@ -8,6 +8,7 @@ public class Etudiant extends Utilisateur {
     protected String prenom;
     protected String mail;
     protected String classe;
+    protected String mdp;
     protected ArrayList<Cours> cours;
 
     public Etudiant(String id, String nom, String prenom, String mail, String mdp, String classe) {
@@ -17,7 +18,6 @@ public class Etudiant extends Utilisateur {
         this.nom = nom;
         this.prenom = prenom;
         this.mail = mail;
-        this.mdp = mdp;
         this.classe = classe;
     }
 
