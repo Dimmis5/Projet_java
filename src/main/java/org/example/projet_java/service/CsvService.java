@@ -381,7 +381,7 @@ public class CsvService {
                             valeurs[5], // heure_fin
                             valeurs[6], // id_enseignant
                             valeurs[7], // classe
-                            Boolean.parseBoolean(valeurs[8]) // estAnnule
+                            Boolean.parseBoolean(valeurs[8])
                     );
                     cours.add(c);
                 }
