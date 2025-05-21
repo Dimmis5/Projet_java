@@ -184,7 +184,7 @@ public class EdtAdministrateurController implements Initializable {
         Label titreLabel = new Label("Emploi du temps de " + etudiant.getPrenom() + " " + etudiant.getNom());
         titreLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
-        Button ajoutBtn = new Button("Ajouter un cours hhh");
+        Button ajoutBtn = new Button("Ajouter un cours");
         ajoutBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
         ajoutBtn.setOnAction(e -> ouvrirPopupAjoutCours(etudiant));
 
@@ -243,9 +243,7 @@ public class EdtAdministrateurController implements Initializable {
                 Button supprimerBtn = new Button("Supprimer");
                 supprimerBtn.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white;");
 
-                // Ajout de l'action pour le bouton supprimer
                 supprimerBtn.setOnAction(event -> {
-                    // Confirmation avant suppression
                     Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
                     confirmation.setTitle("Confirmation de suppression");
                     confirmation.setHeaderText("Supprimer le cours");
@@ -286,7 +284,7 @@ public class EdtAdministrateurController implements Initializable {
                 coursContainer.getChildren().add(coursLine);
             }
 
-            container.getChildren().addAll(titreLabel, coursContainer);
+            container.getChildren().addAll(titreLabel, coursContainer, ajoutBtn);
         }
 
         edtContainer.getChildren().add(container);
@@ -489,7 +487,8 @@ public class EdtAdministrateurController implements Initializable {
         grid.setVgap(10);
         grid.setHgap(10);
 
-        // Champs du formulaire
+
+        TextField coursField= new TextField();
         TextField salleField = new TextField();
         TextField matiereField = new TextField();
         TextField dateField = new TextField();
@@ -506,8 +505,10 @@ public class EdtAdministrateurController implements Initializable {
         ));
 
         // Ajout des champs au formulaire
-        grid.add(new Label("Matière:"), 0, 0);
-        grid.add(matiereField, 1, 0);
+        grid.add(new Label("Id cours"),0 ,0);
+        grid.add(coursField,1,0);
+        grid.add(new Label("Matière:"), 0, 1);
+        grid.add(matiereField, 1, 1);
         grid.add(new Label("Date:"), 0, 2);
         grid.add(dateField, 1, 2);
         grid.add(new Label("Heure début (HH:MM):"), 0, 3);
@@ -523,9 +524,9 @@ public class EdtAdministrateurController implements Initializable {
         Button validerBtn = new Button("Valider");
         validerBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
         validerBtn.setOnAction(e -> {
-            if (validerEtAjouterCours(etudiant, matiereField.getText(),dateField.getText(), heureDebutField.getText(), heureFinField.getText(), salleField.getText(), enseignantCombo.getValue())) {
+            if (validerEtAjouterCours(etudiant,coursField.getText(), matiereField.getText(),dateField.getText(), heureDebutField.getText(), heureFinField.getText(), salleField.getText(), enseignantCombo.getValue())) {
                 popup.close();
-                afficherEmploiDuTempsEtudiant(etudiant); // Rafraîchir l'affichage
+                afficherEmploiDuTempsEtudiant(etudiant);
             }
         });
 
@@ -544,7 +545,7 @@ public class EdtAdministrateurController implements Initializable {
         popup.showAndWait();
     }
 
-    private boolean validerEtAjouterCours(Etudiant etudiant, String matiere, String date, String heureDebut, String heureFin, String salle, String enseignantSelectionne) {
+    private boolean validerEtAjouterCours(Etudiant etudiant, String id_cours, String matiere, String date, String heureDebut, String heureFin, String salle, String enseignantSelectionne) {
         if (matiere == null || matiere.isEmpty() ||
                 date == null ||
                 heureDebut == null || heureDebut.isEmpty() ||
@@ -555,21 +556,11 @@ public class EdtAdministrateurController implements Initializable {
             return false;
         }
 
-        // Validation du format des heures
-        if (!heureDebut.matches("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$") ||
-                !heureFin.matches("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$")) {
-            afficherAlerte("Erreur", "Format des heures invalide (utiliser HH:MM)");
-            return false;
-        }
-
-        // Extraire l'ID de l'enseignant
         String idEnseignant = enseignantSelectionne.split(" - ")[0];
 
-        // Création du nouveau cours
         Cours nouveauCours = new Cours(
-                csvService.genererNouvelIdCours(), salle, matiere, date, heureDebut, heureFin, idEnseignant, etudiant.getClasse(), false);
+                id_cours, salle, matiere, date, heureDebut, heureFin, idEnseignant, etudiant.getClasse(), false);
 
-        // Ajout via le service CSV
         try {
             boolean succes = csvService.ajouterCours(nouveauCours);
             if (succes) {

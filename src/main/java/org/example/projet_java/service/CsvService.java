@@ -208,10 +208,7 @@ public class CsvService {
     }
 
     public boolean supprimerCours(String idCours) {
-        // 1. Supprimer le cours du fichier CSV_COURS
         boolean coursSupprime = supprimerLignesDansFichier(CSV_COURS, 0, idCours);
-
-        // 2. Supprimer les références dans le fichier CSV_EDT
         boolean edtMisAJour = supprimerLignesDansFichier(CSV_EDT, 1, idCours);
 
         return coursSupprime && edtMisAJour;
@@ -259,25 +256,15 @@ public class CsvService {
         return true;
     }
 
-    /**
-     * Génère un nouvel ID unique pour un cours
-     */
-    public String genererNouvelIdCours() {
-        return "CRS" + System.currentTimeMillis();
-    }
-
-    /**
-     * Ajoute un nouveau cours dans le fichier CSV
-     */
     public boolean ajouterCours(Cours nouveauCours) {
         // Formatage de la ligne pour CSV_COURS
         String ligneCours = String.join(",",
                 nouveauCours.getId_cours(),
+                nouveauCours.getId_salle(),
                 nouveauCours.getMatiere(),
                 nouveauCours.getDate(),
                 nouveauCours.getHeure_debut(),
                 nouveauCours.getHeure_fin(),
-                nouveauCours.getId_salle(),
                 nouveauCours.getId_enseignant(),
                 nouveauCours.getClasse()
         );
@@ -329,13 +316,11 @@ public class CsvService {
         try (FileWriter fw = new FileWriter(file, true);
              BufferedWriter bw = new BufferedWriter(fw)) {
 
-            // Écrire l'en-tête si le fichier est vide
             if (!fichierExiste) {
                 bw.write(entete);
                 bw.newLine();
             }
-
-            // Écrire la ligne
+            bw.newLine();
             bw.write(ligne);
             bw.newLine();
         }

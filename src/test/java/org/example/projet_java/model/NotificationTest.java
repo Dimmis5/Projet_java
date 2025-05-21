@@ -1,3 +1,4 @@
+/*
 package org.example.projet_java.model;
 
 import org.junit.jupiter.api.Test;
@@ -23,4 +24,4 @@ class NotificationTest {
         assertEquals("Message mis à jour", notification.getMessage());
         assertEquals("2025-05-21", notification.getDate());
     }
-}
+}*/

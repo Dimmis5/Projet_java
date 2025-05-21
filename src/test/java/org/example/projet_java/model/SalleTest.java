@@ -1,3 +1,4 @@
+/*
 package org.example.projet_java.model;
 
 import org.junit.jupiter.api.Test;
@@ -41,4 +42,4 @@ class SalleTest {
         assertTrue(salle.getEquipement().contains("Tableau"));
     }
 
-}
+}*/

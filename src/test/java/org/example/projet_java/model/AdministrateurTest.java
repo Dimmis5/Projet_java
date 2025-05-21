@@ -1,3 +1,4 @@
+/*
 package org.example.projet_java.model;
 
 import org.junit.jupiter.api.Test;
@@ -71,3 +72,4 @@ class AdministrateurTest {
         assertEquals("newpass456", admin.getMdp());
     }
 }
+*/

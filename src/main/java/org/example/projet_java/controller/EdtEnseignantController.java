@@ -12,7 +12,7 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 
 public class EdtEnseignantController {
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE;
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter TIME_FORMAT_H = DateTimeFormatter.ofPattern("H'h'mm");
     private static final DateTimeFormatter TIME_FORMAT_COLON = DateTimeFormatter.ofPattern("H:mm");
     private static final DateTimeFormatter HEADER_DATE_FORMAT = DateTimeFormatter.ofPattern("E dd/MM");
@@ -39,7 +39,7 @@ public class EdtEnseignantController {
 
         // Solution temporaire pour test - À remplacer par l'appel depuis votre code principal
         if (this.idEnseignant == null) {
-            this.idEnseignant = "20000"; // À supprimer après test
+            this.idEnseignant = "20000";
             System.out.println("[DEBUG] ID enseignant défini en dur pour test: " + this.idEnseignant);
         }
 

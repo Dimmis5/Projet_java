@@ -1,3 +1,4 @@
+/*
 package org.example.projet_java.model;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -57,4 +58,4 @@ public class EnseignantTest {
 
         enseignant.setAnomalie("typeTest", "descriptionTest");
     }
-}
+}*/

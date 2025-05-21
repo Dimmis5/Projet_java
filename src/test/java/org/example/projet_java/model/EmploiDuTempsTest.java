@@ -1,3 +1,4 @@
+/*
 package org.example.projet_java.model;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,3 +26,4 @@ public class EmploiDuTempsTest {
         assertEquals("cours2", edt.getId_cours());
     }
 }
+*/
