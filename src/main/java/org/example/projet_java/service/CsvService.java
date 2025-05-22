@@ -450,9 +450,8 @@ public class CsvService {
     }
 
     public boolean modifierCours(Cours coursModifie) {
-        List<Cours> tousLesCours = lireTousLesCours(); // Méthode existante qui lit tous les cours
+        List<Cours> tousLesCours = lireTousLesCours();
 
-        // Trouver l'index du cours à modifier
         int index = -1;
         for (int i = 0; i < tousLesCours.size(); i++) {
             if (tousLesCours.get(i).getId_cours().equals(coursModifie.getId_cours())) {
@@ -462,29 +461,24 @@ public class CsvService {
         }
 
         if (index == -1) {
-            return false; // Cours non trouvé
+            return false;
         }
 
-        // Remplacer l'ancien cours par le cours modifié
         tousLesCours.set(index, coursModifie);
 
-        // Réécrire tous les cours dans le fichier
-        return reecrireTousLesCours(tousLesCours); // Méthode qui écrit la liste complète
+        return reecrireTousLesCours(tousLesCours);
     }
 
     public boolean isSalleDisponible(String idSalle, String date, String heureDebut, String heureFin, String idCoursExclu) {
         List<Cours> tousLesCours = lireTousLesCours();
 
         for (Cours cours : tousLesCours) {
-            // Ignorer le cours qu'on est en train de modifier
             if (idCoursExclu != null && cours.getId_cours().equals(idCoursExclu)) {
                 continue;
             }
 
             if (cours.getId_salle().equals(idSalle) && cours.getDate().equals(date)) {
-                if (plagesHorairesSeChevauchent(
-                        cours.getHeure_debut(), cours.getHeure_fin(),
-                        heureDebut, heureFin)) {
+                if (plagesHorairesSeChevauchent(cours.getHeure_debut(), cours.getHeure_fin(), heureDebut, heureFin)) {
                     return false;
                 }
             }
@@ -492,82 +486,55 @@ public class CsvService {
         return true;
     }
 
-    // Surcharge pour la création de nouveau cours
     public boolean isSalleDisponible(String idSalle, String date, String heureDebut, String heureFin) {
         return isSalleDisponible(idSalle, date, heureDebut, heureFin, null);
     }
 
     private boolean plagesHorairesSeChevauchent(String debut1, String fin1, String debut2, String fin2) {
         try {
-            // Normaliser les formats d'heure (supprimer 'h' si présent)
             debut1 = debut1.replace("h", ":");
             fin1 = fin1.replace("h", ":");
             debut2 = debut2.replace("h", ":");
             fin2 = fin2.replace("h", ":");
 
-            // Parse en LocalTime
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm");
             LocalTime d1 = LocalTime.parse(debut1, formatter);
             LocalTime f1 = LocalTime.parse(fin1, formatter);
             LocalTime d2 = LocalTime.parse(debut2, formatter);
             LocalTime f2 = LocalTime.parse(fin2, formatter);
 
-            // Vérifier le chevauchement
             return !(f1.isBefore(d2) || f2.isBefore(d1));
         } catch (Exception e) {
             System.err.println("Erreur lors de la comparaison des horaires: " + e.getMessage());
-            return true; // En cas d'erreur, on considère qu'il y a chevauchement par sécurité
+            return true;
         }
     }
 
 
     public boolean modifierStatutAnnulationCours(String idCours, boolean nouvelEtat) {
-        System.out.println("=== DÉBUT MODIFICATION STATUT ===");
-        System.out.println("ID Cours: " + idCours);
-        System.out.println("Nouvel état: " + nouvelEtat + " (true = annulé, false = prévu)");
-
         List<String> lignes = new ArrayList<>();
         boolean trouve = false;
 
         try (BufferedReader br = new BufferedReader(new FileReader(CSV_COURS))) {
-            String ligne = br.readLine(); // Header
+            String ligne = br.readLine();
             if (ligne != null) {
                 lignes.add(ligne);
                 System.out.println("Header: " + ligne);
             }
 
             while ((ligne = br.readLine()) != null) {
-                System.out.println("Ligne lue: " + ligne);
                 String[] values = ligne.split(",");
-                System.out.println("Nombre de colonnes: " + values.length);
-
-                if (values.length >= 1) {
-                    System.out.println("ID cours dans ligne: '" + values[0].trim() + "'");
-                    System.out.println("ID cours recherché: '" + idCours.trim() + "'");
-                    System.out.println("Comparaison: " + values[0].trim().equals(idCours.trim()));
-                }
 
                 if (values.length >= 8 && values[0].trim().equals(idCours.trim())) {
                     trouve = true;
-                    System.out.println("*** COURS TROUVÉ ***");
 
-                    // Afficher l'état actuel si la colonne existe
-                    if (values.length >= 9) {
-                        System.out.println("État actuel dans CSV: " + values[8]);
-                    } else {
-                        System.out.println("Pas de colonne d'état actuel, sera ajoutée");
-                    }
-
-                    // Reconstruire la ligne avec le nouveau statut
                     StringBuilder nouvelleLigne = new StringBuilder();
 
-                    // Copier les 8 premières colonnes (id, matière, classe, date, heure_debut, heure_fin, enseignant, salle)
                     for (int i = 0; i < 8; i++) {
                         if (i > 0) nouvelleLigne.append(",");
-                        nouvelleLigne.append(values[i].trim()); // Trim pour éviter les espaces
+                        nouvelleLigne.append(values[i].trim());
                     }
 
-                    // Ajouter le statut d'annulation (true = annulé, false = prévu)
                     nouvelleLigne.append(",").append(nouvelEtat);
 
                     lignes.add(nouvelleLigne.toString());
@@ -584,19 +551,11 @@ public class CsvService {
         }
 
         if (!trouve) {
-            System.out.println("*** COURS NON TROUVÉ ***");
-            System.out.println("ID recherché: '" + idCours + "'");
-
-            // Afficher tous les IDs disponibles pour débogage
             try (BufferedReader br = new BufferedReader(new FileReader(CSV_COURS))) {
-                br.readLine(); // skip header
+                br.readLine();
                 String ligne;
-                System.out.println("IDs disponibles dans le CSV:");
                 while ((ligne = br.readLine()) != null) {
                     String[] values = ligne.split(",");
-                    if (values.length >= 1) {
-                        System.out.println("  - '" + values[0].trim() + "'");
-                    }
                 }
             } catch (IOException e) {
                 System.err.println("Erreur lors de la lecture des IDs: " + e.getMessage());
@@ -605,20 +564,17 @@ public class CsvService {
             return false;
         }
 
-        // Réécrire le fichier
         try (PrintWriter pw = new PrintWriter(new FileWriter(CSV_COURS))) {
             for (String ligne : lignes) {
                 pw.println(ligne);
             }
             pw.flush();
-            System.out.println("*** FICHIER RÉÉCRIT AVEC SUCCÈS ***");
         } catch (IOException e) {
             System.err.println("Erreur écriture: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
 
-        // Vérification de la modification
         try (BufferedReader br = new BufferedReader(new FileReader(CSV_COURS))) {
             br.readLine(); // skip header
             String ligne;
@@ -627,10 +583,6 @@ public class CsvService {
                 if (values.length >= 1 && values[0].trim().equals(idCours.trim())) {
                     if (values.length >= 9) {
                         boolean statutFinal = Boolean.parseBoolean(values[8].trim());
-                        System.out.println("*** VÉRIFICATION ***");
-                        System.out.println("Statut dans fichier: " + values[8] + " -> " + statutFinal);
-                        System.out.println("Statut attendu: " + nouvelEtat);
-                        System.out.println("Modification réussie: " + (statutFinal == nouvelEtat));
                         return statutFinal == nouvelEtat;
                     }
                     break;
@@ -639,8 +591,6 @@ public class CsvService {
         } catch (IOException e) {
             System.err.println("Erreur vérification: " + e.getMessage());
         }
-
-        System.out.println("=== FIN MODIFICATION STATUT ===");
         return true;
     }
 
@@ -649,7 +599,7 @@ public class CsvService {
 
         try (BufferedReader br = new BufferedReader(new FileReader(CSV_CLASSE))) {
             String line;
-            br.readLine(); // ignore header
+            br.readLine();
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
                 if (values.length >= 2) {
@@ -669,16 +619,15 @@ public class CsvService {
 
         try (BufferedReader br = new BufferedReader(new FileReader(CSV_SALLE))) {
             String line;
-            br.readLine(); // ignore header
+            br.readLine();
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
-                if (values.length >= 5) {
+                if (values.length >= 4) {
                     String id_salle = values[0];
                     String localisation = values[1];
                     int capacite = Integer.parseInt(values[2]);
-                    boolean statut = Boolean.parseBoolean(values[4]);
 
-                    Salle salle = new Salle(id_salle, localisation, capacite, statut);
+                    Salle salle = new Salle(id_salle, localisation, capacite);
 
                     salles.add(salle);
                 }
@@ -697,24 +646,20 @@ public class CsvService {
         System.out.println("Recherche de l'effectif pour la classe: '" + nomClasse + "'");
 
         try (BufferedReader br = new BufferedReader(new FileReader(CSV_CLASSE))) {
-            br.readLine(); // ignorer l'en-tête
+            br.readLine();
             String ligne;
-            int numeroLigne = 1; // pour le débogage
+            int numeroLigne = 1;
 
             while ((ligne = br.readLine()) != null) {
                 numeroLigne++;
-                System.out.println("Ligne " + numeroLigne + ": " + ligne);
 
                 String[] valeurs = ligne.split(",");
                 if (valeurs.length >= 2) {
                     String classe = valeurs[0].trim();
-                    System.out.println("Classe trouvée: '" + classe + "' (longueur: " + classe.length() + ")");
-                    System.out.println("Comparaison avec: '" + nomClasse + "' (longueur: " + nomClasse.length() + ")");
 
                     if (classe.equalsIgnoreCase(nomClasse)) {
                         try {
                             effectif = Integer.parseInt(valeurs[1].trim());
-                            System.out.println("Effectif trouvé: " + effectif);
                             break;
                         } catch (NumberFormatException e) {
                             System.out.println("Erreur de conversion pour l'effectif: " + valeurs[1]);
@@ -727,8 +672,6 @@ public class CsvService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        System.out.println("Effectif final retourné: " + effectif);
         return effectif;
     }
 }

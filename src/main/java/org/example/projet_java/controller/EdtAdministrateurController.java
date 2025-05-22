@@ -667,9 +667,7 @@ public class EdtAdministrateurController implements Initializable {
         Button validerBtn = new Button("Valider");
         validerBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
         validerBtn.setOnAction(e -> {
-            if (validerEtModifierCours(etudiant, coursField.getText(), matiereField.getText(),
-                    dateField.getText(), heureDebutField.getText(), heureFinField.getText(),
-                    salleCombo.getValue(), enseignantCombo.getValue())) {
+            if (validerEtModifierCours(etudiant, coursField.getText(), matiereField.getText(), dateField.getText(), heureDebutField.getText(), heureFinField.getText(), salleCombo.getValue(), enseignantCombo.getValue())) {
                 popup.close();
                 afficherEmploiDuTempsEtudiant(etudiant);
             }
@@ -756,9 +754,7 @@ public class EdtAdministrateurController implements Initializable {
 
         ComboBox<String> enseignantCombo = new ComboBox<>();
         enseignantCombo.setItems(FXCollections.observableArrayList(
-                csvService.Enseignants().stream()
-                        .map(e -> e.getId() + " - " + e.getNom() + " " + e.getPrenom())
-                        .collect(Collectors.toList())
+                csvService.Enseignants().stream().map(e -> e.getId() + " - " + e.getNom() + " " + e.getPrenom()).collect(Collectors.toList())
         ))
         ;
 
