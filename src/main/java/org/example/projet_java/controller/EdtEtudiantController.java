@@ -83,12 +83,12 @@ public class EdtEtudiantController {
         int nombreCreneaux = 10; // nombre de lignes horaires, ajuste selon besoin
 
         for (int i = 0; i < nombreCreneaux; i++) {
-            RowConstraints row = new RowConstraints(60); // hauteur fixe 60 pixels par ligne
+            RowConstraints row = new RowConstraints(160); // hauteur fixe 60 pixels par ligne
             grilleCalendrier.getRowConstraints().add(row);
         }
 
         for (int i = 0; i < 7; i++) {
-            ColumnConstraints col = new ColumnConstraints(120); // largeur fixe 120 pixels par jour
+            ColumnConstraints col = new ColumnConstraints(200); // largeur fixe 120 pixels par jour
             grilleCalendrier.getColumnConstraints().add(col);
         }
 

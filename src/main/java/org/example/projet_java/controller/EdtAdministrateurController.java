@@ -741,14 +741,12 @@ public class EdtAdministrateurController implements Initializable {
         grid.setVgap(10);
         grid.setHgap(10);
 
-        // Champs pré-remplis avec les valeurs actuelles du cours
         TextField matiereField = new TextField(cours.getMatiere());
         TextField dateField = new TextField(cours.getDate());
         TextField heureDebutField = new TextField(cours.getHeure_debut());
         TextField heureFinField = new TextField(cours.getHeure_fin());
         TextField salleField = new TextField(cours.getId_salle());
 
-        // ComboBox pour les enseignants
         ComboBox<String> enseignantCombo = new ComboBox<>();
         enseignantCombo.setItems(FXCollections.observableArrayList(
                 csvService.Enseignants().stream()
@@ -757,7 +755,6 @@ public class EdtAdministrateurController implements Initializable {
         ))
         ;
 
-        // Sélectionner l'enseignant actuel
         String enseignantActuel = cours.getId_enseignant();
         try {
             Enseignant enseignant = csvService.getEnseignantById(enseignantActuel);
@@ -768,7 +765,6 @@ public class EdtAdministrateurController implements Initializable {
             System.err.println("Erreur lors de la récupération de l'enseignant: " + e.getMessage());
         }
 
-        // ComboBox pour le statut annulé
         ComboBox<Boolean> annuleCombo = new ComboBox<>();
         annuleCombo.setItems(FXCollections.observableArrayList(true, false));
         annuleCombo.setValue(cours.isAnnulation());
@@ -828,7 +824,6 @@ public class EdtAdministrateurController implements Initializable {
 
         String idEnseignant = enseignantSelectionne.split(" - ")[0];
 
-        // Créer un nouvel objet Cours avec les modifications
         Cours coursModifie = new Cours(
                 cours.getId_cours(),
                 salle,
@@ -874,7 +869,6 @@ public class EdtAdministrateurController implements Initializable {
         ComboBox<String> classeComboBox = new ComboBox<>();
         ComboBox<String> salleComboBox = new ComboBox<>();
 
-
         grid.add(new Label("ID Cours:"), 0, 0);
         grid.add(coursField, 1, 0);
         grid.add(new Label("Matière:"), 0, 1);
@@ -890,20 +884,28 @@ public class EdtAdministrateurController implements Initializable {
         grid.add(new Label("Salle:"), 0, 6);
         grid.add(salleComboBox, 1, 6);
 
-        List<String> classes = csvService.getToutesLesClasses();
-        classeComboBox.getItems().addAll(classes);
+        // Chargement initial des classes et salles
+        List<Classe> classes = csvService.Classes();
+        List<Salle> salles = csvService.Salles(); // Récupérée une fois
+
+// Ajouter les noms des classes dans le ComboBox
+        for (Classe classe : classes) {
+            classeComboBox.getItems().add(classe.getClasse());
+        }
 
         classeComboBox.setOnAction(event -> {
             String classeSelectionnee = classeComboBox.getValue();
+
             int effectif = csvService.getEffectifClasse(classeSelectionnee);
-            List<Salle> sallesDisponibles = csvService.getToutesLesSalles().stream().filter(salle -> salle.getCapacite() >= effectif).collect(Collectors.toList());
+            System.out.println("Effectif de " + classeSelectionnee + ": " + effectif);
+
+            List<Salle> sallesDisponibles = salles.stream().filter(salle -> salle.getCapacite() >= effectif).collect(Collectors.toList());
 
             salleComboBox.getItems().clear();
             for (Salle salle : sallesDisponibles) {
                 salleComboBox.getItems().add(salle.getId_salle());
             }
         });
-
 
         Button validerBtn = new Button("Valider");
         validerBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");

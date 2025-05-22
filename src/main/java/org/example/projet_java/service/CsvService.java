@@ -42,8 +42,7 @@ public class CsvService {
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
                 if (values.length >= 6) {
-                    Etudiant etudiant = new Etudiant(
-                            values[0], values[1], values[2], values[3], values[4], values[5]);
+                    Etudiant etudiant = new Etudiant(values[0], values[1], values[2], values[3], values[4], values[5]);
                     etudiants.add(etudiant);
                 }
             }
@@ -645,62 +644,91 @@ public class CsvService {
         return true;
     }
 
-    public List<String> getToutesLesClasses() {
-        List<String> classes = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader("classe.csv"))) {
-            String ligne;
-            while ((ligne = br.readLine()) != null) {
-                String[] valeurs = ligne.split(",");
-                if (valeurs.length >= 1) {
-                    classes.add(valeurs[0].trim());
+    public List<Classe> Classes() {
+        List<Classe> classes = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(CSV_CLASSE))) {
+            String line;
+            br.readLine(); // ignore header
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(",");
+                if (values.length >= 2) {
+                    Classe classe = new Classe(values[0].trim(), values[1].trim());
+                    classes.add(classe);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return classes;
     }
 
-
-    public int getEffectifClasse(String nomClasse) {
-        int effectif = 0;
-        try (BufferedReader br = new BufferedReader(new FileReader("classe.csv"))) {
-            String ligne;
-            while ((ligne = br.readLine()) != null) {
-                String[] valeurs = ligne.split(",");
-                if (valeurs.length >= 2) {
-                    String classe = valeurs[0].trim();
-                    if (classe.equalsIgnoreCase(nomClasse)) {
-                        effectif = Integer.parseInt(valeurs[1].trim());
-                        break;
-                    }
-                }
-            }
-        } catch (IOException | NumberFormatException e) {
-            e.printStackTrace();
-        }
-        return effectif;
-    }
-
-
-
-    public List<Salle> getToutesLesSalles() {
+    public List<Salle> Salles() {
         List<Salle> salles = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader("salles.csv"))) {
-            String ligne;
-            while ((ligne = br.readLine()) != null) {
-                String[] valeurs = ligne.split(",");
-                if (valeurs.length >= 2) {
-                    String nom = valeurs[0].trim();
-                    int capacite = Integer.parseInt(valeurs[1].trim());
-                    salles.add(new Salle(nom, "", capacite,false));
+
+        try (BufferedReader br = new BufferedReader(new FileReader(CSV_SALLE))) {
+            String line;
+            br.readLine(); // ignore header
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(",");
+                if (values.length >= 5) {
+                    String id_salle = values[0];
+                    String localisation = values[1];
+                    int capacite = Integer.parseInt(values[2]);
+                    boolean statut = Boolean.parseBoolean(values[4]);
+
+                    Salle salle = new Salle(id_salle, localisation, capacite, statut);
+
+                    salles.add(salle);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return salles;
     }
 
 
+
+    public int getEffectifClasse(String nomClasse) {
+        int effectif = 0;
+        System.out.println("Recherche de l'effectif pour la classe: '" + nomClasse + "'");
+
+        try (BufferedReader br = new BufferedReader(new FileReader(CSV_CLASSE))) {
+            br.readLine(); // ignorer l'en-tête
+            String ligne;
+            int numeroLigne = 1; // pour le débogage
+
+            while ((ligne = br.readLine()) != null) {
+                numeroLigne++;
+                System.out.println("Ligne " + numeroLigne + ": " + ligne);
+
+                String[] valeurs = ligne.split(",");
+                if (valeurs.length >= 2) {
+                    String classe = valeurs[0].trim();
+                    System.out.println("Classe trouvée: '" + classe + "' (longueur: " + classe.length() + ")");
+                    System.out.println("Comparaison avec: '" + nomClasse + "' (longueur: " + nomClasse.length() + ")");
+
+                    if (classe.equalsIgnoreCase(nomClasse)) {
+                        try {
+                            effectif = Integer.parseInt(valeurs[1].trim());
+                            System.out.println("Effectif trouvé: " + effectif);
+                            break;
+                        } catch (NumberFormatException e) {
+                            System.out.println("Erreur de conversion pour l'effectif: " + valeurs[1]);
+                        }
+                    }
+                } else {
+                    System.out.println("Ligne ignorée (pas assez de colonnes): " + ligne);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Effectif final retourné: " + effectif);
+        return effectif;
+    }
 }
