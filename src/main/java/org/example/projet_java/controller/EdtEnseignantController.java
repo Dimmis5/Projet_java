@@ -611,7 +611,6 @@ public class EdtEnseignantController {
             LocalDate dateCours = LocalDate.parse(cours.getDate(), DATE_FORMAT);
             return !dateCours.isBefore(debut) && !dateCours.isAfter(fin);
         } catch (DateTimeParseException e) {
-            System.err.println("[ERREUR] Format de date invalide pour le cours: " + cours.getMatiere());
             return false;
         }
     }
