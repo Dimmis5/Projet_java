@@ -247,7 +247,7 @@ public class EdtEnseignantController {
 
         Label lblHoraire = new Label(parseHeure(cours.getHeure_debut()).format(DateTimeFormatter.ofPattern("HH:mm")) +
                 "-" + parseHeure(cours.getHeure_fin()).format(DateTimeFormatter.ofPattern("HH:mm")));
-        lblHoraire.setStyle("-fx-font-size: 10; -fx-text-fill: #555;");
+        lblHoraire.setStyle("-fx-font-size:10; -fx-text-fill: #555;");
 
         box.getChildren().addAll(lblMatiere, lblSalle, lblClasse, lblHoraire);
         return box;
