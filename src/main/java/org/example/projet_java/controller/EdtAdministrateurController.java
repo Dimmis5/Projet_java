@@ -667,7 +667,21 @@ public class EdtAdministrateurController implements Initializable {
         Button validerBtn = new Button("Valider");
         validerBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
         validerBtn.setOnAction(e -> {
-            if (validerEtModifierCours(etudiant, coursField.getText(), matiereField.getText(), dateField.getText(), heureDebutField.getText(), heureFinField.getText(), salleCombo.getValue(), enseignantCombo.getValue())) {
+            String salleSelectionnee = salleCombo.getValue();
+            if (salleSelectionnee == null || salleSelectionnee.isEmpty()) {
+                afficherAlerte("Erreur", "Veuillez sélectionner une salle");
+                return;
+            }
+            String idSalle = salleSelectionnee.split(" - ")[0].trim();
+
+            if (validerEtModifierCours(etudiant,
+                    coursField.getText(),
+                    matiereField.getText(),
+                    dateField.getText(),
+                    heureDebutField.getText(),
+                    heureFinField.getText(),
+                    idSalle,
+                    enseignantCombo.getValue())) {
                 popup.close();
                 afficherEmploiDuTempsEtudiant(etudiant);
             }
@@ -887,11 +901,9 @@ public class EdtAdministrateurController implements Initializable {
         grid.add(new Label("Salle:"), 0, 6);
         grid.add(salleComboBox, 1, 6);
 
-        // Chargement initial des classes et salles
         List<Classe> classes = csvService.Classes();
-        List<Salle> salles = csvService.Salles(); // Récupérée une fois
+        List<Salle> salles = csvService.Salles();
 
-// Ajouter les noms des classes dans le ComboBox
         for (Classe classe : classes) {
             classeComboBox.getItems().add(classe.getClasse());
         }
@@ -920,13 +932,14 @@ public class EdtAdministrateurController implements Initializable {
                     dateField.getText(),
                     heureDebutField.getText(),
                     heureFinField.getText(),
-                    classeComboBox.getValue(),
-                    salleComboBox.getValue())) {
-
+                    salleComboBox.getValue(),
+                    classeComboBox.getValue()
+            )) {
                 popup.close();
                 afficherEmploiDuTempsEnseignant(enseignant);
             }
         });
+
 
         Button annulerBtn = new Button("Annuler");
         annulerBtn.setOnAction(e -> popup.close());
@@ -942,9 +955,7 @@ public class EdtAdministrateurController implements Initializable {
         popup.showAndWait();
     }
 
-    private boolean validerEtAjouterCoursEnseignant(Enseignant enseignant, String idCours, String matiere,
-                                                    String date, String heureDebut, String heureFin,
-                                                    String salle, String classe) {
+    private boolean validerEtAjouterCoursEnseignant(Enseignant enseignant, String idCours, String matiere, String date, String heureDebut, String heureFin, String salle, String classe) {
         if (idCours == null || idCours.isEmpty() ||
                 matiere == null || matiere.isEmpty() ||
                 date == null || date.isEmpty() ||
@@ -961,17 +972,7 @@ public class EdtAdministrateurController implements Initializable {
             return false;
         }
 
-        // Créer un nouvel objet Cours
-        Cours nouveauCours = new Cours(
-                idCours,
-                salle,
-                matiere,
-                date,
-                heureDebut,
-                heureFin,
-                enseignant.getId(),
-                classe,
-                false);
+        Cours nouveauCours = new Cours(idCours, salle, matiere, date, heureDebut, heureFin, enseignant.getId(), classe, false);
 
         try {
             boolean succes = csvService.ajouterCours(nouveauCours);
@@ -1064,17 +1065,7 @@ public class EdtAdministrateurController implements Initializable {
             return false;
         }
 
-        // Créer un nouvel objet Cours avec les modifications
-        Cours coursModifie = new Cours(
-                cours.getId_cours(),
-                salle,
-                matiere,
-                date,
-                heureDebut,
-                heureFin,
-                enseignant.getId(),
-                classe,
-                estAnnule);
+        Cours coursModifie = new Cours(cours.getId_cours(), salle, matiere, date, heureDebut, heureFin, enseignant.getId(), classe, estAnnule);
 
         try {
             boolean succes = csvService.modifierCours(coursModifie);
@@ -1101,13 +1092,11 @@ public class EdtAdministrateurController implements Initializable {
 
     private boolean plagesHorairesSeChevauchent(String debut1, String fin1, String debut2, String fin2) {
         try {
-            // Normaliser les formats d'heure (supprimer 'h' si présent et ajouter : si nécessaire)
             debut1 = debut1.replace("h", ":").replace("H", ":");
             fin1 = fin1.replace("h", ":").replace("H", ":");
             debut2 = debut2.replace("h", ":").replace("H", ":");
             fin2 = fin2.replace("h", ":").replace("H", ":");
 
-            // S'assurer qu'il y a deux chiffres pour les minutes
             debut1 = normaliserHeure(debut1);
             fin1 = normaliserHeure(fin1);
             debut2 = normaliserHeure(debut2);
@@ -1119,11 +1108,10 @@ public class EdtAdministrateurController implements Initializable {
             LocalTime d2 = LocalTime.parse(debut2, formatter);
             LocalTime f2 = LocalTime.parse(fin2, formatter);
 
-            // Vérifier le chevauchement
             return !(f1.isBefore(d2) || f2.isBefore(d1));
         } catch (Exception e) {
             System.err.println("Erreur lors de la comparaison des horaires: " + e.getMessage());
-            return true; // En cas d'erreur, on considère qu'il y a chevauchement par sécurité
+            return true;
         }
     }
 
@@ -1142,14 +1130,14 @@ public class EdtAdministrateurController implements Initializable {
             }
         }
         if (heure.length() == 3) {
-            if (heure.contains(":")) { // format H:mm ou HH:m
+            if (heure.contains(":")) {
                 String[] parts = heure.split(":");
                 if (parts[1].length() == 1) {
                     return parts[0] + ":0" + parts[1];
                 } else {
                     return heure;
                 }
-            } else { // format HHmm
+            } else {
                 return heure.substring(0, 2) + ":" + heure.substring(2);
             }
         }
@@ -1181,20 +1169,4 @@ public class EdtAdministrateurController implements Initializable {
             return false;
         }
     }
-
-    private void afficherCoursTriés(String critereTri, List<Cours> coursEtudiant, Etudiant etudiant, VBox container) {
-        coursEtudiant.sort(switch (critereTri) {
-            case "Matière" -> Comparator.comparing(Cours::getMatiere);
-            case "Date" -> Comparator.comparing(Cours::getDate);
-            case "Horaires" -> Comparator.comparing(Cours::getHeure_debut);
-            case "Salle" -> Comparator.comparing(Cours::getId_salle);
-            case "Enseignant" -> Comparator.comparing(c -> {
-                Enseignant ens = csvService.getEnseignantById(c.getId_enseignant());
-                return ens != null ? ens.getNom() : "";
-            });
-            default -> Comparator.comparing(Cours::getDate); // fallback
-        });
-    }
-
-
 }
