@@ -628,13 +628,20 @@ public class EdtAdministrateurController implements Initializable {
         grid.setHgap(10);
 
         TextField coursField = new TextField();
-        TextField salleField = new TextField();
         TextField matiereField = new TextField();
         TextField dateField = new TextField();
         TextField heureDebutField = new TextField();
         TextField heureFinField = new TextField();
+        ComboBox<String> salleCombo = new ComboBox<>();
 
-        // ComboBox pour les enseignants
+        String nomClasse = etudiant.getClasse();
+        int effectif = csvService.getEffectifClasse(nomClasse);
+
+        List<String> sallesDispo = csvService.Salles().stream()
+                .filter(salle -> salle.getCapacite() >= effectif).map(salle -> salle.getId_salle() + " - " + salle.getLocalisation() + " (Capacité: " + salle.getCapacite() + ")").collect(Collectors.toList());
+
+        salleCombo.setItems(FXCollections.observableArrayList(sallesDispo));
+
         ComboBox<String> enseignantCombo = new ComboBox<>();
         enseignantCombo.setItems(FXCollections.observableArrayList(
                 csvService.Enseignants().stream()
@@ -642,7 +649,6 @@ public class EdtAdministrateurController implements Initializable {
                         .collect(Collectors.toList())
         ));
 
-        // Ajout des champs au formulaire
         grid.add(new Label("ID Cours:"), 0, 0);
         grid.add(coursField, 1, 0);
         grid.add(new Label("Matière:"), 0, 1);
@@ -654,7 +660,7 @@ public class EdtAdministrateurController implements Initializable {
         grid.add(new Label("Heure fin:"), 0, 4);
         grid.add(heureFinField, 1, 4);
         grid.add(new Label("Salle:"), 0, 5);
-        grid.add(salleField, 1, 5);
+        grid.add(salleCombo, 1, 5);
         grid.add(new Label("Enseignant:"), 0, 6);
         grid.add(enseignantCombo, 1, 6);
 
@@ -663,7 +669,7 @@ public class EdtAdministrateurController implements Initializable {
         validerBtn.setOnAction(e -> {
             if (validerEtModifierCours(etudiant, coursField.getText(), matiereField.getText(),
                     dateField.getText(), heureDebutField.getText(), heureFinField.getText(),
-                    salleField.getText(), enseignantCombo.getValue())) {
+                    salleCombo.getValue(), enseignantCombo.getValue())) {
                 popup.close();
                 afficherEmploiDuTempsEtudiant(etudiant);
             }
@@ -682,6 +688,7 @@ public class EdtAdministrateurController implements Initializable {
         popup.setScene(scene);
         popup.showAndWait();
     }
+
 
     private boolean validerEtModifierCours(Etudiant etudiant, String idCours, String matiere,
                                            String date, String heureDebut, String heureFin,
