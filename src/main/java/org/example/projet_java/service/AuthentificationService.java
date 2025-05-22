@@ -1,6 +1,5 @@
 package org.example.projet_java.service;
 
-import javafx.application.Application;
 import org.example.projet_java.model.Administrateur;
 import org.example.projet_java.model.Enseignant;
 import org.example.projet_java.model.Etudiant;
@@ -58,13 +57,5 @@ public class AuthentificationService {
             }
         }
         return null;
-    }
-
-    public void logout() {
-        this.currentUser = null;
-    }
-
-    public Utilisateur getCurrentUser() {
-        return currentUser;
     }
 }

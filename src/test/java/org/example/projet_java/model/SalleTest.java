@@ -1,4 +1,3 @@
-/*
 package org.example.projet_java.model;
 
 import org.junit.jupiter.api.Test;
@@ -11,35 +10,30 @@ import static org.junit.jupiter.api.Assertions.*;
 class SalleTest {
     @Test
     public void testConstructorAndGetters() {
-        Salle salle = new Salle("S101", "Bâtiment A", "50", true);
+        Salle salle = new Salle("101", "Etage 1", 50);
 
-        assertEquals("S101", salle.getId_salle());
-        assertEquals("Bâtiment A", salle.getLocalisation());
-        assertEquals("50", salle.getCapacite());
-        assertTrue(salle.getStatut());
-        assertNotNull(salle.getEquipement());
+        assertEquals("101", salle.getId_salle());
+        assertEquals("Etage 1", salle.getLocalisation());
+        assertEquals(50, salle.getCapacite());
         assertTrue(salle.getEquipement().isEmpty());
     }
 
     @Test
     public void testSetters() {
-        Salle salle = new Salle("S101", "Bâtiment A", "50", true);
+        Salle salle = new Salle("101", "Etage 2", 50);
 
-        salle.setId_salle("S202");
-        salle.setLocalisation("Bâtiment B");
-        salle.setCapacite("100");
-        salle.setStatut(false);
+        salle.setId_salle("202");
+        salle.setLocalisation("Etage 2");
+        salle.setCapacite(100);
 
-        ArrayList<String> equipements = new ArrayList<>(Arrays.asList("Projecteur", "Tableau"));
+        ArrayList<String> equipements = new ArrayList<>(Arrays.asList("Vidéoprojecteur"));
         salle.setEquipement(equipements);
 
-        assertEquals("S202", salle.getId_salle());
-        assertEquals("Bâtiment B", salle.getLocalisation());
-        assertEquals("100", salle.getCapacite());
-        assertFalse(salle.getStatut());
-        assertEquals(2, salle.getEquipement().size());
-        assertTrue(salle.getEquipement().contains("Projecteur"));
-        assertTrue(salle.getEquipement().contains("Tableau"));
+        assertEquals("202", salle.getId_salle());
+        assertEquals("Etage 2", salle.getLocalisation());
+        assertEquals(100, salle.getCapacite());
+        assertEquals(1, salle.getEquipement().size());
+        assertTrue(salle.getEquipement().contains("Vidéoprojecteur"));
     }
 
-}*/
+}

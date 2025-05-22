@@ -28,15 +28,13 @@
                     </padding>
                     <Label fx:id="edtLabel" text="Gestion de l'emploi du temps" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
 
-                    <HBox fx:id="etudiantSection" spacing="15" alignment="CENTER_LEFT"
-                          style="-fx-background-color: #f0f0f0; -fx-border-color: #dddddd; -fx-border-radius: 5;">
+                    <HBox fx:id="etudiantSection" spacing="15" alignment="CENTER_LEFT" style="-fx-background-color: #f0f0f0; -fx-border-color: #dddddd; -fx-border-radius: 5;">
                         <padding>
                             <Insets top="10" right="10" bottom="10" left="10"/>
                         </padding>
                         <Label text="Sélectionner un étudiant:" style="-fx-font-weight: bold;"/>
                         <ComboBox fx:id="etudiantComboBox" promptText="Choisir un étudiant"/>
-                        <Button fx:id="btnListeEtudiants" text="Liste complète des étudiants"
-                                style="-fx-background-color: #4a87e8; -fx-text-fill: white;"/>
+                        <Button fx:id="btnListeEtudiants" text="Liste complète des étudiants" style="-fx-background-color: #4a87e8; -fx-text-fill: white;"/>
                     </HBox>
 
                     <VBox fx:id="etudiantInfoContainer" spacing="10">
@@ -51,15 +49,13 @@
                         </padding>
                     </VBox>
 
-                    <HBox fx:id="enseignantSection" spacing="15" alignment="CENTER_LEFT"
-                          style="-fx-background-color: #f0f0f0; -fx-border-color: #dddddd; -fx-border-radius: 5;">
+                    <HBox fx:id="enseignantSection" spacing="15" alignment="CENTER_LEFT" style="-fx-background-color: #f0f0f0; -fx-border-color: #dddddd; -fx-border-radius: 5;">
                         <padding>
                             <Insets top="20" right="10" bottom="10" left="10"/>
                         </padding>
                         <Label text="Sélectionner un enseignant:" style="-fx-font-weight: bold;"/>
                         <ComboBox fx:id="enseignantComboBox" promptText="Choisir un enseignant"/>
-                        <Button fx:id="btnListeEnseignants" text="Liste complète des enseignants"
-                                style="-fx-background-color: #4a87e8; -fx-text-fill: white;"/>
+                        <Button fx:id="btnListeEnseignants" text="Liste complète des enseignants" style="-fx-background-color: #4a87e8; -fx-text-fill: white;"/>
                     </HBox>
 
                     <VBox fx:id="enseignantInfoContainer" spacing="10">

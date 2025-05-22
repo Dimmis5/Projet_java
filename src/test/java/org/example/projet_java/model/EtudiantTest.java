@@ -1,4 +1,3 @@
-/*
 package org.example.projet_java.model;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,19 +8,26 @@ public class EtudiantTest {
 
     @Test
     public void testConstructeur() {
-        Etudiant etudiant = new Etudiant("id1", "Dupont", "Marie", "marie.dupont@mail.com", "pass123", "ClasseA");
+        Etudiant etudiant = new Etudiant("10000", "Dupont", "Marie", "marie.dupont@gmail.com", "md123", "G4A");
+        assertEquals("10000", etudiant.getId());
+        assertEquals("Dupont", etudiant.getNom());
+        assertEquals("Marie", etudiant.getPrenom());
+        assertEquals("marie.dupont@gmail.com", etudiant.getMail());
+        assertEquals("md123", etudiant.getMdp());
+        assertEquals("G4A", etudiant.getClasse());
         assertNotNull(etudiant);
     }
 
     @Test
     public void testGetters() {
-        Etudiant etudiant = new Etudiant("id1", "Dupont", "Marie", "marie.dupont@mail.com", "pass123", "ClasseA");
+        Etudiant etudiant = new Etudiant("10000", "Dupont", "Marie", "marie.dupont@gmail.com", "md123", "G4A");
 
-        assertEquals("id1", etudiant.getId());
+        assertEquals("10000", etudiant.getId());
         assertEquals("Dupont", etudiant.getNom());
         assertEquals("Marie", etudiant.getPrenom());
-        assertEquals("marie.dupont@mail.com", etudiant.getMail());
-        assertEquals("ClasseA", etudiant.getClasse());
+        assertEquals("marie.dupont@gmail.com", etudiant.getMail());
+        assertEquals("md123", etudiant.getMdp());
+        assertEquals("G4A", etudiant.getClasse());
 
         assertNotNull(etudiant.getCours());
         assertTrue(etudiant.getCours().isEmpty());
@@ -29,48 +35,28 @@ public class EtudiantTest {
 
     @Test
     public void testSetters() {
-        Etudiant etudiant = new Etudiant("id1", "Dupont", "Marie", "marie.dupont@mail.com", "pass123", "ClasseA");
+        Etudiant etudiant = new Etudiant("10000", "Dupont", "Marie", "marie.dupont@gmail.com", "md123", "G4A");
 
-        etudiant.setId("id2");
+        etudiant.setId("10001");
         etudiant.setNom("Martin");
         etudiant.setPrenom("Paul");
-        etudiant.setMail("paul.martin@mail.com");
-        etudiant.setClasse("ClasseB");
+        etudiant.setMail("paul.martin@gmail.com");
+        etudiant.setClasse("G4B");
 
-        assertEquals("id2", etudiant.getId());
+        assertEquals("10001", etudiant.getId());
         assertEquals("Martin", etudiant.getNom());
         assertEquals("Paul", etudiant.getPrenom());
-        assertEquals("paul.martin@mail.com", etudiant.getMail());
-        assertEquals("ClasseB", etudiant.getClasse());
+        assertEquals("paul.martin@gmail.com", etudiant.getMail());
+        assertEquals("G4B", etudiant.getClasse());
     }
 
     @Test
     public void testSetCours() {
-        Etudiant etudiant = new Etudiant("id1", "Dupont", "Marie", "marie.dupont@mail.com", "pass123", "ClasseA");
+        Etudiant etudiant = new Etudiant("10000", "Dupont", "Marie", "marie.dupont@gmail.com", "md123", "G4A");
 
         ArrayList<Cours> listeCours = new ArrayList<>();
 
         etudiant.setCours(listeCours);
         assertEquals(listeCours, etudiant.getCours());
     }
-
-    @Test
-    public void testAjouterCoursEtGetSalle() {
-        Etudiant etudiant = new Etudiant("id1", "Dupont", "Marie", "marie.dupont@mail.com", "pass123", "ClasseA");
-
-        Cours cours1 = new Cours("1", "2", "mathematique", "15/05/2025", "10h00", "11h00", "3", "GR4", false);
-        etudiant.ajouterCours(cours1);
-
-        assertEquals(1, etudiant.getCours().size());
-        assertEquals("2", etudiant.getSalle("1"));
-        assertNull(etudiant.getSalle("cours2"));
-    }
-
-    @Test
-    public void testNotification() {
-        Etudiant etudiant = new Etudiant("id1", "Dupont", "Marie", "marie.dupont@mail.com", "pass123", "ClasseA");
-        String result = etudiant.notification("cours1", "Devoir à rendre lundi");
-        String expected = "Id cours : cours1\nNotification : Devoir à rendre lundi";
-        assertEquals(expected, result);
-    }
-}*/
+}

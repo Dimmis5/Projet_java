@@ -1,4 +1,3 @@
-/*
 package org.example.projet_java.model;
 
 import org.junit.jupiter.api.Test;
@@ -6,6 +5,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AnomalieTest {
+
+    @Test
+    public void testConstructeur() {
+        Anomalie anomalie = new Anomalie("Réseau", "Perte de connexion");
+        assertEquals("Réseau", anomalie.getType());
+        assertEquals("Perte de connexion", anomalie.getDescription());
+        assertNotNull(anomalie);
+    }
 
     @Test
     void testGetType() {
@@ -32,4 +39,4 @@ class AnomalieTest {
         anomalie.setDescription("Panne d'alimentation");
         assertEquals("Panne d'alimentation", anomalie.getDescription());
     }
-}*/
+}

@@ -47,7 +47,6 @@ public class EdtAdministrateurController implements Initializable {
     private final CsvService csvService = CsvService.getInstance();
 
     private static final String STYLE_BOLD_LABEL = "bold-label";
-    private static final String STYLE_POPUP = "popup";
     private static final String STYLE_BUTTON_PRIMARY = "button-primary";
     private static final String STYLE_BUTTON_SECONDARY = "button-secondary";
     private static final String STYLE_INFO_BOX = "info-box";
@@ -194,10 +193,10 @@ public class EdtAdministrateurController implements Initializable {
         edtContainer.getChildren().clear();
 
         VBox container = new VBox(10);
-        container.getStyleClass().add("schedule-container");
+        container.getStyleClass().add("calendrier-container");
 
         Label titreLabel = new Label("Emploi du temps de " + etudiant.getPrenom() + " " + etudiant.getNom());
-        titreLabel.getStyleClass().add("schedule-title");
+        titreLabel.getStyleClass().add("calendrier-title");
 
         ComboBox<String> triComboBox = new ComboBox<>();
         triComboBox.getItems().addAll("Matière", "Date", "Horaires", "Salle", "Enseignant");
@@ -377,10 +376,10 @@ public class EdtAdministrateurController implements Initializable {
         edtEnseignantContainer.getChildren().clear();
 
         VBox container = new VBox(10);
-        container.getStyleClass().add("schedule-container");
+        container.getStyleClass().add("calendrier-container");
 
         Label titreLabel = new Label("Emploi du temps de " + enseignant.getPrenom() + " " + enseignant.getNom());
-        titreLabel.getStyleClass().add("schedule-title");
+        titreLabel.getStyleClass().add("calendrier-title");
 
         Button ajoutBtn = new Button("Ajouter un cours");
         ajoutBtn.getStyleClass().add("button-ajout");
@@ -609,33 +608,26 @@ public class EdtAdministrateurController implements Initializable {
         String nomClasse = etudiant.getClasse();
         int effectif = csvService.getEffectifClasse(nomClasse);
 
-        List<String> sallesDispo = csvService.Salles().stream()
-                .filter(salle -> salle.getCapacite() >= effectif)
-                .map(salle -> salle.getId_salle() + " - " + salle.getLocalisation() + " (Capacité: " + salle.getCapacite() + ")")
-                .collect(Collectors.toList());
+        List<String> sallesDispo = csvService.Salles().stream().filter(salle -> salle.getCapacite() >= effectif).map(salle -> salle.getId_salle() + " - " + salle.getLocalisation() + " (Capacité: " + salle.getCapacite() + ")").collect(Collectors.toList());
 
         salleCombo.setItems(FXCollections.observableArrayList(sallesDispo));
 
         ComboBox<String> enseignantCombo = new ComboBox<>();
-        enseignantCombo.setItems(FXCollections.observableArrayList(
-                csvService.Enseignants().stream()
-                        .map(e -> e.getId() + " - " + e.getNom() + " " + e.getPrenom())
-                        .collect(Collectors.toList())
-        ));
+        enseignantCombo.setItems(FXCollections.observableArrayList(csvService.Enseignants().stream().map(e -> e.getId() + " - " + e.getNom() + " " + e.getPrenom()).collect(Collectors.toList())));
 
-        grid.add(new Label("ID Cours:"), 0, 0);
+        grid.add(new Label("ID Cours :"), 0, 0);
         grid.add(coursField, 1, 0);
-        grid.add(new Label("Matière:"), 0, 1);
+        grid.add(new Label("Matière :"), 0, 1);
         grid.add(matiereField, 1, 1);
         grid.add(new Label("Date:"), 0, 2);
         grid.add(dateField, 1, 2);
-        grid.add(new Label("Heure début:"), 0, 3);
+        grid.add(new Label("Heure début :"), 0, 3);
         grid.add(heureDebutField, 1, 3);
-        grid.add(new Label("Heure fin:"), 0, 4);
+        grid.add(new Label("Heure fin :"), 0, 4);
         grid.add(heureFinField, 1, 4);
-        grid.add(new Label("Salle:"), 0, 5);
+        grid.add(new Label("Salle :"), 0, 5);
         grid.add(salleCombo, 1, 5);
-        grid.add(new Label("Enseignant:"), 0, 6);
+        grid.add(new Label("Enseignant :"), 0, 6);
         grid.add(enseignantCombo, 1, 6);
 
         Button validerBtn = new Button("Valider");
@@ -680,14 +672,7 @@ public class EdtAdministrateurController implements Initializable {
         popup.showAndWait();
     }
 
-    private boolean validerEtModifierCours(Etudiant etudiant,
-                                           String idCours,
-                                           String matiere,
-                                           String date,
-                                           String heureDebut,
-                                           String heureFin,
-                                           String salle,
-                                           String enseignantSelectionne) {
+    private boolean validerEtModifierCours(Etudiant etudiant, String idCours, String matiere, String date, String heureDebut, String heureFin, String salle, String enseignantSelectionne) {
 
         if (idCours == null || idCours.isEmpty() ||
                 matiere == null || matiere.isEmpty() ||
@@ -708,17 +693,7 @@ public class EdtAdministrateurController implements Initializable {
 
         String idEnseignant = enseignantSelectionne.split(" - ")[0];
 
-        Cours nouveauCours = new Cours(
-                idCours,
-                salle,
-                matiere,
-                date,
-                heureDebut,
-                heureFin,
-                idEnseignant,
-                etudiant.getClasse(),
-                false
-        );
+        Cours nouveauCours = new Cours(idCours, salle, matiere, date, heureDebut, heureFin, idEnseignant, etudiant.getClasse(), false);
 
         try {
             boolean ajoutReussi = csvService.ajouterCours(nouveauCours);
@@ -780,7 +755,6 @@ public class EdtAdministrateurController implements Initializable {
         grid.setHgap(10);
         grid.getStyleClass().add("form-grid");
 
-        // Champs de saisie
         TextField coursField = new TextField();
         TextField matiereField = new TextField();
         TextField dateField = new TextField();
@@ -789,7 +763,6 @@ public class EdtAdministrateurController implements Initializable {
         ComboBox<String> classeComboBox = new ComboBox<>();
         ComboBox<String> salleComboBox = new ComboBox<>();
 
-        // Ajout des champs et labels
         grid.add(new Label("ID Cours:"), 0, 0);
         grid.add(coursField, 1, 0);
         grid.add(new Label("Matière:"), 0, 1);
@@ -805,7 +778,6 @@ public class EdtAdministrateurController implements Initializable {
         grid.add(new Label("Salle:"), 0, 6);
         grid.add(salleComboBox, 1, 6);
 
-        // Récupération des classes/salles
         List<Classe> classes = csvService.Classes();
         List<Salle> salles = csvService.Salles();
 
@@ -813,13 +785,10 @@ public class EdtAdministrateurController implements Initializable {
             classeComboBox.getItems().add(classe.getClasse());
         }
 
-        // Mise à jour dynamique des salles
         classeComboBox.setOnAction(event -> {
             String classeSelectionnee = classeComboBox.getValue();
             int effectif = csvService.getEffectifClasse(classeSelectionnee);
-            List<Salle> sallesDisponibles = salles.stream()
-                    .filter(salle -> salle.getCapacite() >= effectif)
-                    .collect(Collectors.toList());
+            List<Salle> sallesDisponibles = salles.stream().filter(salle -> salle.getCapacite() >= effectif).collect(Collectors.toList());
 
             salleComboBox.getItems().clear();
             for (Salle salle : sallesDisponibles) {
@@ -827,7 +796,6 @@ public class EdtAdministrateurController implements Initializable {
             }
         });
 
-        // Bouton valider
         Button validerBtn = new Button("Valider");
         validerBtn.getStyleClass().add("btn-valider");
         validerBtn.setOnAction(e -> {
@@ -859,20 +827,16 @@ public class EdtAdministrateurController implements Initializable {
             }
         });
 
-        // Bouton annuler
         Button annulerBtn = new Button("Annuler");
         annulerBtn.getStyleClass().add("btn-annuler");
         annulerBtn.setOnAction(e -> popup.close());
 
-        // Zone boutons
         HBox boutonsBox = new HBox(10, validerBtn, annulerBtn);
         boutonsBox.setAlignment(Pos.CENTER_RIGHT);
 
-        // Contenu principal
         VBox popupContent = new VBox(10, grid, boutonsBox);
         popupContent.getStyleClass().add("popup-content");
 
-        // Création de la scène avec le CSS externe
         Scene scene = new Scene(popupContent, 400, 400);
         scene.getStylesheets().add(getClass().getResource("/org/example/projet_java/style/administrateur.css").toExternalForm());
 
@@ -925,7 +889,6 @@ public class EdtAdministrateurController implements Initializable {
         grid.setHgap(10);
         grid.getStyleClass().add("form-grid");
 
-        // Champs préremplis
         TextField matiereField = new TextField(cours.getMatiere());
         TextField dateField = new TextField(cours.getDate());
         TextField heureDebutField = new TextField(cours.getHeure_debut());
@@ -933,7 +896,6 @@ public class EdtAdministrateurController implements Initializable {
         TextField salleField = new TextField(cours.getId_salle());
         TextField classeField = new TextField(cours.getClasse());
 
-        // Style des champs
         matiereField.getStyleClass().add("text-field");
         dateField.getStyleClass().add("text-field");
         heureDebutField.getStyleClass().add("text-field");
@@ -980,16 +942,7 @@ public class EdtAdministrateurController implements Initializable {
                 return;
             }
 
-            if (validerEtModifierCoursEnseignant(
-                    cours,
-                    enseignant,
-                    matiereField.getText(),
-                    date,
-                    heureDebut,
-                    heureFin,
-                    idSalle,
-                    classeField.getText(),
-                    annuleCombo.getValue())) {
+            if (validerEtModifierCoursEnseignant(cours, enseignant, matiereField.getText(), date, heureDebut, heureFin, idSalle, classeField.getText(), annuleCombo.getValue())) {
                 popup.close();
                 afficherEmploiDuTempsEnseignant(enseignant);
             }
@@ -1067,11 +1020,7 @@ public class EdtAdministrateurController implements Initializable {
         TextField salleField = new TextField(cours.getId_salle());
 
         ComboBox<String> enseignantCombo = new ComboBox<>();
-        enseignantCombo.setItems(FXCollections.observableArrayList(
-                csvService.Enseignants().stream()
-                        .map(e -> e.getId() + " - " + e.getNom() + " " + e.getPrenom())
-                        .collect(Collectors.toList())
-        ));
+        enseignantCombo.setItems(FXCollections.observableArrayList(csvService.Enseignants().stream().map(e -> e.getId() + " - " + e.getNom() + " " + e.getPrenom()).collect(Collectors.toList())));
         String enseignantActuel = cours.getId_enseignant();
         for (String item : enseignantCombo.getItems()) {
             if (item.startsWith(enseignantActuel)) {
@@ -1080,17 +1029,17 @@ public class EdtAdministrateurController implements Initializable {
             }
         }
 
-        grid.add(new Label("Matière:"), 0, 0);
+        grid.add(new Label("Matière :"), 0, 0);
         grid.add(matiereField, 1, 0);
-        grid.add(new Label("Date:"), 0, 1);
+        grid.add(new Label("Date :"), 0, 1);
         grid.add(dateField, 1, 1);
-        grid.add(new Label("Heure début:"), 0, 2);
+        grid.add(new Label("Heure début :"), 0, 2);
         grid.add(heureDebutField, 1, 2);
-        grid.add(new Label("Heure fin:"), 0, 3);
+        grid.add(new Label("Heure fin :"), 0, 3);
         grid.add(heureFinField, 1, 3);
-        grid.add(new Label("Salle:"), 0, 4);
+        grid.add(new Label("Salle :"), 0, 4);
         grid.add(salleField, 1, 4);
-        grid.add(new Label("Enseignant:"), 0, 5);
+        grid.add(new Label("Enseignant :"), 0, 5);
         grid.add(enseignantCombo, 1, 5);
 
         Button validerBtn = new Button("Valider");
@@ -1112,17 +1061,7 @@ public class EdtAdministrateurController implements Initializable {
                 return;
             }
 
-            if (validerEtModifierCours(
-                    cours,
-                    etudiant,
-                    matiereField.getText(),
-                    date,
-                    heureDebut,
-                    heureFin,
-                    idSalle,
-                    enseignantSelectionne,
-                    cours.isAnnulation()
-            )) {
+            if (validerEtModifierCours(cours, etudiant, matiereField.getText(), date, heureDebut, heureFin, idSalle, enseignantSelectionne, cours.isAnnulation())) {
                 popup.close();
                 afficherEmploiDuTempsEtudiant(etudiant);
             }

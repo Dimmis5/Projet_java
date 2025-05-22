@@ -5,22 +5,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import org.example.projet_java.Edt;
 
 import java.io.IOException;
 
 public class MainController {
-    @FXML
-    private Button btnEtudiant;
-
-    @FXML
-    private Button btnEnseignant;
-
-    @FXML
-    private Button btnAdministrateur;
-
     @FXML
     protected void connexionEtudiant(ActionEvent event) {
         try {

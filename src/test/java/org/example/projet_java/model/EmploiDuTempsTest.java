@@ -1,4 +1,3 @@
-/*
 package org.example.projet_java.model;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -8,22 +7,20 @@ public class EmploiDuTempsTest {
 
     @Test
     public void testConstructeur() {
-        EmploiDuTemps edt = new EmploiDuTemps("etudiant123", "cours456");
-        assertEquals("etudiant123", edt.getId_etudiant());
-        assertEquals("cours456", edt.getId_cours());
+        EmploiDuTemps edt = new EmploiDuTemps("10000", "1");
+        assertEquals("10000", edt.getId_etudiant());
+        assertEquals("1", edt.getId_cours());
+        assertNotNull(edt);
     }
 
     @Test
     public void testGettersSetters() {
-        EmploiDuTemps edt = new EmploiDuTemps("etudiant1", "cours1");
+        EmploiDuTemps edt = new EmploiDuTemps("10000", "1");
 
-        // Test setter et getter id_etudiant
-        edt.setId_etudiant("etudiant2");
-        assertEquals("etudiant2", edt.getId_etudiant());
+        edt.setId_etudiant("20000");
+        assertEquals("20000", edt.getId_etudiant());
 
-        // Test setter et getter id_cours
-        edt.setId_cours("cours2");
-        assertEquals("cours2", edt.getId_cours());
+        edt.setId_cours("20000");
+        assertEquals("20000", edt.getId_cours());
     }
 }
-*/

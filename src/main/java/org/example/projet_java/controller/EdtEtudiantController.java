@@ -59,7 +59,6 @@ public class EdtEtudiantController {
         dateDebutSemaineCourante = dateCourante.with(DayOfWeek.MONDAY);
         premierJourMoisCourant = dateCourante.withDayOfMonth(1);
 
-        // Appliquer les styles CSS aux boutons
         boutonVueJour.getStyleClass().add("button-normal");
         boutonVueSemaine.getStyleClass().add("button-normal");
         boutonVueMois.getStyleClass().add("button-normal");
@@ -82,7 +81,6 @@ public class EdtEtudiantController {
     private void changerModeAffichage(ModeAffichage nouveauMode) {
         modeAffichage = nouveauMode;
 
-        // Mettre à jour les styles des boutons
         boutonVueJour.getStyleClass().remove("button-active");
         boutonVueSemaine.getStyleClass().remove("button-active");
         boutonVueMois.getStyleClass().remove("button-active");
@@ -205,8 +203,7 @@ public class EdtEtudiantController {
     private void afficherVueSemaine() {
         grilleCalendrier.getChildren().clear();
         configurerDispositionCalendrierSemaine();
-        mettreAJourEtiquetteDate("Semaine du " + dateDebutSemaineCourante.format(FORMAT_DATE) +
-                " au " + dateDebutSemaineCourante.plusDays(6).format(FORMAT_DATE));
+        mettreAJourEtiquetteDate("Semaine du " + dateDebutSemaineCourante.format(FORMAT_DATE) + " au " + dateDebutSemaineCourante.plusDays(6).format(FORMAT_DATE));
 
         ajouterEnTetesJours(dateDebutSemaineCourante);
         ajouterEnTetesHeuresSemaine();
@@ -219,12 +216,10 @@ public class EdtEtudiantController {
         grilleCalendrier.getColumnConstraints().clear();
         grilleCalendrier.getRowConstraints().clear();
 
-        // Colonne heures
         ColumnConstraints colHeure = new ColumnConstraints(100);
         colHeure.setHgrow(Priority.NEVER);
         grilleCalendrier.getColumnConstraints().add(colHeure);
 
-        // Colonnes jours
         for (int i = 0; i < 7; i++) {
             ColumnConstraints col = new ColumnConstraints();
             col.setHgrow(Priority.ALWAYS);
@@ -233,12 +228,10 @@ public class EdtEtudiantController {
             grilleCalendrier.getColumnConstraints().add(col);
         }
 
-        // Ligne en-tête
         RowConstraints rowHeader = new RowConstraints(35);
         rowHeader.setVgrow(Priority.NEVER);
         grilleCalendrier.getRowConstraints().add(rowHeader);
 
-        // Lignes créneaux
         int nbCreneaux = (int) Duration.between(heureDebut, heureFin).toMinutes() / intervalMinutes;
         for (int i = 0; i < nbCreneaux; i++) {
             RowConstraints row = new RowConstraints(100);
@@ -248,7 +241,6 @@ public class EdtEtudiantController {
             grilleCalendrier.getRowConstraints().add(row);
         }
 
-        // Ajouter des cellules vides
         for (int row = 1; row <= nbCreneaux; row++) {
             for (int col = 1; col <= 7; col++) {
                 Region celluleVide = new Region();
@@ -384,7 +376,6 @@ public class EdtEtudiantController {
                 Label labelCours = new Label(cours.getMatiere());
                 labelCours.getStyleClass().add("month-course");
 
-                // Appliquer une couleur basée sur le hash de la matière
                 int colorIndex = Math.abs(cours.getMatiere().hashCode()) % 6 + 1;
                 labelCours.getStyleClass().add("course-color-" + colorIndex);
 
@@ -416,7 +407,6 @@ public class EdtEtudiantController {
         StackPane cellule = new StackPane(contenuCours);
         cellule.getStyleClass().add("course-box");
 
-        // Appliquer une couleur basée sur le hash de la matière
         int colorIndex = Math.abs(cours.getMatiere().hashCode()) % 6 + 1;
         cellule.getStyleClass().add("course-color-" + colorIndex);
 
@@ -446,7 +436,7 @@ public class EdtEtudiantController {
 
         if (cours.isAnnulation()) {
             Label annuleLabel = new Label("ANNULÉ");
-            annuleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: red; -fx-font-size: 10px;");
+            annuleLabel.getStyleClass().add("annuleLabel");
             contenu.getChildren().add(annuleLabel);
         }
 
@@ -478,7 +468,7 @@ public class EdtEtudiantController {
 
         if (cours.isAnnulation()) {
             Label annuleLabel = new Label("ANNULÉ");
-            annuleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: red; -fx-font-size: 12px;");
+            annuleLabel.getStyleClass().add("annuleLabel");
             contenu.getChildren().add(annuleLabel);
         }
 
@@ -496,9 +486,9 @@ public class EdtEtudiantController {
         Tooltip tooltip = new Tooltip();
         StringBuilder sb = new StringBuilder();
 
-        sb.append("Matière: ").append(cours.getMatiere()).append("\n");
-        sb.append("Salle: ").append(cours.getId_salle()).append("\n");
-        sb.append("Horaire: ").append(cours.getHeure_debut()).append("-").append(cours.getHeure_fin()).append("\n");
+        sb.append("Matière : ").append(cours.getMatiere()).append("\n");
+        sb.append("Salle : ").append(cours.getId_salle()).append("\n");
+        sb.append("Horaire : ").append(cours.getHeure_debut()).append("-").append(cours.getHeure_fin()).append("\n");
 
         if (cours.isAnnulation()) {
             sb.append("STATUT: ANNULÉ\n");

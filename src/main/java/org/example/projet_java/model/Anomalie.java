@@ -9,7 +9,6 @@ public class Anomalie {
         this.description = description;
     }
 
-
     public String getType() {
         return type;
     }

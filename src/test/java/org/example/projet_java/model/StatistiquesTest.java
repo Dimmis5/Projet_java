@@ -1,4 +1,3 @@
-/*
 package org.example.projet_java.model;
 
 
@@ -11,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class StatistiquesTest {
 
     @Test
-    public void testConstructorAndGetters() {
+    public void testConstructor() {
         Statistiques stats = new Statistiques();
 
         assertNotNull(stats.getUtilisationSalle());
@@ -25,11 +24,11 @@ class StatistiquesTest {
         Statistiques stats = new Statistiques();
 
         HashMap<Salle, Double> salleMap = new HashMap<>();
-        Salle salle = new Salle("S1", "Bâtiment A", "30", true);
+        Salle salle = new Salle("202", "Etage 2", 30);
         salleMap.put(salle, 75.0);
 
         HashMap<Enseignant, Double> enseignantMap = new HashMap<>();
-        Enseignant enseignant = new Enseignant("E1", "Dupont", "Jean", "jean.dupont@mail.com", "pass");
+        Enseignant enseignant = new Enseignant("20000", "Dupont", "Jean", "jean.dupont@gmail.com", "dj123");
         enseignantMap.put(enseignant, 60.5);
 
         stats.setUtilisationSalle(salleMap);
@@ -42,4 +41,4 @@ class StatistiquesTest {
         assertEquals(60.5, stats.getUtilisationEnseignant().get(enseignant));
     }
 
-} */
+}

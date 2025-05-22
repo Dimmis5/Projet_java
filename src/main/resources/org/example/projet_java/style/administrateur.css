@@ -22,7 +22,6 @@
     -fx-background-radius: 5;
 }
 
-/* Conteneur d'informations général */
 .info-box {
     -fx-background-color: #e6f3ff;
     -fx-background-radius: 8;
@@ -32,7 +31,6 @@
     -fx-padding: 15;
 }
 
-/* Bouton principal générique */
 .button-primary {
     -fx-background-color: #4a90e2;
     -fx-text-fill: white;
@@ -41,40 +39,34 @@
     -fx-background-radius: 5;
 }
 
-/* Emploi du temps : conteneur principal */
-.schedule-container {
+.calendrier-container {
     -fx-background-color: #f5f5f5;
     -fx-border-color: #cccccc;
     -fx-border-radius: 5;
     -fx-padding: 15;
 }
 
-/* Titre emploi du temps */
-.schedule-title {
+.calendrier-title {
     -fx-font-size: 16px;
     -fx-font-weight: bold;
 }
 
-/* ComboBox de tri */
 .combo-tri {
     -fx-font-size: 14px;
 }
 
-/* Ligne d'en-tête */
 .header-row {
     -fx-background-color: #e0e0e0;
     -fx-font-weight: bold;
     -fx-padding: 5;
 }
 
-/* Ligne de cours */
 .course-row {
     -fx-border-color: #e0e0e0;
     -fx-border-width: 0 0 1 0;
     -fx-padding: 8 5 8 5;
 }
 
-/* Statuts */
 .label-annule {
     -fx-text-fill: red;
 }
@@ -82,7 +74,6 @@
     -fx-text-fill: green;
 }
 
-/* Boutons secondaires */
 .button-warning {
     -fx-background-color: #ffbb33;
     -fx-text-fill: white;

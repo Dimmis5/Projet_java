@@ -19,6 +19,7 @@ public class Etudiant extends Utilisateur {
         this.prenom = prenom;
         this.mail = mail;
         this.classe = classe;
+        this.mdp = mdp;
     }
 
     public String getId() {
@@ -64,23 +65,4 @@ public class Etudiant extends Utilisateur {
     public String getClasse() { return classe; }
 
     public void setClasse(String classe) { this.classe = classe; }
-
-    // Méthode getSalle
-    public String getSalle(String id_cours) {
-        for (Cours cour : cours) {
-            if (cour.getId_cours().equals(id_cours)) {
-                return cour.getId_salle();
-            }
-        }
-        return null;
-    }
-
-    public String notification(String id_cours, String notification) {
-        return "Id cours : " + id_cours + "\n" + "Notification : " + notification;
-    }
-
-    public void ajouterCours(Cours cours) {
-        this.cours.add(cours);
-    }
-
 }

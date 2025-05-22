@@ -14,7 +14,6 @@ public class CsvService {
     private static final String CSV_EDT = "CSV_Java/edt.csv";
     private static final String CSV_ENSEIGNANT = "CSV_Java/Enseignant.csv";
     private static final String CSV_ETUDIANT = "CSV_Java/Etudiant.csv";
-    private static final String CSV_NOTIFICATION = "CSV_Java/Notification.csv";
     private static final String CSV_SALLE = "CSV_Java/Salle.csv";
     private static final String CSV_CLASSE = "CSV_Java/Classe.csv";
 
@@ -74,16 +73,11 @@ public class CsvService {
 
         try (BufferedReader br = new BufferedReader(new FileReader(CSV_ENSEIGNANT))) {
             String line;
-            br.readLine(); // ignore header
+            br.readLine();
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
                 if (values.length >= 5) {
-                    Enseignant enseignant = new Enseignant(
-                            values[0].trim(),
-                            values[1].trim(),
-                            values[2].trim(),
-                            values[3].trim(),
-                            values[4].trim());
+                    Enseignant enseignant = new Enseignant(values[0].trim(), values[1].trim(), values[2].trim(), values[3].trim(), values[4].trim());
                     enseignants.add(enseignant);
                 }
             }
@@ -103,8 +97,7 @@ public class CsvService {
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
                 if (values.length >= 5) {
-                    Administrateur admin = new Administrateur(
-                            values[0], values[1], values[2], values[3], values[4]);
+                    Administrateur admin = new Administrateur(values[0], values[1], values[2], values[3], values[4]);
                     administrateurs.add(admin);
                 }
             }
@@ -137,16 +130,7 @@ public class CsvService {
                                     String statutStr = values2[8].trim();
                                     estAnnule = Boolean.parseBoolean(statutStr);
                                 }
-                                Cours c = new Cours(
-                                        values2[0].trim(),
-                                        values2[1].trim(),
-                                        values2[2].trim(),
-                                        values2[3].trim(),
-                                        values2[4].trim(),
-                                        values2[5].trim(),
-                                        values2[6].trim(),
-                                        values2[7].trim(),
-                                        estAnnule);
+                                Cours c = new Cours(values2[0].trim(), values2[1].trim(), values2[2].trim(), values2[3].trim(), values2[4].trim(), values2[5].trim(), values2[6].trim(), values2[7].trim(), estAnnule);
                                 cours.add(c);
                                 break;
                             }
@@ -227,16 +211,7 @@ public class CsvService {
     }
 
     public boolean ajouterCours(Cours nouveauCours) {
-        String ligneCours = String.join(",",
-                nouveauCours.getId_cours(),
-                nouveauCours.getId_salle(),
-                nouveauCours.getMatiere(),
-                nouveauCours.getDate(),
-                nouveauCours.getHeure_debut(),
-                nouveauCours.getHeure_fin(),
-                nouveauCours.getId_enseignant(),
-                nouveauCours.getClasse()
-        );
+        String ligneCours = String.join(",", nouveauCours.getId_cours(), nouveauCours.getId_salle(), nouveauCours.getMatiere(), nouveauCours.getDate(), nouveauCours.getHeure_debut(), nouveauCours.getHeure_fin(), nouveauCours.getId_enseignant(), nouveauCours.getClasse());
 
         List<String> lignesEdt = new ArrayList<>();
         for (Etudiant etudiant : getEtudiantsParClasse(nouveauCours.getClasse())) {
@@ -341,17 +316,7 @@ public class CsvService {
             bw.newLine();
 
             for (Cours c : cours) {
-                String ligne = String.join(",",
-                        c.getId_cours(),
-                        c.getId_salle(),
-                        c.getMatiere(),
-                        c.getDate(),
-                        c.getHeure_debut(),
-                        c.getHeure_fin(),
-                        c.getId_enseignant(),
-                        c.getClasse(),
-                        String.valueOf(c.isAnnulation())
-                );
+                String ligne = String.join(",", c.getId_cours(), c.getId_salle(), c.getMatiere(), c.getDate(), c.getHeure_debut(), c.getHeure_fin(), c.getId_enseignant(), c.getClasse(), String.valueOf(c.isAnnulation()));
                 bw.write(ligne);
                 bw.newLine();
             }
@@ -451,8 +416,6 @@ public class CsvService {
                     nouvelleLigne.append(",").append(nouvelEtat);
 
                     lignes.add(nouvelleLigne.toString());
-                    System.out.println("Ancienne ligne: " + ligne);
-                    System.out.println("Nouvelle ligne: " + nouvelleLigne.toString());
                 } else {
                     lignes.add(ligne);
                 }
@@ -489,7 +452,7 @@ public class CsvService {
         }
 
         try (BufferedReader br = new BufferedReader(new FileReader(CSV_COURS))) {
-            br.readLine(); // skip header
+            br.readLine();
             String ligne;
             while ((ligne = br.readLine()) != null) {
                 String[] values = ligne.split(",");
@@ -539,9 +502,7 @@ public class CsvService {
                     String id_salle = values[0];
                     String localisation = values[1];
                     int capacite = Integer.parseInt(values[2]);
-
                     Salle salle = new Salle(id_salle, localisation, capacite);
-
                     salles.add(salle);
                 }
             }
@@ -552,11 +513,8 @@ public class CsvService {
         return salles;
     }
 
-
-
     public int getEffectifClasse(String nomClasse) {
         int effectif = 0;
-        System.out.println("Recherche de l'effectif pour la classe: '" + nomClasse + "'");
 
         try (BufferedReader br = new BufferedReader(new FileReader(CSV_CLASSE))) {
             br.readLine();
@@ -579,7 +537,7 @@ public class CsvService {
                         }
                     }
                 } else {
-                    System.out.println("Ligne ignorée (pas assez de colonnes): " + ligne);
+                    System.out.println("Ligne ignorée : " + ligne);
                 }
             }
         } catch (IOException e) {

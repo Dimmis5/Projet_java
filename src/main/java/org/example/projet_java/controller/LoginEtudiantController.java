@@ -10,7 +10,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.example.projet_java.Edt;
-import org.example.projet_java.model.Etudiant;
 import org.example.projet_java.service.AuthentificationService;
 
 import java.io.IOException;

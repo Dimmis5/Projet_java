@@ -1,7 +1,5 @@
 package org.example.projet_java.model;
 
-import java.util.ArrayList;
-
 public class EmploiDuTemps {
     protected String id_etudiant;
     protected String id_cours;

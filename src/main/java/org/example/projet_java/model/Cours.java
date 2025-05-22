@@ -13,7 +13,6 @@ public class Cours {
     protected String classe;
     protected ArrayList<Etudiant> etudiants;
     protected boolean annulation = false;
-    protected String EstAnnule;
 
     public Cours(String id_cours, String id_salle, String matiere, String date, String heure_debut, String heure_fin, String id_enseignant, String classe, Boolean estAnnule) {
         this.id_cours = id_cours;

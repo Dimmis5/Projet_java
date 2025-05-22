@@ -1,4 +1,3 @@
-/*
 package org.example.projet_java.model;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,19 +8,25 @@ public class EnseignantTest {
 
     @Test
     public void testConstructeur() {
-        Enseignant enseignant = new Enseignant("id1", "Dupont", "Jean", "jean.dupont@mail.com", "pass123");
+        Enseignant enseignant = new Enseignant("20000", "Dupont", "Jean", "jean.dupont@gmail.com", "dj123");
+
+        assertEquals("20000", enseignant.getId());
+        assertEquals("Dupont", enseignant.getNom());
+        assertEquals("Jean", enseignant.getPrenom());
+        assertEquals("jean.dupont@gmail.com", enseignant.getMail());
+        assertEquals("dj123", enseignant.getMdp());
         assertNotNull(enseignant);
     }
 
     @Test
     public void testGetters() {
-        Enseignant enseignant = new Enseignant("id1", "Dupont", "Jean", "jean.dupont@mail.com", "pass123");
+        Enseignant enseignant = new Enseignant("20000", "Dupont", "Jean", "jean.dupont@gmail.com", "dj123");
 
-        assertEquals("id1", enseignant.getId());
+        assertEquals("20000", enseignant.getId());
         assertEquals("Dupont", enseignant.getNom());
         assertEquals("Jean", enseignant.getPrenom());
-        assertEquals("jean.dupont@mail.com", enseignant.getMail());
-        assertEquals("pass123", enseignant.getMdp());
+        assertEquals("jean.dupont@gmail.com", enseignant.getMail());
+        assertEquals("dj123", enseignant.getMdp());
 
         assertNotNull(enseignant.getCours());
         assertTrue(enseignant.getCours().isEmpty());
@@ -29,33 +34,26 @@ public class EnseignantTest {
 
     @Test
     public void testSetters() {
-        Enseignant enseignant = new Enseignant("id1", "Dupont", "Jean", "jean.dupont@mail.com", "pass123");
+        Enseignant enseignant = new Enseignant("20000", "Dupont", "Jean", "jean.dupont@gmail.com", "dj123");
 
-        enseignant.setId("id2");
+        enseignant.setId("20001");
         enseignant.setNom("Martin");
         enseignant.setPrenom("Paul");
-        enseignant.setMail("paul.martin@mail.com");
-        enseignant.setMdp("newpass");
+        enseignant.setMail("paul.martin@gmail.com");
+        enseignant.setMdp("pm123");
 
-        assertEquals("id2", enseignant.getId());
+        assertEquals("20001", enseignant.getId());
         assertEquals("Martin", enseignant.getNom());
         assertEquals("Paul", enseignant.getPrenom());
-        assertEquals("paul.martin@mail.com", enseignant.getMail());
-        assertEquals("newpass", enseignant.getMdp());
+        assertEquals("paul.martin@gmail.com", enseignant.getMail());
+        assertEquals("pm123", enseignant.getMdp());
     }
 
     @Test
     public void testSetCours() {
-        Enseignant enseignant = new Enseignant("id1", "Dupont", "Jean", "jean.dupont@mail.com", "pass123");
+        Enseignant enseignant = new Enseignant("20000", "Dupont", "Jean", "jean.dupont@gmail.com", "dj123");
         ArrayList<Cours> listeCours = new ArrayList<>();
         enseignant.setCours(listeCours);
         assertEquals(listeCours, enseignant.getCours());
     }
-
-    @Test
-    public void testSetAnomalie() {
-        Enseignant enseignant = new Enseignant("id1", "Dupont", "Jean", "jean.dupont@mail.com", "pass123");
-
-        enseignant.setAnomalie("typeTest", "descriptionTest");
-    }
-}*/
+}

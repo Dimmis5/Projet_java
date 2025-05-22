@@ -3,7 +3,6 @@ package org.example.projet_java.controller;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import org.example.projet_java.model.Cours;
 import org.example.projet_java.service.CsvService;
 
@@ -11,7 +10,6 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.TextStyle;
-import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.List;
 
@@ -19,7 +17,6 @@ public class EdtEnseignantController {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter TIME_FORMAT_H = DateTimeFormatter.ofPattern("H'h'mm");
     private static final DateTimeFormatter TIME_FORMAT_COLON = DateTimeFormatter.ofPattern("H:mm");
-    private static final DateTimeFormatter HEADER_DATE_FORMAT = DateTimeFormatter.ofPattern("E dd/MM");
     private static final DateTimeFormatter MONTH_FORMAT = DateTimeFormatter.ofPattern("MMMM yyyy", Locale.FRENCH);
 
     private final LocalTime heureDebut = LocalTime.of(8, 0);
@@ -31,16 +28,8 @@ public class EdtEnseignantController {
     private String idEnseignant;
     private String modeAffichage = "semaine";
 
-    // Couleurs pour différencier les matières
     private final Map<String, String> classesCouleursMatiere = new HashMap<>();
-    private final String[] classesCouleurs = {
-            "course-color-1",
-            "course-color-2",
-            "course-color-3",
-            "course-color-4",
-            "course-color-5",
-            "course-color-6"
-    };
+    private final String[] classesCouleurs = {"course-color-1", "course-color-2", "course-color-3", "course-color-4", "course-color-5", "course-color-6"};
 
     @FXML private GridPane grilleCalendrier;
     @FXML private Label etiquetteMoisAnnee;
@@ -53,7 +42,6 @@ public class EdtEnseignantController {
 
     @FXML
     public void initialize() {
-        System.out.println("[DEBUG] Initialisation du contrôleur EDT Enseignant");
         dateCourante = LocalDate.now();
         configurerBoutons();
         initEnseignantDepuisCsv();
@@ -81,42 +69,24 @@ public class EdtEnseignantController {
 
             if (idsEnseignants != null && !idsEnseignants.isEmpty()) {
                 this.idEnseignant = idsEnseignants.get(0);
-                System.out.println("[DEBUG] ID enseignant récupéré depuis CSV: " + this.idEnseignant);
             } else {
-                System.err.println("[ERREUR] Aucun enseignant trouvé dans le CSV");
                 showAlert("Erreur", "Aucun enseignant disponible", "Aucun enseignant n'a été trouvé dans les données");
             }
         } catch (Exception e) {
-            System.err.println("[ERREUR] Impossible de récupérer la liste des enseignants: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    public void setIdEnseignant(String id) {
-        if (id == null || id.isEmpty()) {
-            System.err.println("[ERREUR] ID enseignant non valide");
-            return;
-        }
-
-        this.idEnseignant = id.trim();
-        System.out.println("[DEBUG] ID enseignant défini: " + this.idEnseignant);
-        initialiserCouleurs();
-        rafraichirAffichage();
-    }
-
     private void configurerBoutons() {
         boutonPeriodePrecedente.setOnAction(e -> {
-            System.out.println("[DEBUG] Clic sur Période précédente");
             changerPeriode(-1);
         });
 
         boutonPeriodeSuivante.setOnAction(e -> {
-            System.out.println("[DEBUG] Clic sur Période suivante");
             changerPeriode(1);
         });
 
         boutonAujourdhui.setOnAction(e -> {
-            System.out.println("[DEBUG] Clic sur Aujourd'hui");
             dateCourante = LocalDate.now();
             rafraichirAffichage();
         });
@@ -272,8 +242,7 @@ public class EdtEnseignantController {
     private void afficherEnTetesSemaine(LocalDate debutSemaine) {
         for (int i = 0; i < 7; i++) {
             LocalDate date = debutSemaine.plusDays(i);
-            String jourTexte = date.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.FRENCH) + " " +
-                    date.format(DateTimeFormatter.ofPattern("dd/MM"));
+            String jourTexte = date.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.FRENCH) + " " + date.format(DateTimeFormatter.ofPattern("dd/MM"));
 
             Label label = new Label(jourTexte);
             label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -334,7 +303,6 @@ public class EdtEnseignantController {
             }
 
         } catch (Exception e) {
-            System.err.println("[ERREUR] Impossible d'afficher le cours: " + cours.getMatiere());
             e.printStackTrace();
         }
     }
@@ -353,8 +321,7 @@ public class EdtEnseignantController {
         lblSalle.getStyleClass().add("course-detail");
         lblSalle.setWrapText(true);
 
-        Label lblHoraire = new Label(parseHeure(cours.getHeure_debut()).format(DateTimeFormatter.ofPattern("HH:mm")) +
-                "-" + parseHeure(cours.getHeure_fin()).format(DateTimeFormatter.ofPattern("HH:mm")));
+        Label lblHoraire = new Label(parseHeure(cours.getHeure_debut()).format(DateTimeFormatter.ofPattern("HH:mm")) + "-" + parseHeure(cours.getHeure_fin()).format(DateTimeFormatter.ofPattern("HH:mm")));
         lblHoraire.getStyleClass().add("course-detail");
 
         Label lblClasse = new Label(cours.getClasse());
@@ -369,7 +336,6 @@ public class EdtEnseignantController {
 
     private void afficherJour(LocalDate date) {
         configurerGrilleJour();
-
         List<Cours> cours = csvService.CoursEnseignant(idEnseignant);
         cours.stream()
                 .filter(c -> estLeJour(c, date))
@@ -435,7 +401,6 @@ public class EdtEnseignantController {
             grilleCalendrier.getChildren().add(box);
 
         } catch (Exception e) {
-            System.err.println("[ERREUR] Impossible d'afficher le cours: " + cours.getMatiere());
             e.printStackTrace();
         }
     }
@@ -443,7 +408,6 @@ public class EdtEnseignantController {
     private void afficherMois(LocalDate debutMois) {
         configurerGrilleMois();
         afficherJoursMois(debutMois);
-
         List<Cours> cours = csvService.CoursEnseignant(idEnseignant);
         cours.stream().filter(c -> estDansMois(c, debutMois)).forEach(this::afficherCoursMois);
     }
@@ -526,8 +490,7 @@ public class EdtEnseignantController {
 
             if (row <= 6) {
                 Label labelCours = new Label(cours.getMatiere());
-                labelCours.getStyleClass().addAll("month-course",
-                        classesCouleursMatiere.getOrDefault(cours.getMatiere(), "course-color-1"));
+                labelCours.getStyleClass().addAll("month-course", classesCouleursMatiere.getOrDefault(cours.getMatiere(), "course-color-1"));
 
                 grilleCalendrier.getChildren().stream()
                         .filter(node -> GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row)
@@ -539,7 +502,6 @@ public class EdtEnseignantController {
                         });
             }
         } catch (Exception e) {
-            System.err.println("[ERREUR] Impossible d'afficher le cours en mode mois: " + cours.getMatiere());
             e.printStackTrace();
         }
     }
@@ -549,7 +511,6 @@ public class EdtEnseignantController {
             LocalDate dateCours = LocalDate.parse(cours.getDate(), DATE_FORMAT);
             return dateCours.isEqual(date);
         } catch (DateTimeParseException e) {
-            System.err.println("[ERREUR] Format de date invalide pour le cours: " + cours.getMatiere());
             return false;
         }
     }
@@ -560,7 +521,6 @@ public class EdtEnseignantController {
             return dateCours.getMonth() == debutMois.getMonth() &&
                     dateCours.getYear() == debutMois.getYear();
         } catch (DateTimeParseException e) {
-            System.err.println("[ERREUR] Format de date invalide pour le cours: " + cours.getMatiere());
             return false;
         }
     }
@@ -593,7 +553,6 @@ public class EdtEnseignantController {
                     }
                     throw e2;
                 } catch (DateTimeParseException e3) {
-                    System.err.println("[ERREUR] Format d'heure invalide: " + heureStr);
                     throw new DateTimeParseException("Format d'heure invalide (attendu HH:mm ou Hhmm)", heureStr, 0);
                 }
             }

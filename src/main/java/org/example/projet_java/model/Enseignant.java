@@ -61,11 +61,12 @@ public class Enseignant extends Utilisateur {
         this.mail = mail;
     }
 
+    @Override
     public String getMdp() {
         return mdp;
     }
 
-
+    @Override
     public void setMdp(String mdp) {
         this.mdp = mdp;
     }
@@ -76,11 +77,6 @@ public class Enseignant extends Utilisateur {
 
     public void setCours(ArrayList<Cours> cours) {
         this.cours = cours;
-    }
-
-    // Methode set anomalie
-    public void setAnomalie(String type, String description) {
-        Anomalie anomalie = new Anomalie(type, description);
     }
 
 }

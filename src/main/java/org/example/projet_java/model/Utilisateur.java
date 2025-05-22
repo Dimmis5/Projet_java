@@ -55,7 +55,4 @@ public class Utilisateur {
         this.mdp = mdp;
     }
 
-    public EmploiDuTemps consulter(EmploiDuTemps emploi){
-        return emploi;
-    }
 }
