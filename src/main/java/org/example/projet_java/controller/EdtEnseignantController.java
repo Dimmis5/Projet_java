@@ -1,9 +1,9 @@
 package org.example.projet_java.controller;
 
-
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import org.example.projet_java.model.Cours;
 import org.example.projet_java.service.CsvService;
 
@@ -12,8 +12,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.TextStyle;
 import java.time.temporal.WeekFields;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
 
 public class EdtEnseignantController {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -29,7 +29,18 @@ public class EdtEnseignantController {
     private LocalDate dateCourante;
     private final CsvService csvService = CsvService.getInstance();
     private String idEnseignant;
-    private String modeAffichage = "semaine"; // "jour", "semaine" ou "mois"
+    private String modeAffichage = "semaine";
+
+    // Couleurs pour différencier les matières
+    private final Map<String, String> couleursMatiere = new HashMap<>();
+    private final String[] couleurs = {
+            "#e3f2fd;-fx-border-color: #bbdefb;", // Bleu clair
+            "#fce4ec;-fx-border-color: #f8bbd9;", // Rose clair
+            "#e8f5e8;-fx-border-color: #c8e6c9;", // Vert clair
+            "#fff3e0;-fx-border-color: #ffcc02;", // Orange clair
+            "#f3e5f5;-fx-border-color: #e1bee7;", // Violet clair
+            "#e0f2f1;-fx-border-color: #b2dfdb;", // Turquoise clair
+    };
 
     @FXML private GridPane grilleCalendrier;
     @FXML private Label etiquetteMoisAnnee;
@@ -40,14 +51,29 @@ public class EdtEnseignantController {
     @FXML private Button boutonModeSemaine;
     @FXML private Button boutonModeMois;
 
-
     @FXML
     public void initialize() {
         System.out.println("[DEBUG] Initialisation du contrôleur EDT Enseignant");
         dateCourante = LocalDate.now();
         configurerBoutons();
         initEnseignantDepuisCsv();
+        initialiserCouleurs();
         rafraichirAffichage();
+    }
+
+    private void initialiserCouleurs() {
+        // Récupérer toutes les matières et leur attribuer une couleur
+        List<Cours> tousLesCours = csvService.CoursEnseignant(idEnseignant);
+        Set<String> matieres = new HashSet<>();
+        for (Cours cours : tousLesCours) {
+            matieres.add(cours.getMatiere());
+        }
+
+        int index = 0;
+        for (String matiere : matieres) {
+            couleursMatiere.put(matiere, couleurs[index % couleurs.length]);
+            index++;
+        }
     }
 
     private void initEnseignantDepuisCsv() {
@@ -75,10 +101,15 @@ public class EdtEnseignantController {
 
         this.idEnseignant = id.trim();
         System.out.println("[DEBUG] ID enseignant défini: " + this.idEnseignant);
+        initialiserCouleurs();
         rafraichirAffichage();
     }
 
     private void configurerBoutons() {
+        // Style des boutons de mode
+        String styleNormal = "-fx-background-color: #f9f9f9; -fx-border-color: #ccc; -fx-border-radius: 4; -fx-background-radius: 4;";
+        String styleActif = "-fx-background-color: #d0d0d0; -fx-border-color: #999; -fx-border-radius: 4; -fx-background-radius: 4;";
+
         boutonPeriodePrecedente.setOnAction(e -> {
             System.out.println("[DEBUG] Clic sur Période précédente");
             changerPeriode(-1);
@@ -113,12 +144,17 @@ public class EdtEnseignantController {
             mettreAJourStyleBoutons();
         });
 
+        // Style initial
+        mettreAJourStyleBoutons();
     }
 
     private void mettreAJourStyleBoutons() {
-        boutonModeJour.setStyle(modeAffichage.equals("jour") ? "-fx-background-color: #d0d0d0;" : "");
-        boutonModeSemaine.setStyle(modeAffichage.equals("semaine") ? "-fx-background-color: #d0d0d0;" : "");
-        boutonModeMois.setStyle(modeAffichage.equals("mois") ? "-fx-background-color: #d0d0d0;" : "");
+        String styleNormal = "-fx-background-color: #f9f9f9; -fx-border-color: #ccc; -fx-border-radius: 4; -fx-background-radius: 4;";
+        String styleActif = "-fx-background-color: #d0d0d0; -fx-border-color: #999; -fx-border-radius: 4; -fx-background-radius: 4;";
+
+        boutonModeJour.setStyle(modeAffichage.equals("jour") ? styleActif : styleNormal);
+        boutonModeSemaine.setStyle(modeAffichage.equals("semaine") ? styleActif : styleNormal);
+        boutonModeMois.setStyle(modeAffichage.equals("mois") ? styleActif : styleNormal);
     }
 
     private void changerPeriode(int delta) {
@@ -171,6 +207,208 @@ public class EdtEnseignantController {
         }
     }
 
+    private void afficherSemaine(LocalDate debutSemaine) {
+        configurerGrilleSemaine();
+        afficherEnTetesSemaine(debutSemaine);
+
+        List<Cours> cours = csvService.CoursEnseignant(idEnseignant);
+        LocalDate finSemaine = debutSemaine.plusDays(6);
+
+        // Grouper les cours par jour et par heure pour gérer les chevauchements
+        Map<String, List<Cours>> coursParJourEtHeure = new HashMap<>();
+
+        cours.stream()
+                .filter(c -> estDansPeriode(c, debutSemaine, finSemaine))
+                .forEach(c -> {
+                    String cle = c.getDate() + "_" + c.getHeure_debut();
+                    coursParJourEtHeure.computeIfAbsent(cle, k -> new ArrayList<>()).add(c);
+                });
+
+        // Afficher les cours
+        for (List<Cours> coursGroupe : coursParJourEtHeure.values()) {
+            for (int i = 0; i < coursGroupe.size(); i++) {
+                afficherCoursSemaine(coursGroupe.get(i), i, coursGroupe.size());
+            }
+        }
+    }
+
+    private void configurerGrilleSemaine() {
+        grilleCalendrier.getChildren().clear();
+        grilleCalendrier.getColumnConstraints().clear();
+        grilleCalendrier.getRowConstraints().clear();
+
+        // ACTIVER LA GRILLE VISIBLE
+        grilleCalendrier.setGridLinesVisible(true);
+        grilleCalendrier.setStyle("-fx-background-color: white; -fx-border-color: #333; -fx-border-width: 1;");
+
+        // Colonne heures
+        ColumnConstraints colHeure = new ColumnConstraints(100);
+        colHeure.setHgrow(Priority.NEVER);
+        grilleCalendrier.getColumnConstraints().add(colHeure);
+
+        // Colonnes jours - TAILLE FIXE POUR ÉVITER LES DÉBORDEMENTS
+        for (int i = 0; i < 7; i++) {
+            ColumnConstraints col = new ColumnConstraints();
+            col.setHgrow(Priority.ALWAYS);
+            col.setMinWidth(120);
+            col.setMaxWidth(Double.MAX_VALUE);
+            grilleCalendrier.getColumnConstraints().add(col);
+        }
+
+        // Ligne en-tête
+        RowConstraints rowHeader = new RowConstraints(35);
+        rowHeader.setVgrow(Priority.NEVER);
+        grilleCalendrier.getRowConstraints().add(rowHeader);
+
+        // Lignes créneaux - TAILLE FIXE POUR CONTRAINDRE LES COURS
+        int nbCreneaux = (int) Duration.between(heureDebut, heureFin).toMinutes() / intervalMinutes;
+        for (int i = 0; i < nbCreneaux; i++) {
+            RowConstraints row = new RowConstraints(100);
+            row.setVgrow(Priority.NEVER); // IMPORTANT: Ne pas permettre l'expansion
+            row.setMinHeight(100);
+            row.setMaxHeight(100);
+            grilleCalendrier.getRowConstraints().add(row);
+        }
+
+        // Ajouter des cellules vides pour rendre la grille visible
+        for (int row = 1; row <= nbCreneaux; row++) {
+            for (int col = 1; col <= 7; col++) {
+                Region celluleVide = new Region();
+                celluleVide.setStyle("-fx-background-color: transparent; -fx-border-color: #ddd; -fx-border-width: 0.5;");
+                celluleVide.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+                celluleVide.setMinSize(0, 0);
+                grilleCalendrier.add(celluleVide, col, row);
+            }
+        }
+    }
+
+    private void afficherEnTetesSemaine(LocalDate debutSemaine) {
+        // En-têtes jours
+        for (int i = 0; i < 7; i++) {
+            LocalDate date = debutSemaine.plusDays(i);
+            String jourTexte = date.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.FRENCH) + " " +
+                    date.format(DateTimeFormatter.ofPattern("dd/MM"));
+
+            Label label = new Label(jourTexte);
+            label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            label.setStyle("-fx-alignment: center; -fx-font-weight: bold; -fx-background-color: #f0f0f0; -fx-border-color: #333; -fx-border-width: 1; -fx-text-fill: black;");
+            grilleCalendrier.add(label, i + 1, 0);
+        }
+
+        // En-têtes heures
+        LocalTime heure = heureDebut;
+        int row = 1;
+        while (!heure.isAfter(heureFin.minusMinutes(intervalMinutes))) {
+            Label label = new Label(heure.format(DateTimeFormatter.ofPattern("HH:mm")));
+            label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            label.setStyle("-fx-alignment: center; -fx-font-size: 11; -fx-background-color: #f0f0f0; -fx-border-color: #333; -fx-border-width: 1; -fx-text-fill: black;");
+            grilleCalendrier.add(label, 0, row);
+            heure = heure.plusMinutes(intervalMinutes);
+            row++;
+        }
+    }
+
+    private void afficherCoursSemaine(Cours cours, int indexChevauchement, int nbChevauchements) {
+        try {
+            LocalDate date = LocalDate.parse(cours.getDate(), DATE_FORMAT);
+            LocalTime debut = parseHeure(cours.getHeure_debut());
+            LocalTime fin = parseHeure(cours.getHeure_fin());
+
+            int col = date.getDayOfWeek().getValue(); // Lundi=1 à Dimanche=7
+            int row = ((int) Duration.between(heureDebut, debut).toMinutes() / intervalMinutes) + 1;
+            int span = Math.max(1, (int) Duration.between(debut, fin).toMinutes() / intervalMinutes);
+
+            // Vérifier que le cours ne dépasse pas les limites
+            int maxRow = (int) Duration.between(heureDebut, heureFin).toMinutes() / intervalMinutes;
+            if (row + span > maxRow + 1) {
+                span = maxRow + 1 - row;
+            }
+
+            VBox box = creerVBoxCoursAmeliore(cours);
+
+            // CONTRAINDRE LA TAILLE DU COURS DANS SA CELLULE
+            box.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            box.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+
+            // Gérer les chevauchements avec un décalage horizontal
+            if (nbChevauchements > 1) {
+                HBox container = new HBox();
+                container.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+                // Créer des espaces vides pour le décalage
+                for (int i = 0; i < indexChevauchement; i++) {
+                    Region spacer = new Region();
+                    spacer.setPrefWidth(20);
+                    container.getChildren().add(spacer);
+                }
+
+                box.setPrefWidth(Region.USE_COMPUTED_SIZE);
+                container.getChildren().add(box);
+
+                GridPane.setConstraints(container, col, row, 1, span);
+                GridPane.setFillHeight(container, true);
+                GridPane.setFillWidth(container, true);
+                grilleCalendrier.getChildren().add(container);
+            } else {
+                GridPane.setConstraints(box, col, row, 1, span);
+                GridPane.setFillHeight(box, true);
+                GridPane.setFillWidth(box, true);
+                grilleCalendrier.getChildren().add(box);
+            }
+
+        } catch (Exception e) {
+            System.err.println("[ERREUR] Impossible d'afficher le cours: " + cours.getMatiere());
+            e.printStackTrace();
+        }
+    }
+
+    private VBox creerVBoxCoursAmeliore(Cours cours) {
+        VBox box = new VBox(2);
+
+        // Utiliser la couleur spécifique à la matière
+        String couleurMatiere = couleursMatiere.getOrDefault(cours.getMatiere(), couleurs[0]);
+        box.setStyle("-fx-background-color: " + couleurMatiere +
+                " -fx-border-radius: 3; -fx-background-radius: 3; -fx-padding: 4; " +
+                "-fx-border-width: 1; -fx-border-color: #333;");
+
+        // CONTRAINDRE STRICTEMENT LA TAILLE
+        box.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        box.setMinSize(0, 0);
+        box.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+
+        // Titre du cours (matière) - TEXTE EN NOIR
+        Label lblMatiere = new Label(cours.getMatiere());
+        lblMatiere.setStyle("-fx-font-weight: bold; -fx-font-size: 11; -fx-text-fill: black;");
+        lblMatiere.setWrapText(true);
+        lblMatiere.setMaxSize(Double.MAX_VALUE, Region.USE_PREF_SIZE);
+
+        // Informations du cours - TEXTE EN NOIR
+        Label lblSalle = new Label("Salle: " + cours.getId_salle());
+        lblSalle.setStyle("-fx-font-size: 9; -fx-text-fill: black;");
+        lblSalle.setWrapText(true);
+        lblSalle.setMaxSize(Double.MAX_VALUE, Region.USE_PREF_SIZE);
+
+        // Horaires - TEXTE EN NOIR
+        Label lblHoraire = new Label(parseHeure(cours.getHeure_debut()).format(DateTimeFormatter.ofPattern("HH:mm")) +
+                "-" + parseHeure(cours.getHeure_fin()).format(DateTimeFormatter.ofPattern("HH:mm")));
+        lblHoraire.setStyle("-fx-font-size: 9; -fx-text-fill: black;");
+        lblHoraire.setMaxSize(Double.MAX_VALUE, Region.USE_PREF_SIZE);
+
+        // Classe/Enseignant - TEXTE EN NOIR
+        Label lblClasse = new Label(cours.getClasse());
+        lblClasse.setStyle("-fx-font-size: 9; -fx-text-fill: black;");
+        lblClasse.setWrapText(true);
+        lblClasse.setMaxSize(Double.MAX_VALUE, Region.USE_PREF_SIZE);
+
+        box.getChildren().addAll(lblMatiere, lblSalle, lblHoraire, lblClasse);
+
+        // S'assurer que le VBox ne dépasse pas de sa cellule
+        box.setFillWidth(true);
+
+        return box;
+    }
+
+    // Conserver les autres méthodes existantes...
     private void afficherJour(LocalDate date) {
         configurerGrilleJour();
 
@@ -184,30 +422,36 @@ public class EdtEnseignantController {
         grilleCalendrier.getColumnConstraints().clear();
         grilleCalendrier.getRowConstraints().clear();
 
-        // Colonne heures
-        ColumnConstraints colHeure = new ColumnConstraints(80);
+        grilleCalendrier.setGridLinesVisible(true);
+        grilleCalendrier.setStyle("-fx-background-color: white; -fx-border-color: #333; -fx-border-width: 1;");
+
+        ColumnConstraints colHeure = new ColumnConstraints(100);
         grilleCalendrier.getColumnConstraints().add(colHeure);
 
-        // Colonne principale
         ColumnConstraints colPrincipale = new ColumnConstraints();
         colPrincipale.setHgrow(Priority.ALWAYS);
         grilleCalendrier.getColumnConstraints().add(colPrincipale);
 
-        // Lignes créneaux
         int nbCreneaux = (int) Duration.between(heureDebut, heureFin).toMinutes() / intervalMinutes;
         for (int i = 0; i < nbCreneaux; i++) {
-            RowConstraints row = new RowConstraints(60);
+            RowConstraints row = new RowConstraints(100);
             row.setVgrow(Priority.ALWAYS);
             grilleCalendrier.getRowConstraints().add(row);
         }
 
-        // En-têtes heures
         LocalTime heure = heureDebut;
         int row = 0;
         while (!heure.isAfter(heureFin.minusMinutes(intervalMinutes))) {
             Label label = new Label(heure.format(TIME_FORMAT_H));
-            label.setStyle("-fx-alignment: center-right; -fx-font-size: 11; -fx-background-color: #f0f0f0;");
+            label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            label.setStyle("-fx-alignment: center; -fx-font-size: 11; -fx-background-color: #f0f0f0; -fx-border-color: #333; -fx-border-width: 1; -fx-text-fill: black;");
             grilleCalendrier.add(label, 0, row);
+
+            Region celluleVide = new Region();
+            celluleVide.setStyle("-fx-background-color: transparent; -fx-border-color: #ddd; -fx-border-width: 0.5;");
+            celluleVide.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            grilleCalendrier.add(celluleVide, 1, row);
+
             heure = heure.plusMinutes(intervalMinutes);
             row++;
         }
@@ -219,124 +463,20 @@ public class EdtEnseignantController {
             LocalTime fin = parseHeure(cours.getHeure_fin());
 
             int row = ((int) Duration.between(heureDebut, debut).toMinutes() / intervalMinutes);
-            int span = ((int) Duration.between(debut, fin).toMinutes() / intervalMinutes);
+            int span = Math.max(1, (int) Duration.between(debut, fin).toMinutes() / intervalMinutes);
+            int maxRow = (int) Duration.between(heureDebut, heureFin).toMinutes() / intervalMinutes;
+            if (row + span > maxRow) {
+                span = maxRow - row;
+            }
 
-            VBox box = creerVBoxCours(cours);
+            VBox box = creerVBoxCoursAmeliore(cours);
+
+            box.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            box.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+
             GridPane.setConstraints(box, 1, row, 1, span);
-            grilleCalendrier.getChildren().add(box);
-
-        } catch (Exception e) {
-            System.err.println("[ERREUR] Impossible d'afficher le cours: " + cours.getMatiere());
-            e.printStackTrace();
-        }
-    }
-
-    private VBox creerVBoxCours(Cours cours) {
-        VBox box = new VBox(3);
-        box.setStyle("-fx-background-color: #e3f2fd; -fx-border-color: #bbdefb; -fx-border-radius: 3; -fx-padding: 5;");
-        box.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-
-        Label lblMatiere = new Label(cours.getMatiere());
-        lblMatiere.setStyle("-fx-font-weight: bold; -fx-font-size: 12;");
-
-        Label lblSalle = new Label("Salle: " + cours.getId_salle());
-        lblSalle.setStyle("-fx-font-size: 11;");
-
-        Label lblClasse = new Label("Classe: " + cours.getClasse());
-        lblClasse.setStyle("-fx-font-size: 11;");
-
-        Label lblHoraire = new Label(parseHeure(cours.getHeure_debut()).format(DateTimeFormatter.ofPattern("HH:mm")) +
-                "-" + parseHeure(cours.getHeure_fin()).format(DateTimeFormatter.ofPattern("HH:mm")));
-        lblHoraire.setStyle("-fx-font-size: 10; -fx-text-fill: #555;");
-
-        box.getChildren().addAll(lblMatiere, lblSalle, lblClasse, lblHoraire);
-        return box;
-    }
-
-    private boolean estLeJour(Cours cours, LocalDate date) {
-        try {
-            LocalDate dateCours = LocalDate.parse(cours.getDate(), DATE_FORMAT);
-            return dateCours.isEqual(date);
-        } catch (DateTimeParseException e) {
-            System.err.println("[ERREUR] Format de date invalide pour le cours: " + cours.getMatiere());
-            return false;
-        }
-    }
-
-    private void afficherSemaine(LocalDate debutSemaine) {
-        configurerGrilleSemaine();
-        afficherEnTetesSemaine(debutSemaine);
-
-        List<Cours> cours = csvService.CoursEnseignant(idEnseignant);
-        LocalDate finSemaine = debutSemaine.plusDays(6);
-
-        cours.stream()
-                .filter(c -> estDansPeriode(c, debutSemaine, finSemaine))
-                .forEach(this::afficherCoursSemaine);
-    }
-
-    private void configurerGrilleSemaine() {
-        grilleCalendrier.getColumnConstraints().clear();
-        grilleCalendrier.getRowConstraints().clear();
-
-        // Colonne heures
-        ColumnConstraints colHeure = new ColumnConstraints(80);
-        grilleCalendrier.getColumnConstraints().add(colHeure);
-
-        // Colonnes jours
-        for (int i = 0; i < 7; i++) {
-            ColumnConstraints col = new ColumnConstraints();
-            col.setHgrow(Priority.ALWAYS);
-            grilleCalendrier.getColumnConstraints().add(col);
-        }
-
-        // Ligne en-tête
-        RowConstraints rowHeader = new RowConstraints(30);
-        grilleCalendrier.getRowConstraints().add(rowHeader);
-
-        // Lignes créneaux
-        int nbCreneaux = (int) Duration.between(heureDebut, heureFin).toMinutes() / intervalMinutes;
-        for (int i = 0; i < nbCreneaux; i++) {
-            RowConstraints row = new RowConstraints(60);
-            row.setVgrow(Priority.ALWAYS);
-            grilleCalendrier.getRowConstraints().add(row);
-        }
-    }
-
-    private void afficherEnTetesSemaine(LocalDate debutSemaine) {
-        // En-têtes jours
-        for (int i = 0; i < 7; i++) {
-            LocalDate date = debutSemaine.plusDays(i);
-            Label label = new Label(date.format(HEADER_DATE_FORMAT));
-            label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-            label.setStyle("-fx-alignment: center; -fx-font-weight: bold; -fx-background-color: #f0f0f0;");
-            grilleCalendrier.add(label, i + 1, 0);
-        }
-
-        // En-têtes heures
-        LocalTime heure = heureDebut;
-        int row = 1;
-        while (!heure.isAfter(heureFin.minusMinutes(intervalMinutes))) {
-            Label label = new Label(heure.format(TIME_FORMAT_H));
-            label.setStyle("-fx-alignment: center-right; -fx-font-size: 11; -fx-background-color: #f0f0f0;");
-            grilleCalendrier.add(label, 0, row);
-            heure = heure.plusMinutes(intervalMinutes);
-            row++;
-        }
-    }
-
-    private void afficherCoursSemaine(Cours cours) {
-        try {
-            LocalDate date = LocalDate.parse(cours.getDate(), DATE_FORMAT);
-            LocalTime debut = parseHeure(cours.getHeure_debut());
-            LocalTime fin = parseHeure(cours.getHeure_fin());
-
-            int col = date.getDayOfWeek().getValue(); // Lundi=1 à Dimanche=7
-            int row = ((int) Duration.between(heureDebut, debut).toMinutes() / intervalMinutes) + 1;
-            int span = ((int) Duration.between(debut, fin).toMinutes() / intervalMinutes);
-
-            VBox box = creerVBoxCours(cours);
-            GridPane.setConstraints(box, col, row, 1, span);
+            GridPane.setFillHeight(box, true);
+            GridPane.setFillWidth(box, true);
             grilleCalendrier.getChildren().add(box);
 
         } catch (Exception e) {
@@ -350,80 +490,108 @@ public class EdtEnseignantController {
         afficherJoursMois(debutMois);
 
         List<Cours> cours = csvService.CoursEnseignant(idEnseignant);
-        cours.stream()
-                .filter(c -> estDansMois(c, debutMois))
-                .forEach(this::afficherCoursMois);
+        cours.stream().filter(c -> estDansMois(c, debutMois)).forEach(this::afficherCoursMois);
     }
 
     private void configurerGrilleMois() {
         grilleCalendrier.getColumnConstraints().clear();
         grilleCalendrier.getRowConstraints().clear();
+        grilleCalendrier.setGridLinesVisible(true);
+        grilleCalendrier.setStyle("-fx-background-color: white; -fx-border-color: #333; -fx-border-width: 1;");
 
-        // Colonnes jours (7 colonnes pour les jours de la semaine)
         for (int i = 0; i < 7; i++) {
             ColumnConstraints col = new ColumnConstraints();
             col.setHgrow(Priority.ALWAYS);
-            col.setMinWidth(80);
+            col.setMinWidth(100);
             grilleCalendrier.getColumnConstraints().add(col);
         }
 
-        // Lignes (6 semaines max dans un mois)
+        RowConstraints rowHeader = new RowConstraints(30);
+        grilleCalendrier.getRowConstraints().add(rowHeader);
+
         for (int i = 0; i < 6; i++) {
             RowConstraints row = new RowConstraints(80);
             row.setVgrow(Priority.ALWAYS);
             grilleCalendrier.getRowConstraints().add(row);
         }
 
-        // En-têtes des jours
+        String[] joursAbrev = {"Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"};
         for (int i = 0; i < 7; i++) {
-            Label label = new Label(DayOfWeek.of((i % 7) + 1).getDisplayName(TextStyle.SHORT, Locale.FRENCH));
-            label.setStyle("-fx-alignment: center; -fx-font-weight: bold; -fx-background-color: #f0f0f0;");
+            Label label = new Label(joursAbrev[i]);
+            label.setStyle("-fx-alignment: center; -fx-font-weight: bold; -fx-background-color: #f0f0f0; -fx-border-color: #333; -fx-border-width: 1; -fx-text-fill: black;");
+            label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
             grilleCalendrier.add(label, i, 0);
         }
     }
 
     private void afficherJoursMois(LocalDate debutMois) {
         LocalDate date = debutMois.withDayOfMonth(1);
-        // Ajuster pour commencer par lundi
         while (date.getDayOfWeek() != DayOfWeek.MONDAY) {
             date = date.minusDays(1);
         }
 
         int row = 1;
-        while (row < 6) {
+        while (row <= 6) {
             for (int col = 0; col < 7; col++) {
-                if (date.getMonth() == debutMois.getMonth() || row == 1 || row == 5) {
-                    Label label = new Label(String.valueOf(date.getDayOfMonth()));
-                    label.setStyle(date.getMonth() == debutMois.getMonth()
-                            ? "-fx-alignment: top-left; -fx-padding: 5 0 0 5;"
-                            : "-fx-alignment: top-left; -fx-padding: 5 0 0 5; -fx-text-fill: #a0a0a0;");
-                    label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-                    grilleCalendrier.add(label, col, row);
-                }
+                VBox cellule = new VBox();
+                cellule.setStyle("-fx-border-color: #ddd; -fx-border-width: 1; -fx-padding: 2; -fx-background-color: white;");
+                cellule.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+                Label numeroJour = new Label(String.valueOf(date.getDayOfMonth()));
+                numeroJour.setStyle(date.getMonth() == debutMois.getMonth() ? "-fx-font-weight: bold; -fx-text-fill: black;" : "-fx-text-fill: #a0a0a0;");
+
+                cellule.getChildren().add(numeroJour);
+                grilleCalendrier.add(cellule, col, row);
+
                 date = date.plusDays(1);
             }
             row++;
+            if (date.getMonth() != debutMois.getMonth() && row > 2) {
+                break;
+            }
         }
     }
 
     private void afficherCoursMois(Cours cours) {
         try {
             LocalDate date = LocalDate.parse(cours.getDate(), DATE_FORMAT);
-            int semaineDansMois = date.get(WeekFields.of(Locale.FRENCH).weekOfMonth()) - 1;
-            int jourDansSemaine = date.getDayOfWeek().getValue() - 1;
+            LocalDate premierDuMois = dateCourante.withDayOfMonth(1);
+            LocalDate debutCalendrier = premierDuMois;
+            while (debutCalendrier.getDayOfWeek() != DayOfWeek.MONDAY) {
+                debutCalendrier = debutCalendrier.minusDays(1);
+            }
 
-            if (semaineDansMois >= 0 && semaineDansMois < 6) {
-                Label label = new Label(cours.getMatiere() + "\n" +
-                        parseHeure(cours.getHeure_debut()).format(DateTimeFormatter.ofPattern("HH:mm")));
-                label.setStyle("-fx-alignment: top-left; -fx-font-size: 10; -fx-padding: 2;");
-                label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            long joursDepuisDebut = Duration.between(debutCalendrier.atStartOfDay(), date.atStartOfDay()).toDays();
+            int col = (int) (joursDepuisDebut % 7);
+            int row = (int) (joursDepuisDebut / 7) + 1;
 
-                GridPane.setConstraints(label, jourDansSemaine, semaineDansMois + 1);
-                grilleCalendrier.getChildren().add(label);
+            if (row <= 6) {
+                Label labelCours = new Label(cours.getMatiere());
+                String couleurMatiere = couleursMatiere.getOrDefault(cours.getMatiere(), couleurs[0]);
+                labelCours.setStyle("-fx-background-color: " + couleurMatiere + " -fx-font-size: 9; -fx-padding: 1; -fx-border-radius: 2; -fx-background-radius: 2;");
+
+                grilleCalendrier.getChildren().stream()
+                        .filter(node -> GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row)
+                        .findFirst()
+                        .ifPresent(node -> {
+                            if (node instanceof VBox) {
+                                ((VBox) node).getChildren().add(labelCours);
+                            }
+                        });
             }
         } catch (Exception e) {
             System.err.println("[ERREUR] Impossible d'afficher le cours en mode mois: " + cours.getMatiere());
             e.printStackTrace();
+        }
+    }
+
+    private boolean estLeJour(Cours cours, LocalDate date) {
+        try {
+            LocalDate dateCours = LocalDate.parse(cours.getDate(), DATE_FORMAT);
+            return dateCours.isEqual(date);
+        } catch (DateTimeParseException e) {
+            System.err.println("[ERREUR] Format de date invalide pour le cours: " + cours.getMatiere());
+            return false;
         }
     }
 
