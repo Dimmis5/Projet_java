@@ -7,14 +7,12 @@ public class Salle {
     protected String localisation;
     protected int capacite;
     protected ArrayList<String> equipement;
-    protected boolean statut;
 
-    public Salle(String id_salle, String localisation, int capacite, boolean statut) {
+    public Salle(String id_salle, String localisation, int capacite) {
         this.id_salle = id_salle;
         this.localisation = localisation;
         this.capacite = capacite;
         this.equipement = new ArrayList<>();
-        this.statut = statut;
     }
 
     public String getId_salle() {
@@ -39,14 +37,6 @@ public class Salle {
 
     public void setCapacite(int capacite) {
         this.capacite = capacite;
-    }
-
-    public boolean getStatut() {
-        return statut;
-    }
-
-    public void setStatut(boolean statut) {
-        this.statut = statut;
     }
 
     public ArrayList<String> getEquipement() {
