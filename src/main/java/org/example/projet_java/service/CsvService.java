@@ -17,6 +17,8 @@ public class CsvService {
     private static final String CSV_ENSEIGNANT = "CSV_Java/Enseignant.csv";
     private static final String CSV_ETUDIANT = "CSV_Java/Etudiant.csv";
     private static final String CSV_NOTIFICATION = "CSV_Java/Notification.csv";
+    private static final String CSV_SALLE = "CSV_Java/Salle.csv";
+    private static final String CSV_CLASSE = "CSV_Java/Classe.csv";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("H'h'mm");
 
@@ -642,4 +644,63 @@ public class CsvService {
         System.out.println("=== FIN MODIFICATION STATUT ===");
         return true;
     }
+
+    public List<String> getToutesLesClasses() {
+        List<String> classes = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader("classe.csv"))) {
+            String ligne;
+            while ((ligne = br.readLine()) != null) {
+                String[] valeurs = ligne.split(",");
+                if (valeurs.length >= 1) {
+                    classes.add(valeurs[0].trim());
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return classes;
+    }
+
+
+    public int getEffectifClasse(String nomClasse) {
+        int effectif = 0;
+        try (BufferedReader br = new BufferedReader(new FileReader("classe.csv"))) {
+            String ligne;
+            while ((ligne = br.readLine()) != null) {
+                String[] valeurs = ligne.split(",");
+                if (valeurs.length >= 2) {
+                    String classe = valeurs[0].trim();
+                    if (classe.equalsIgnoreCase(nomClasse)) {
+                        effectif = Integer.parseInt(valeurs[1].trim());
+                        break;
+                    }
+                }
+            }
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace();
+        }
+        return effectif;
+    }
+
+
+
+    public List<Salle> getToutesLesSalles() {
+        List<Salle> salles = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader("salles.csv"))) {
+            String ligne;
+            while ((ligne = br.readLine()) != null) {
+                String[] valeurs = ligne.split(",");
+                if (valeurs.length >= 2) {
+                    String nom = valeurs[0].trim();
+                    int capacite = Integer.parseInt(valeurs[1].trim());
+                    salles.add(new Salle(nom, "", capacite,false));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return salles;
+    }
+
+
 }

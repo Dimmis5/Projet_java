@@ -867,12 +867,13 @@ public class EdtAdministrateurController implements Initializable {
         grid.setHgap(10);
 
         TextField coursField = new TextField();
-        TextField salleField = new TextField();
         TextField matiereField = new TextField();
         TextField dateField = new TextField();
         TextField heureDebutField = new TextField();
         TextField heureFinField = new TextField();
-        TextField classeField = new TextField();
+        ComboBox<String> classeComboBox = new ComboBox<>();
+        ComboBox<String> salleComboBox = new ComboBox<>();
+
 
         grid.add(new Label("ID Cours:"), 0, 0);
         grid.add(coursField, 1, 0);
@@ -884,17 +885,39 @@ public class EdtAdministrateurController implements Initializable {
         grid.add(heureDebutField, 1, 3);
         grid.add(new Label("Heure fin:"), 0, 4);
         grid.add(heureFinField, 1, 4);
-        grid.add(new Label("Salle:"), 0, 5);
-        grid.add(salleField, 1, 5);
-        grid.add(new Label("Classe:"), 0, 6);
-        grid.add(classeField, 1, 6);
+        grid.add(new Label("Classe:"), 0, 5);
+        grid.add(classeComboBox, 1, 5);
+        grid.add(new Label("Salle:"), 0, 6);
+        grid.add(salleComboBox, 1, 6);
+
+        List<String> classes = csvService.getToutesLesClasses();
+        classeComboBox.getItems().addAll(classes);
+
+        classeComboBox.setOnAction(event -> {
+            String classeSelectionnee = classeComboBox.getValue();
+            int effectif = csvService.getEffectifClasse(classeSelectionnee);
+            List<Salle> sallesDisponibles = csvService.getToutesLesSalles().stream().filter(salle -> salle.getCapacite() >= effectif).collect(Collectors.toList());
+
+            salleComboBox.getItems().clear();
+            for (Salle salle : sallesDisponibles) {
+                salleComboBox.getItems().add(salle.getId_salle());
+            }
+        });
+
 
         Button validerBtn = new Button("Valider");
         validerBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
         validerBtn.setOnAction(e -> {
-            if (validerEtAjouterCoursEnseignant(enseignant, coursField.getText(), matiereField.getText(),
-                    dateField.getText(), heureDebutField.getText(), heureFinField.getText(),
-                    salleField.getText(), classeField.getText())) {
+            if (validerEtAjouterCoursEnseignant(
+                    enseignant,
+                    coursField.getText(),
+                    matiereField.getText(),
+                    dateField.getText(),
+                    heureDebutField.getText(),
+                    heureFinField.getText(),
+                    classeComboBox.getValue(),
+                    salleComboBox.getValue())) {
+
                 popup.close();
                 afficherEmploiDuTempsEnseignant(enseignant);
             }

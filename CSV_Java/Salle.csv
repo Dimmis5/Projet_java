@@ -1,0 +1,7 @@
+id_salle,localisation,capacite,equipement,statut
+101,etage1,20,,false
+102,etage1,25,,false
+103,etage1,35,,false
+104,etage1,30,,false
+201,etage2,28,,false
+202,etage2,30,,false

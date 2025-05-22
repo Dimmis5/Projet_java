@@ -5,11 +5,11 @@ import java.util.ArrayList;
 public class Salle {
     protected String id_salle;
     protected String localisation;
-    protected String capacite;
+    protected int capacite;
     protected ArrayList<String> equipement;
     protected boolean statut;
 
-    public Salle(String id_salle, String localisation, String capacite, boolean statut) {
+    public Salle(String id_salle, String localisation, int capacite, boolean statut) {
         this.id_salle = id_salle;
         this.localisation = localisation;
         this.capacite = capacite;
@@ -33,11 +33,11 @@ public class Salle {
         this.localisation = localisation;
     }
 
-    public String getCapacite() {
+    public int getCapacite() {
         return capacite;
     }
 
-    public void setCapacite(String capacite) {
+    public void setCapacite(int capacite) {
         this.capacite = capacite;
     }
 
