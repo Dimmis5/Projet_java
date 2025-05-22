@@ -1,0 +1,146 @@
+.bold-label {
+    -fx-font-weight: bold;
+}
+
+.popup {
+    -fx-background-color: white;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0);
+}
+
+.button-primary {
+    -fx-background-color: #4a87e8;
+    -fx-text-fill: white;
+}
+
+.button-secondary {
+    -fx-background-color: #4a90e2;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8 15;
+    -fx-background-radius: 5;
+}
+
+/* Conteneur d'informations général */
+.info-box {
+    -fx-background-color: #e6f3ff;
+    -fx-background-radius: 8;
+    -fx-border-color: #b3d7ff;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 15;
+}
+
+/* Bouton principal générique */
+.button-primary {
+    -fx-background-color: #4a90e2;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8 15;
+    -fx-background-radius: 5;
+}
+
+/* Emploi du temps : conteneur principal */
+.schedule-container {
+    -fx-background-color: #f5f5f5;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 5;
+    -fx-padding: 15;
+}
+
+/* Titre emploi du temps */
+.schedule-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+/* ComboBox de tri */
+.combo-tri {
+    -fx-font-size: 14px;
+}
+
+/* Ligne d'en-tête */
+.header-row {
+    -fx-background-color: #e0e0e0;
+    -fx-font-weight: bold;
+    -fx-padding: 5;
+}
+
+/* Ligne de cours */
+.course-row {
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 8 5 8 5;
+}
+
+/* Statuts */
+.label-annule {
+    -fx-text-fill: red;
+}
+.label-prevu {
+    -fx-text-fill: green;
+}
+
+/* Boutons secondaires */
+.button-warning {
+    -fx-background-color: #ffbb33;
+    -fx-text-fill: white;
+}
+.button-danger {
+    -fx-background-color: #ff4444;
+    -fx-text-fill: white;
+}
+.button-success {
+    -fx-background-color: #33cc33;
+    -fx-text-fill: white;
+}
+.button-orange {
+    -fx-background-color: #ff9900;
+    -fx-text-fill: white;
+}
+.button-ajout {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+.label-empty {
+    -fx-font-style: italic;
+}
+
+.popup-content {
+    -fx-background-color: white;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0.1, 0, 2);
+}
+
+.popup-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.popup-content {
+    -fx-background-color: white;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0.1, 0, 2);
+}
+
+.form-grid {
+    -fx-background-color: transparent;
+}
+
+.btn-valider {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.btn-annuler {
+    -fx-background-color: #e0e0e0;
+    -fx-text-fill: black;
+}

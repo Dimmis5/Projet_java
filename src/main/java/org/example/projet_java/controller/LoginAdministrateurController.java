@@ -44,6 +44,7 @@ public class LoginAdministrateurController {
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(Edt.class.getResource("edt-administrateur-view.fxml"));
                 Scene scene = new Scene(fxmlLoader.load(), 800, 600);
+                scene.getStylesheets().add(getClass().getResource("/org/example/projet_java/style/administrateur.css").toExternalForm());
                 EdtAdministrateurController controller = fxmlLoader.getController();
 
                 controller.setAdministrateur(admin);

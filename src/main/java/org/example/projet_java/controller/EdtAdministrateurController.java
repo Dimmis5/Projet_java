@@ -46,9 +46,11 @@ public class EdtAdministrateurController implements Initializable {
     private List<Enseignant> listeEnseignants = new ArrayList<>();
     private final CsvService csvService = CsvService.getInstance();
 
-    private static final String STYLE_BOLD_LABEL = "-fx-font-weight: bold;";
-    private static final String STYLE_POPUP = "-fx-background-color: white; -fx-border-color: #cccccc; -fx-border-width: 1; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0);";
-    private static final String STYLE_BUTTON_PRIMARY = "-fx-background-color: #4a87e8; -fx-text-fill: white;";
+    private static final String STYLE_BOLD_LABEL = "bold-label";
+    private static final String STYLE_POPUP = "popup";
+    private static final String STYLE_BUTTON_PRIMARY = "button-primary";
+    private static final String STYLE_BUTTON_SECONDARY = "button-secondary";
+    private static final String STYLE_INFO_BOX = "info-box";
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -58,7 +60,10 @@ public class EdtAdministrateurController implements Initializable {
         initializeEtudiantComboBox();
         initializeEnseignantComboBox();
 
+        btnListeEtudiants.getStyleClass().add(STYLE_BUTTON_PRIMARY);
         btnListeEtudiants.setOnAction(e -> ouvrirListeEtudiants());
+
+        btnListeEnseignants.getStyleClass().add(STYLE_BUTTON_PRIMARY);
         btnListeEnseignants.setOnAction(e -> ouvrirListeEnseignants());
     }
 
@@ -105,17 +110,23 @@ public class EdtAdministrateurController implements Initializable {
         if (administrateur == null) return;
 
         titreLabel.setText("Informations de l'administrateur");
-        detailsContainer.getChildren().setAll(
+
+        VBox infoBox = new VBox(5);
+        infoBox.getStyleClass().add(STYLE_INFO_BOX);
+
+        infoBox.getChildren().addAll(
                 createInfoLine("Identifiant", administrateur.getId()),
                 createInfoLine("Nom", administrateur.getNom()),
                 createInfoLine("Prénom", administrateur.getPrenom()),
                 createInfoLine("Email", administrateur.getMail())
         );
+
+        detailsContainer.getChildren().setAll(infoBox);
     }
 
     private HBox createInfoLine(String libelle, String valeur) {
         Label libelleLabel = new Label(libelle + " :");
-        libelleLabel.setStyle(STYLE_BOLD_LABEL);
+        libelleLabel.getStyleClass().add(STYLE_BOLD_LABEL);
         libelleLabel.setPrefWidth(100);
 
         Label valeurLabel = new Label(valeur);
@@ -130,8 +141,11 @@ public class EdtAdministrateurController implements Initializable {
         etudiantInfoContainer.getChildren().clear();
         edtContainer.getChildren().clear();
 
-        etudiantInfoContainer.getChildren().addAll(
-                createInfoLine("ID", e.getId()),
+        VBox infoBox = new VBox(8);
+        infoBox.getStyleClass().add(STYLE_INFO_BOX);
+
+        infoBox.getChildren().addAll(
+                createInfoLine("Identifiant", e.getId()),
                 createInfoLine("Nom", e.getNom()),
                 createInfoLine("Prénom", e.getPrenom()),
                 createInfoLine("Email", e.getMail()),
@@ -139,10 +153,14 @@ public class EdtAdministrateurController implements Initializable {
         );
 
         Button btnVoirEmploiDuTemps = new Button("Voir l'emploi du temps");
-        btnVoirEmploiDuTemps.setStyle(STYLE_BUTTON_PRIMARY);
+        btnVoirEmploiDuTemps.getStyleClass().add(STYLE_BUTTON_SECONDARY);
         btnVoirEmploiDuTemps.setOnAction(event -> afficherEmploiDuTempsEtudiant(e));
 
-        etudiantInfoContainer.getChildren().add(btnVoirEmploiDuTemps);
+        HBox buttonContainer = new HBox(btnVoirEmploiDuTemps);
+        buttonContainer.setAlignment(Pos.CENTER);
+
+        infoBox.getChildren().add(buttonContainer);
+        etudiantInfoContainer.getChildren().add(infoBox);
     }
 
 
@@ -150,7 +168,10 @@ public class EdtAdministrateurController implements Initializable {
         enseignantInfoContainer.getChildren().clear();
         edtEnseignantContainer.getChildren().clear();
 
-        enseignantInfoContainer.getChildren().addAll(
+        VBox infoBox = new VBox(8);
+        infoBox.getStyleClass().add("info-box");
+
+        infoBox.getChildren().addAll(
                 createInfoLine("ID", e.getId()),
                 createInfoLine("Nom", e.getNom()),
                 createInfoLine("Prénom", e.getPrenom()),
@@ -158,10 +179,14 @@ public class EdtAdministrateurController implements Initializable {
         );
 
         Button btnVoirEmploiDuTemps = new Button("Voir l'emploi du temps");
-        btnVoirEmploiDuTemps.setStyle(STYLE_BUTTON_PRIMARY);
+        btnVoirEmploiDuTemps.getStyleClass().add("button-primary");
         btnVoirEmploiDuTemps.setOnAction(event -> afficherEmploiDuTempsEnseignant(e));
 
-        enseignantInfoContainer.getChildren().add(btnVoirEmploiDuTemps);
+        HBox buttonContainer = new HBox(btnVoirEmploiDuTemps);
+        buttonContainer.setAlignment(Pos.CENTER);
+        infoBox.getChildren().add(buttonContainer);
+
+        enseignantInfoContainer.getChildren().add(infoBox);
     }
 
     private void afficherEmploiDuTempsEtudiant(Etudiant etudiant) {
@@ -169,17 +194,16 @@ public class EdtAdministrateurController implements Initializable {
         edtContainer.getChildren().clear();
 
         VBox container = new VBox(10);
-        container.setPadding(new Insets(15));
-        container.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #cccccc; -fx-border-radius: 5;");
+        container.getStyleClass().add("schedule-container");
 
         Label titreLabel = new Label("Emploi du temps de " + etudiant.getPrenom() + " " + etudiant.getNom());
-        titreLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        titreLabel.getStyleClass().add("schedule-title");
 
         ComboBox<String> triComboBox = new ComboBox<>();
         triComboBox.getItems().addAll("Matière", "Date", "Horaires", "Salle", "Enseignant");
         triComboBox.setValue("Date");
         triComboBox.setPrefWidth(150);
-        triComboBox.setStyle("-fx-font-size: 14px;");
+        triComboBox.getStyleClass().add("combo-tri");
 
         HBox triContainer = new HBox(10);
         triContainer.setAlignment(Pos.CENTER_LEFT);
@@ -187,7 +211,7 @@ public class EdtAdministrateurController implements Initializable {
         triContainer.setPadding(new Insets(0, 0, 10, 0));
 
         Button ajoutBtn = new Button("Ajouter un cours");
-        ajoutBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;");
+        ajoutBtn.getStyleClass().add("button-ajout");
         ajoutBtn.setOnAction(e -> ouvrirPopupAjoutCours(etudiant));
 
         VBox coursContainer = new VBox(5);
@@ -198,14 +222,14 @@ public class EdtAdministrateurController implements Initializable {
 
             if (coursEtudiant.isEmpty()) {
                 Label emptyLabel = new Label("Aucun cours trouvé pour cet étudiant.");
-                emptyLabel.setStyle("-fx-font-style: italic;");
+                emptyLabel.getStyleClass().add("label-empty");
                 container.getChildren().addAll(titreLabel, triContainer, emptyLabel, ajoutBtn);
                 return;
             }
 
             HBox header = new HBox(10);
             header.setPadding(new Insets(5));
-            header.setStyle("-fx-background-color: #e0e0e0; -fx-font-weight: bold;");
+            header.getStyleClass().add("header-row");
 
             Label matiereHeader = new Label("Matière");
             Label dateHeader = new Label("Date");
@@ -251,7 +275,7 @@ public class EdtAdministrateurController implements Initializable {
             for (Cours cours : coursEtudiant) {
                 HBox coursLine = new HBox(10);
                 coursLine.setPadding(new Insets(8, 5, 8, 5));
-                coursLine.setStyle("-fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;");
+                coursLine.getStyleClass().add("course-row");
 
                 Label matiere = new Label(cours.getMatiere());
                 Label date = new Label(cours.getDate());
@@ -270,19 +294,18 @@ public class EdtAdministrateurController implements Initializable {
 
                 Label enseignantLabel = new Label(enseignantNom);
                 Label statutLabel = new Label(cours.isAnnulation() ? "Annulé" : "Prévu");
-                statutLabel.setStyle(cours.isAnnulation() ? "-fx-text-fill: red;" : "-fx-text-fill: green;");
+                statutLabel.getStyleClass().add(cours.isAnnulation() ? "label-annule" : "label-prevu");
 
                 Button modifierBtn = new Button("Modifier");
-                modifierBtn.setStyle("-fx-background-color: #ffbb33; -fx-text-fill: white;");
+                modifierBtn.getStyleClass().add("button-warning");
                 modifierBtn.setOnAction(event -> ouvrirPopupModificationCours(cours, etudiant));
 
                 Button supprimerBtn = new Button("Supprimer");
-                supprimerBtn.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white;");
+                supprimerBtn.getStyleClass().add("button-danger");
                 supprimerBtn.setOnAction(event -> confirmerSuppressionCours(cours, etudiant));
 
                 Button annulerBtn = new Button(cours.isAnnulation() ? "Rétablir" : "Annuler");
-                annulerBtn.setStyle(cours.isAnnulation() ? "-fx-background-color: #33cc33; -fx-text-fill: white;"
-                        : "-fx-background-color: #ff9900; -fx-text-fill: white;");
+                annulerBtn.getStyleClass().add(cours.isAnnulation() ? "button-success" : "button-orange");
                 annulerBtn.setOnAction(event -> changerStatutAnnulation(cours, etudiant));
 
                 HBox boutonsContainer = new HBox(5, modifierBtn, supprimerBtn, annulerBtn);
@@ -354,27 +377,25 @@ public class EdtAdministrateurController implements Initializable {
         edtEnseignantContainer.getChildren().clear();
 
         VBox container = new VBox(10);
-        container.setPadding(new Insets(15));
-        container.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #cccccc; -fx-border-radius: 5;");
+        container.getStyleClass().add("schedule-container");
 
         Label titreLabel = new Label("Emploi du temps de " + enseignant.getPrenom() + " " + enseignant.getNom());
-        titreLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        titreLabel.getStyleClass().add("schedule-title");
 
         Button ajoutBtn = new Button("Ajouter un cours");
-        ajoutBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+        ajoutBtn.getStyleClass().add("button-ajout");
         ajoutBtn.setOnAction(e -> ouvrirPopupAjoutCoursEnseignant(enseignant));
 
         if (coursEnseignant.isEmpty()) {
             Label emptyLabel = new Label("Aucun cours trouvé pour cet enseignant.");
-            emptyLabel.setStyle("-fx-font-style: italic;");
+            emptyLabel.getStyleClass().add("label-empty");
             container.getChildren().addAll(titreLabel, emptyLabel, ajoutBtn);
         } else {
             VBox coursContainer = new VBox(5);
             coursContainer.setPadding(new Insets(10, 0, 0, 0));
 
             HBox header = new HBox(10);
-            header.setPadding(new Insets(5));
-            header.setStyle("-fx-background-color: #e0e0e0; -fx-font-weight: bold;");
+            header.getStyleClass().add("header-row");
 
             Label matiereHeader = new Label("Matière");
             Label dateHeader = new Label("Date");
@@ -397,23 +418,23 @@ public class EdtAdministrateurController implements Initializable {
 
             for (Cours cours : coursEnseignant) {
                 HBox coursLine = new HBox(10);
-                coursLine.setPadding(new Insets(8, 5, 8, 5));
-                coursLine.setStyle("-fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;");
+                coursLine.getStyleClass().add("course-row");
 
                 Label matiere = new Label(cours.getMatiere());
                 Label date = new Label(cours.getDate());
                 Label horaires = new Label(cours.getHeure_debut() + " - " + cours.getHeure_fin());
                 Label salle = new Label(cours.getId_salle());
                 Label classe = new Label(cours.getClasse());
+
                 Label statutLabel = new Label(cours.isAnnulation() ? "Annulé" : "Prévu");
-                statutLabel.setStyle(cours.isAnnulation() ? "-fx-text-fill: red;" : "-fx-text-fill: green;");
+                statutLabel.getStyleClass().add(cours.isAnnulation() ? "label-annule" : "label-prevu");
 
                 Button modifierBtn = new Button("Modifier");
-                modifierBtn.setStyle("-fx-background-color: #ffbb33; -fx-text-fill: white;");
+                modifierBtn.getStyleClass().add("button-warning");
                 modifierBtn.setOnAction(event -> ouvrirPopupModificationCoursEnseignant(cours, enseignant));
 
                 Button supprimerBtn = new Button("Supprimer");
-                supprimerBtn.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white;");
+                supprimerBtn.getStyleClass().add("button-danger");
                 supprimerBtn.setOnAction(event -> {
                     Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
                     confirmation.setTitle("Confirmation de suppression");
@@ -442,7 +463,7 @@ public class EdtAdministrateurController implements Initializable {
                 });
 
                 Button annulerBtn = new Button(cours.isAnnulation() ? "Rétablir" : "Annuler");
-                annulerBtn.setStyle(cours.isAnnulation() ? "-fx-background-color: #33cc33; -fx-text-fill: white;" : "-fx-background-color: #ff9900; -fx-text-fill: white;");
+                annulerBtn.getStyleClass().add(cours.isAnnulation() ? "button-success" : "button-orange");
                 annulerBtn.setOnAction(event -> {
                     boolean nouvelEtat = !cours.isAnnulation();
                     boolean modificationReussie = csvService.modifierStatutAnnulationCours(cours.getId_cours(), nouvelEtat);
@@ -480,6 +501,7 @@ public class EdtAdministrateurController implements Initializable {
 
             container.getChildren().addAll(titreLabel, coursContainer, ajoutBtn);
         }
+
         edtEnseignantContainer.getChildren().add(container);
     }
 
@@ -553,17 +575,18 @@ public class EdtAdministrateurController implements Initializable {
 
         VBox popupContent = new VBox(10);
         popupContent.setPadding(new Insets(15));
-        popupContent.setStyle(STYLE_POPUP);
+        popupContent.getStyleClass().add("popup-content");
         popupContent.setMinWidth(400);
         popupContent.setMaxHeight(500);
 
         Label titleLabel = new Label(titre);
-        titleLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+        titleLabel.getStyleClass().add("popup-title");
 
         popupContent.getChildren().add(titleLabel);
         popup.getContent().add(popupContent);
         return popup;
     }
+
 
     private void ouvrirPopupAjoutCours(Etudiant etudiant) {
         Stage popup = new Stage();
@@ -574,6 +597,7 @@ public class EdtAdministrateurController implements Initializable {
         grid.setPadding(new Insets(20));
         grid.setVgap(10);
         grid.setHgap(10);
+        grid.getStyleClass().add("form-grid");
 
         TextField coursField = new TextField();
         TextField matiereField = new TextField();
@@ -585,13 +609,18 @@ public class EdtAdministrateurController implements Initializable {
         String nomClasse = etudiant.getClasse();
         int effectif = csvService.getEffectifClasse(nomClasse);
 
-        List<String> sallesDispo = csvService.Salles().stream().filter(salle -> salle.getCapacite() >= effectif).map(salle -> salle.getId_salle() + " - " + salle.getLocalisation() + " (Capacité: " + salle.getCapacite() + ")").collect(Collectors.toList());
+        List<String> sallesDispo = csvService.Salles().stream()
+                .filter(salle -> salle.getCapacite() >= effectif)
+                .map(salle -> salle.getId_salle() + " - " + salle.getLocalisation() + " (Capacité: " + salle.getCapacite() + ")")
+                .collect(Collectors.toList());
 
         salleCombo.setItems(FXCollections.observableArrayList(sallesDispo));
 
         ComboBox<String> enseignantCombo = new ComboBox<>();
         enseignantCombo.setItems(FXCollections.observableArrayList(
-                csvService.Enseignants().stream().map(e -> e.getId() + " - " + e.getNom() + " " + e.getPrenom()).collect(Collectors.toList())
+                csvService.Enseignants().stream()
+                        .map(e -> e.getId() + " - " + e.getNom() + " " + e.getPrenom())
+                        .collect(Collectors.toList())
         ));
 
         grid.add(new Label("ID Cours:"), 0, 0);
@@ -610,7 +639,7 @@ public class EdtAdministrateurController implements Initializable {
         grid.add(enseignantCombo, 1, 6);
 
         Button validerBtn = new Button("Valider");
-        validerBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+        validerBtn.getStyleClass().add("btn-valider");
         validerBtn.setOnAction(e -> {
             String salleSelectionnee = salleCombo.getValue();
             if (salleSelectionnee == null || salleSelectionnee.isEmpty()) {
@@ -634,6 +663,7 @@ public class EdtAdministrateurController implements Initializable {
         });
 
         Button annulerBtn = new Button("Annuler");
+        annulerBtn.getStyleClass().add("btn-annuler");
         annulerBtn.setOnAction(e -> popup.close());
 
         HBox boutonsBox = new HBox(10, validerBtn, annulerBtn);
@@ -641,14 +671,24 @@ public class EdtAdministrateurController implements Initializable {
 
         VBox popupContent = new VBox(10, grid, boutonsBox);
         popupContent.setPadding(new Insets(10));
+        popupContent.getStyleClass().add("popup-content");
 
         Scene scene = new Scene(popupContent, 400, 400);
+        scene.getStylesheets().add(getClass().getResource("/org/example/projet_java/style/administrateur.css").toExternalForm());
+
         popup.setScene(scene);
         popup.showAndWait();
     }
 
+    private boolean validerEtModifierCours(Etudiant etudiant,
+                                           String idCours,
+                                           String matiere,
+                                           String date,
+                                           String heureDebut,
+                                           String heureFin,
+                                           String salle,
+                                           String enseignantSelectionne) {
 
-    private boolean validerEtModifierCours(Etudiant etudiant, String idCours, String matiere, String date, String heureDebut, String heureFin, String salle, String enseignantSelectionne) {
         if (idCours == null || idCours.isEmpty() ||
                 matiere == null || matiere.isEmpty() ||
                 date == null || date.isEmpty() ||
@@ -656,120 +696,45 @@ public class EdtAdministrateurController implements Initializable {
                 heureFin == null || heureFin.isEmpty() ||
                 salle == null || salle.isEmpty() ||
                 enseignantSelectionne == null || enseignantSelectionne.isEmpty()) {
-            afficherAlerte("Erreur", "Tous les champs doivent être remplis");
+
+            afficherAlerte("Erreur", "Tous les champs doivent être remplis.");
             return false;
         }
 
         if (!csvService.isSalleDisponible(salle, date, heureDebut, heureFin)) {
-            afficherAlerte("Erreur", "La salle " + salle + " est déjà occupée à cette date et heure");
+            afficherAlerte("Erreur", "La salle " + salle + " est déjà occupée à cette date et heure.");
             return false;
         }
 
         String idEnseignant = enseignantSelectionne.split(" - ")[0];
 
-        Cours nouveauCours = new Cours(idCours, salle, matiere, date, heureDebut, heureFin, idEnseignant, etudiant.getClasse(), false);
+        Cours nouveauCours = new Cours(
+                idCours,
+                salle,
+                matiere,
+                date,
+                heureDebut,
+                heureFin,
+                idEnseignant,
+                etudiant.getClasse(),
+                false
+        );
 
         try {
-            boolean succes = csvService.ajouterCours(nouveauCours);
-            if (succes) {
-                afficherAlerte("Succès", "Le cours a été ajouté avec succès");
+            boolean ajoutReussi = csvService.ajouterCours(nouveauCours);
+
+            if (ajoutReussi) {
+                afficherAlerte("Succès", "Le cours a été ajouté avec succès.");
                 return true;
             } else {
-                afficherAlerte("Erreur", "Échec de l'ajout du cours");
+                afficherAlerte("Erreur", "Échec de l'ajout du cours.");
                 return false;
             }
+
         } catch (Exception e) {
-            afficherAlerte("Erreur", "Une erreur est survenue: " + e.getMessage());
+            afficherAlerte("Erreur", "Une erreur est survenue : " + e.getMessage());
             return false;
         }
-    }
-
-    private void ouvrirPopupModificationCours(Cours cours, Etudiant etudiant) {
-        Stage popup = new Stage();
-        popup.initModality(Modality.APPLICATION_MODAL);
-        popup.setTitle("Modifier le cours");
-
-        GridPane grid = new GridPane();
-        grid.setPadding(new Insets(20));
-        grid.setVgap(10);
-        grid.setHgap(10);
-
-        TextField matiereField = new TextField(cours.getMatiere());
-        TextField dateField = new TextField(cours.getDate());
-        TextField heureDebutField = new TextField(cours.getHeure_debut());
-        TextField heureFinField = new TextField(cours.getHeure_fin());
-        TextField salleField = new TextField(cours.getId_salle());
-
-        ComboBox<String> enseignantCombo = new ComboBox<>();
-        enseignantCombo.setItems(FXCollections.observableArrayList(csvService.Enseignants().stream().map(e -> e.getId() + " - " + e.getNom() + " " + e.getPrenom()).collect(Collectors.toList())
-        ))
-        ;
-
-        String enseignantActuel = cours.getId_enseignant();
-        try {
-            Enseignant enseignant = csvService.getEnseignantById(enseignantActuel);
-            if (enseignant != null) {
-                enseignantCombo.setValue(enseignant.getId() + " - " + enseignant.getNom() + " " + enseignant.getPrenom());
-            }
-        } catch (Exception e) {
-            System.err.println("Erreur lors de la récupération de l'enseignant: " + e.getMessage());
-        }
-
-        ComboBox<Boolean> annuleCombo = new ComboBox<>();
-        annuleCombo.setItems(FXCollections.observableArrayList(true, false));
-        annuleCombo.setValue(cours.isAnnulation());
-
-        grid.add(new Label("Matière:"), 0, 0);
-        grid.add(matiereField, 1, 0);
-        grid.add(new Label("Date:"), 0, 1);
-        grid.add(dateField, 1, 1);
-        grid.add(new Label("Heure début (HH:MM):"), 0, 2);
-        grid.add(heureDebutField, 1, 2);
-        grid.add(new Label("Heure fin (HH:MM):"), 0, 3);
-        grid.add(heureFinField, 1, 3);
-        grid.add(new Label("Salle:"), 0, 4);
-        grid.add(salleField, 1, 4);
-        grid.add(new Label("Enseignant:"), 0, 5);
-        grid.add(enseignantCombo, 1, 5);
-        grid.add(new Label("Statut:"), 0, 6);
-        grid.add(annuleCombo, 1, 6);
-
-        Button validerBtn = new Button("Valider");
-        validerBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
-        validerBtn.setOnAction(e -> {
-            String idSalle = salleField.getText();
-            String date = dateField.getText();
-            String heureDebut = heureDebutField.getText();
-            String heureFin = heureFinField.getText();
-
-            if (idSalle == null || idSalle.isEmpty()) {
-                afficherAlerte("Erreur", "Veuillez saisir une salle");
-                return;
-            }
-
-            if (!csvService.isSalleDisponible(idSalle, date, heureDebut, heureFin)) {
-                afficherAlerte("Erreur", "La salle " + idSalle + " est déjà occupée à cette date et heure");
-                return;
-            }
-
-            if (validerEtModifierCours(cours, etudiant, matiereField.getText(), date, heureDebut, heureFin, idSalle, enseignantCombo.getValue(), annuleCombo.getValue())) {
-                popup.close();
-                afficherEmploiDuTempsEtudiant(etudiant);
-            }
-        });
-
-        Button annulerBtn = new Button("Annuler");
-        annulerBtn.setOnAction(e -> popup.close());
-
-        HBox boutonsBox = new HBox(10, validerBtn, annulerBtn);
-        boutonsBox.setAlignment(Pos.CENTER_RIGHT);
-
-        VBox popupContent = new VBox(10, grid, boutonsBox);
-        popupContent.setPadding(new Insets(10));
-
-        Scene scene = new Scene(popupContent, 400, 450);
-        popup.setScene(scene);
-        popup.showAndWait();
     }
 
     private boolean validerEtModifierCours(Cours cours, Etudiant etudiant, String matiere, String date, String heureDebut, String heureFin, String salle, String enseignantSelectionne, Boolean estAnnule) {
@@ -813,7 +778,9 @@ public class EdtAdministrateurController implements Initializable {
         grid.setPadding(new Insets(20));
         grid.setVgap(10);
         grid.setHgap(10);
+        grid.getStyleClass().add("form-grid");
 
+        // Champs de saisie
         TextField coursField = new TextField();
         TextField matiereField = new TextField();
         TextField dateField = new TextField();
@@ -822,6 +789,7 @@ public class EdtAdministrateurController implements Initializable {
         ComboBox<String> classeComboBox = new ComboBox<>();
         ComboBox<String> salleComboBox = new ComboBox<>();
 
+        // Ajout des champs et labels
         grid.add(new Label("ID Cours:"), 0, 0);
         grid.add(coursField, 1, 0);
         grid.add(new Label("Matière:"), 0, 1);
@@ -837,6 +805,7 @@ public class EdtAdministrateurController implements Initializable {
         grid.add(new Label("Salle:"), 0, 6);
         grid.add(salleComboBox, 1, 6);
 
+        // Récupération des classes/salles
         List<Classe> classes = csvService.Classes();
         List<Salle> salles = csvService.Salles();
 
@@ -844,13 +813,13 @@ public class EdtAdministrateurController implements Initializable {
             classeComboBox.getItems().add(classe.getClasse());
         }
 
+        // Mise à jour dynamique des salles
         classeComboBox.setOnAction(event -> {
             String classeSelectionnee = classeComboBox.getValue();
-
             int effectif = csvService.getEffectifClasse(classeSelectionnee);
-            System.out.println("Effectif de " + classeSelectionnee + ": " + effectif);
-
-            List<Salle> sallesDisponibles = salles.stream().filter(salle -> salle.getCapacite() >= effectif).collect(Collectors.toList());
+            List<Salle> sallesDisponibles = salles.stream()
+                    .filter(salle -> salle.getCapacite() >= effectif)
+                    .collect(Collectors.toList());
 
             salleComboBox.getItems().clear();
             for (Salle salle : sallesDisponibles) {
@@ -858,8 +827,9 @@ public class EdtAdministrateurController implements Initializable {
             }
         });
 
+        // Bouton valider
         Button validerBtn = new Button("Valider");
-        validerBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+        validerBtn.getStyleClass().add("btn-valider");
         validerBtn.setOnAction(e -> {
             String salleSelectionnee = salleComboBox.getValue();
             String classeSelectionnee = classeComboBox.getValue();
@@ -889,16 +859,23 @@ public class EdtAdministrateurController implements Initializable {
             }
         });
 
+        // Bouton annuler
         Button annulerBtn = new Button("Annuler");
+        annulerBtn.getStyleClass().add("btn-annuler");
         annulerBtn.setOnAction(e -> popup.close());
 
+        // Zone boutons
         HBox boutonsBox = new HBox(10, validerBtn, annulerBtn);
         boutonsBox.setAlignment(Pos.CENTER_RIGHT);
 
+        // Contenu principal
         VBox popupContent = new VBox(10, grid, boutonsBox);
-        popupContent.setPadding(new Insets(10));
+        popupContent.getStyleClass().add("popup-content");
 
+        // Création de la scène avec le CSS externe
         Scene scene = new Scene(popupContent, 400, 400);
+        scene.getStylesheets().add(getClass().getResource("/org/example/projet_java/style/administrateur.css").toExternalForm());
+
         popup.setScene(scene);
         popup.showAndWait();
     }
@@ -946,7 +923,9 @@ public class EdtAdministrateurController implements Initializable {
         grid.setPadding(new Insets(20));
         grid.setVgap(10);
         grid.setHgap(10);
+        grid.getStyleClass().add("form-grid");
 
+        // Champs préremplis
         TextField matiereField = new TextField(cours.getMatiere());
         TextField dateField = new TextField(cours.getDate());
         TextField heureDebutField = new TextField(cours.getHeure_debut());
@@ -954,9 +933,18 @@ public class EdtAdministrateurController implements Initializable {
         TextField salleField = new TextField(cours.getId_salle());
         TextField classeField = new TextField(cours.getClasse());
 
+        // Style des champs
+        matiereField.getStyleClass().add("text-field");
+        dateField.getStyleClass().add("text-field");
+        heureDebutField.getStyleClass().add("text-field");
+        heureFinField.getStyleClass().add("text-field");
+        salleField.getStyleClass().add("text-field");
+        classeField.getStyleClass().add("text-field");
+
         ComboBox<Boolean> annuleCombo = new ComboBox<>();
         annuleCombo.setItems(FXCollections.observableArrayList(true, false));
         annuleCombo.setValue(cours.isAnnulation());
+        annuleCombo.getStyleClass().add("combo-box");
 
         grid.add(new Label("Matière:"), 0, 0);
         grid.add(matiereField, 1, 0);
@@ -974,7 +962,8 @@ public class EdtAdministrateurController implements Initializable {
         grid.add(annuleCombo, 1, 6);
 
         Button validerBtn = new Button("Valider");
-        validerBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+        validerBtn.getStyleClass().addAll("btn-valider");
+
         validerBtn.setOnAction(e -> {
             String idSalle = salleField.getText();
             String date = dateField.getText();
@@ -991,26 +980,38 @@ public class EdtAdministrateurController implements Initializable {
                 return;
             }
 
-            if (validerEtModifierCoursEnseignant(cours, enseignant, matiereField.getText(), date, heureDebut, heureFin, idSalle, classeField.getText(), annuleCombo.getValue())) {
+            if (validerEtModifierCoursEnseignant(
+                    cours,
+                    enseignant,
+                    matiereField.getText(),
+                    date,
+                    heureDebut,
+                    heureFin,
+                    idSalle,
+                    classeField.getText(),
+                    annuleCombo.getValue())) {
                 popup.close();
                 afficherEmploiDuTempsEnseignant(enseignant);
             }
         });
 
-
         Button annulerBtn = new Button("Annuler");
+        annulerBtn.getStyleClass().addAll("btn-annuler");
         annulerBtn.setOnAction(e -> popup.close());
 
         HBox boutonsBox = new HBox(10, validerBtn, annulerBtn);
         boutonsBox.setAlignment(Pos.CENTER_RIGHT);
 
         VBox popupContent = new VBox(10, grid, boutonsBox);
-        popupContent.setPadding(new Insets(10));
+        popupContent.getStyleClass().add("popup-content");
 
         Scene scene = new Scene(popupContent, 400, 450);
+        scene.getStylesheets().add(getClass().getResource("/org/example/projet_java/style/administrateur.css").toExternalForm());
+
         popup.setScene(scene);
         popup.showAndWait();
     }
+
 
     private boolean validerEtModifierCoursEnseignant(Cours cours, Enseignant enseignant, String matiere, String date, String heureDebut, String heureFin, String salle, String classe, Boolean estAnnule) {
         if (matiere == null || matiere.isEmpty() ||
@@ -1048,4 +1049,100 @@ public class EdtAdministrateurController implements Initializable {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
+    private void ouvrirPopupModificationCours(Cours cours, Etudiant etudiant) {
+        Stage popup = new Stage();
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.setTitle("Modifier le cours");
+
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(20));
+        grid.setVgap(10);
+        grid.setHgap(10);
+
+        TextField matiereField = new TextField(cours.getMatiere());
+        TextField dateField = new TextField(cours.getDate());
+        TextField heureDebutField = new TextField(cours.getHeure_debut());
+        TextField heureFinField = new TextField(cours.getHeure_fin());
+        TextField salleField = new TextField(cours.getId_salle());
+
+        ComboBox<String> enseignantCombo = new ComboBox<>();
+        enseignantCombo.setItems(FXCollections.observableArrayList(
+                csvService.Enseignants().stream()
+                        .map(e -> e.getId() + " - " + e.getNom() + " " + e.getPrenom())
+                        .collect(Collectors.toList())
+        ));
+        String enseignantActuel = cours.getId_enseignant();
+        for (String item : enseignantCombo.getItems()) {
+            if (item.startsWith(enseignantActuel)) {
+                enseignantCombo.setValue(item);
+                break;
+            }
+        }
+
+        grid.add(new Label("Matière:"), 0, 0);
+        grid.add(matiereField, 1, 0);
+        grid.add(new Label("Date:"), 0, 1);
+        grid.add(dateField, 1, 1);
+        grid.add(new Label("Heure début:"), 0, 2);
+        grid.add(heureDebutField, 1, 2);
+        grid.add(new Label("Heure fin:"), 0, 3);
+        grid.add(heureFinField, 1, 3);
+        grid.add(new Label("Salle:"), 0, 4);
+        grid.add(salleField, 1, 4);
+        grid.add(new Label("Enseignant:"), 0, 5);
+        grid.add(enseignantCombo, 1, 5);
+
+        Button validerBtn = new Button("Valider");
+        validerBtn.getStyleClass().add("button-valider");
+        validerBtn.setOnAction(e -> {
+            String idSalle = salleField.getText();
+            String date = dateField.getText();
+            String heureDebut = heureDebutField.getText();
+            String heureFin = heureFinField.getText();
+            String enseignantSelectionne = enseignantCombo.getValue();
+
+            if (idSalle == null || idSalle.isEmpty()) {
+                afficherAlerte("Erreur", "Veuillez saisir une salle");
+                return;
+            }
+
+            if (!csvService.isSalleDisponible(idSalle, date, heureDebut, heureFin)) {
+                afficherAlerte("Erreur", "La salle " + idSalle + " est déjà occupée à cette date et heure");
+                return;
+            }
+
+            if (validerEtModifierCours(
+                    cours,
+                    etudiant,
+                    matiereField.getText(),
+                    date,
+                    heureDebut,
+                    heureFin,
+                    idSalle,
+                    enseignantSelectionne,
+                    cours.isAnnulation()
+            )) {
+                popup.close();
+                afficherEmploiDuTempsEtudiant(etudiant);
+            }
+        });
+
+        Button annulerBtn = new Button("Annuler");
+        annulerBtn.setOnAction(e -> popup.close());
+
+        HBox boutonsBox = new HBox(10, validerBtn, annulerBtn);
+        boutonsBox.setAlignment(Pos.CENTER_RIGHT);
+
+        VBox popupContent = new VBox(10, grid, boutonsBox);
+        popupContent.setPadding(new Insets(10));
+        popupContent.getStyleClass().add("popup-content"); // classe css
+
+        Scene scene = new Scene(popupContent, 400, 400);
+        scene.getStylesheets().add(getClass().getResource("/org/example/projet_java/style/administrateur.css").toExternalForm());
+
+        popup.setScene(scene);
+        popup.showAndWait();
+    }
+
 }
