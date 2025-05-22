@@ -2,3 +2,13 @@ id_etudiant,nom,prenom,mail,mdp,classe
 10000,Coutand,Oriane,orianecoutand@gmail.com,oc123,G4A
 10001,Abdou,Kamy,kamyabdou@gmail.com,ka123,G4A
 10002,Mayer,Perle,perlemayer@gmail.com,pm123,G4D
+10003,Dupont,Lisa,lisadupont@gmail.com,ld123,G4A
+10004,Garcia,Leo,leogarcia@gmail.com,lg123,G4A
+10005,Roux,Ines,inesroux@gmail.com,ir123,G4A
+10006,Petit,Tom,tompetit@gmail.com,tp123,G4D
+10007,Morel,Eva,evamorel@gmail.com,em123,G4D
+10008,Henry,Max,maxhenry@gmail.com,mh123,G4D
+10009,Faure,Nina,ninafaure@gmail.com,nf123,G4D
+10010,Lopez,Adam,adamlopez@gmail.com,al123,G4B
+10011,Benoit,Emma,emmabenoit@gmail.com,eb123,G4B
+10012,Chevalier,Noa,noachevalier@gmail.com,nc123,G4B

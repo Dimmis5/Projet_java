@@ -61,17 +61,38 @@ public class EdtEtudiantController {
                 "-fx-border-color: #1976d2; " +      // Bordure bleue
                 "-fx-border-width: 2px; " +          // Épaisseur de la bordure
                 "-fx-border-radius: 5px; " +         // Coins arrondis
+                "-fx-border-insets: 0; " +           // Bordure à l'intérieur
+                "-fx-background-insets: 0; " +       // Fond à l'intérieur
                 "-fx-padding: 5px; " +               // Marge intérieure
                 "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 3, 3, 0, 0);"; // Ombre légère
 
         cellule.setStyle(style);
         cellule.getStyleClass().add("cellule-cours");
 
+        // Fixer la taille pour éviter débordement
+        cellule.setMaxHeight(Double.MAX_VALUE);
+        cellule.setMaxWidth(Double.MAX_VALUE);
+
         return cellule;
     }
 
+
     @FXML
     public void initialize() {
+        // Définir taille fixe des lignes et colonnes de la grille
+        int nombreCreneaux = 10; // nombre de lignes horaires, ajuste selon besoin
+
+        for (int i = 0; i < nombreCreneaux; i++) {
+            RowConstraints row = new RowConstraints(60); // hauteur fixe 60 pixels par ligne
+            grilleCalendrier.getRowConstraints().add(row);
+        }
+
+        for (int i = 0; i < 7; i++) {
+            ColumnConstraints col = new ColumnConstraints(120); // largeur fixe 120 pixels par jour
+            grilleCalendrier.getColumnConstraints().add(col);
+        }
+
+        // Ensuite ton code existant
         configurerControlesCalendrier();
         dateCourante = LocalDate.now();
         dateDebutSemaineCourante = dateCourante.with(DayOfWeek.MONDAY);
@@ -85,6 +106,7 @@ public class EdtEtudiantController {
         // Afficher la vue par défaut
         afficherVueSemaine();
     }
+
 
     public void setIdEtudiantConnecte(String idEtudiant) {
         this.idEtudiantConnecte = idEtudiant;
@@ -136,11 +158,12 @@ public class EdtEtudiantController {
 
         // Lignes pour les créneaux horaires
         int nombreCreneaux = (int) Duration.between(heureDebut, heureFin).toMinutes() / intervalMinutes;
-        for (int i = 0; i <= nombreCreneaux; i++) {
+        for (int i = 0; i < nombreCreneaux; i++) {
             RowConstraints row = new RowConstraints(60);
-            if (i == 0) row.setPrefHeight(30); // En-tête
+            row.setVgrow(Priority.NEVER); // éviter qu'elles s'agrandissent
             grilleCalendrier.getRowConstraints().add(row);
         }
+
 
         // Ajouter les heures
         ajouterEnTetesHeures();
@@ -185,7 +208,7 @@ public class EdtEtudiantController {
         for (int ligne = 1; ligne <= nombreCreneaux; ligne++) {
             for (int col = 1; col <= 7; col++) {
                 Pane pane = new Pane();
-                pane.getStyleClass().add("cellule-semaine");
+                pane.setStyle("-fx-border-color: #d3d3d3; -fx-border-width: 1px; -fx-border-style: solid;");
                 grilleCalendrier.add(pane, col, ligne);
             }
         }

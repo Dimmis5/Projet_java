@@ -1,5 +1,6 @@
 package org.example.projet_java.controller;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -11,6 +12,7 @@ import javafx.collections.ObservableList;
 import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.scene.Scene;
+import java.util.Comparator;
 
 import javafx.stage.Stage;
 import org.example.projet_java.model.*;
@@ -175,7 +177,6 @@ public class EdtAdministrateurController implements Initializable {
 
     private void afficherEmploiDuTempsEtudiant(Etudiant etudiant) {
         List<Cours> coursEtudiant = csvService.CoursEtudiant(etudiant.getId());
-
         edtContainer.getChildren().clear();
 
         VBox container = new VBox(10);
@@ -185,18 +186,37 @@ public class EdtAdministrateurController implements Initializable {
         Label titreLabel = new Label("Emploi du temps de " + etudiant.getPrenom() + " " + etudiant.getNom());
         titreLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
+        // Création de la ComboBox de tri
+        ComboBox<String> triComboBox = new ComboBox<>();
+        triComboBox.getItems().addAll("Matière", "Date", "Horaires", "Salle", "Enseignant");
+        triComboBox.setValue("Date");
+        triComboBox.setPrefWidth(150);
+        triComboBox.setStyle("-fx-font-size: 14px;");
+
+        HBox triContainer = new HBox(10);
+        triContainer.setAlignment(Pos.CENTER_LEFT);
+        triContainer.getChildren().addAll(new Label("Trier par:"), triComboBox);
+        triContainer.setPadding(new Insets(0, 0, 10, 0));
+
         Button ajoutBtn = new Button("Ajouter un cours");
-        ajoutBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+        ajoutBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;");
         ajoutBtn.setOnAction(e -> ouvrirPopupAjoutCours(etudiant));
 
-        if (coursEtudiant.isEmpty()) {
-            Label emptyLabel = new Label("Aucun cours trouvé pour cet étudiant.");
-            emptyLabel.setStyle("-fx-font-style: italic;");
-            container.getChildren().addAll(titreLabel, emptyLabel, ajoutBtn);
-        } else {
-            VBox coursContainer = new VBox(5);
-            coursContainer.setPadding(new Insets(10, 0, 0, 0));
+        VBox coursContainer = new VBox(5);
+        coursContainer.setPadding(new Insets(10, 0, 0, 0));
 
+        // Fonction pour afficher/mettre à jour les cours
+        Runnable afficherCours = () -> {
+            coursContainer.getChildren().clear();
+
+            if (coursEtudiant.isEmpty()) {
+                Label emptyLabel = new Label("Aucun cours trouvé pour cet étudiant.");
+                emptyLabel.setStyle("-fx-font-style: italic;");
+                container.getChildren().addAll(titreLabel, triContainer, emptyLabel, ajoutBtn);
+                return;
+            }
+
+            // Création de l'en-tête
             HBox header = new HBox(10);
             header.setPadding(new Insets(5));
             header.setStyle("-fx-background-color: #e0e0e0; -fx-font-weight: bold;");
@@ -206,6 +226,7 @@ public class EdtAdministrateurController implements Initializable {
             Label heureHeader = new Label("Horaires");
             Label salleHeader = new Label("Salle");
             Label enseignantHeader = new Label("Enseignant");
+            Label statutHeader = new Label("Statut");
             Label actionsHeader = new Label("Actions");
 
             matiereHeader.setPrefWidth(150);
@@ -213,11 +234,36 @@ public class EdtAdministrateurController implements Initializable {
             heureHeader.setPrefWidth(100);
             salleHeader.setPrefWidth(80);
             enseignantHeader.setPrefWidth(150);
-            actionsHeader.setPrefWidth(150);
+            statutHeader.setPrefWidth(80);
+            actionsHeader.setPrefWidth(180);
 
-            header.getChildren().addAll(matiereHeader, dateHeader, heureHeader, salleHeader, enseignantHeader, actionsHeader);
+            header.getChildren().addAll(matiereHeader, dateHeader, heureHeader, salleHeader, enseignantHeader, statutHeader, actionsHeader);
             coursContainer.getChildren().add(header);
 
+            // Application du tri
+            String critereTri = triComboBox.getValue();
+            switch (critereTri) {
+                case "Matière":
+                    coursEtudiant.sort(Comparator.comparing(Cours::getMatiere));
+                    break;
+                case "Date":
+                    coursEtudiant.sort(Comparator.comparing(Cours::getDate));
+                    break;
+                case "Horaires":
+                    coursEtudiant.sort(Comparator.comparing(Cours::getHeure_debut));
+                    break;
+                case "Salle":
+                    coursEtudiant.sort(Comparator.comparing(Cours::getId_salle));
+                    break;
+                case "Enseignant":
+                    coursEtudiant.sort(Comparator.comparing(c -> {
+                        Enseignant ens = csvService.getEnseignantById(c.getId_enseignant());
+                        return ens != null ? ens.getNom() + " " + ens.getPrenom() : "";
+                    }));
+                    break;
+            }
+
+            // Affichage des cours
             for (Cours cours : coursEtudiant) {
                 HBox coursLine = new HBox(10);
                 coursLine.setPadding(new Insets(8, 5, 8, 5));
@@ -228,11 +274,9 @@ public class EdtAdministrateurController implements Initializable {
                 Label horaires = new Label(cours.getHeure_debut() + " - " + cours.getHeure_fin());
                 Label salle = new Label(cours.getId_salle());
 
-                String enseignantId = cours.getId_enseignant();
-                String enseignantNom = enseignantId;
-
+                String enseignantNom = cours.getId_enseignant();
                 try {
-                    Enseignant enseignant = csvService.getEnseignantById(enseignantId);
+                    Enseignant enseignant = csvService.getEnseignantById(cours.getId_enseignant());
                     if (enseignant != null) {
                         enseignantNom = enseignant.getNom() + " " + enseignant.getPrenom();
                     }
@@ -241,6 +285,8 @@ public class EdtAdministrateurController implements Initializable {
                 }
 
                 Label enseignantLabel = new Label(enseignantNom);
+                Label statutLabel = new Label(cours.isAnnulation() ? "Annulé" : "Prévu");
+                statutLabel.setStyle(cours.isAnnulation() ? "-fx-text-fill: red;" : "-fx-text-fill: green;");
 
                 Button modifierBtn = new Button("Modifier");
                 modifierBtn.setStyle("-fx-background-color: #ffbb33; -fx-text-fill: white;");
@@ -248,34 +294,14 @@ public class EdtAdministrateurController implements Initializable {
 
                 Button supprimerBtn = new Button("Supprimer");
                 supprimerBtn.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white;");
-                supprimerBtn.setOnAction(event -> {
-                    Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
-                    confirmation.setTitle("Confirmation de suppression");
-                    confirmation.setHeaderText("Supprimer le cours");
-                    confirmation.setContentText("Êtes-vous sûr de vouloir supprimer ce cours de " + cours.getMatiere() + " ?");
+                supprimerBtn.setOnAction(event -> confirmerSuppressionCours(cours, etudiant));
 
-                    Optional<ButtonType> result = confirmation.showAndWait();
-                    if (result.isPresent() && result.get() == ButtonType.OK) {
-                        boolean suppressionReussie = csvService.supprimerCours(cours.getId_cours());
+                Button annulerBtn = new Button(cours.isAnnulation() ? "Rétablir" : "Annuler");
+                annulerBtn.setStyle(cours.isAnnulation() ? "-fx-background-color: #33cc33; -fx-text-fill: white;"
+                        : "-fx-background-color: #ff9900; -fx-text-fill: white;");
+                annulerBtn.setOnAction(event -> changerStatutAnnulation(cours, etudiant));
 
-                        if (suppressionReussie) {
-                            afficherEmploiDuTempsEtudiant(etudiant);
-                            Alert success = new Alert(Alert.AlertType.INFORMATION);
-                            success.setTitle("Succès");
-                            success.setHeaderText(null);
-                            success.setContentText("Le cours a été supprimé avec succès.");
-                            success.showAndWait();
-                        } else {
-                            Alert error = new Alert(Alert.AlertType.ERROR);
-                            error.setTitle("Erreur");
-                            error.setHeaderText(null);
-                            error.setContentText("Une erreur est survenue lors de la suppression du cours.");
-                            error.showAndWait();
-                        }
-                    }
-                });
-
-                HBox boutonsContainer = new HBox(5, modifierBtn, supprimerBtn);
+                HBox boutonsContainer = new HBox(5, modifierBtn, supprimerBtn, annulerBtn);
                 boutonsContainer.setAlignment(Pos.CENTER);
 
                 matiere.setPrefWidth(150);
@@ -283,16 +309,63 @@ public class EdtAdministrateurController implements Initializable {
                 horaires.setPrefWidth(100);
                 salle.setPrefWidth(80);
                 enseignantLabel.setPrefWidth(150);
-                boutonsContainer.setPrefWidth(150);
+                statutLabel.setPrefWidth(80);
+                boutonsContainer.setPrefWidth(200);
 
-                coursLine.getChildren().addAll(matiere, date, horaires, salle, enseignantLabel, boutonsContainer);
+                coursLine.getChildren().addAll(matiere, date, horaires, salle, enseignantLabel, statutLabel, boutonsContainer);
                 coursContainer.getChildren().add(coursLine);
             }
+        };
 
-            container.getChildren().addAll(titreLabel, coursContainer, ajoutBtn);
-        }
+        // Gestion du changement de tri
+        triComboBox.setOnAction(e -> afficherCours.run());
 
+        // Affichage initial
+        afficherCours.run();
+
+        // Organisation des éléments dans le conteneur principal
+        container.getChildren().addAll(titreLabel, triContainer, coursContainer, ajoutBtn);
         edtContainer.getChildren().add(container);
+    }
+
+    // Méthodes auxiliaires extraites pour plus de clarté
+    private void confirmerSuppressionCours(Cours cours, Etudiant etudiant) {
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Confirmation de suppression");
+        confirmation.setHeaderText("Supprimer le cours");
+        confirmation.setContentText("Êtes-vous sûr de vouloir supprimer ce cours de " + cours.getMatiere() + " ?");
+
+        Optional<ButtonType> result = confirmation.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            boolean suppressionReussie = csvService.supprimerCours(cours.getId_cours());
+
+            if (suppressionReussie) {
+                Platform.runLater(() -> afficherEmploiDuTempsEtudiant(etudiant));
+                showAlert(Alert.AlertType.INFORMATION, "Succès", "Le cours a été supprimé avec succès.");
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Erreur", "Une erreur est survenue lors de la suppression du cours.");
+            }
+        }
+    }
+
+    private void changerStatutAnnulation(Cours cours, Etudiant etudiant) {
+        boolean nouvelEtat = !cours.isAnnulation();
+        boolean modificationReussie = csvService.modifierStatutAnnulationCours(cours.getId_cours(), nouvelEtat);
+
+        if (modificationReussie) {
+            afficherEmploiDuTempsEtudiant(etudiant);
+            showAlert(Alert.AlertType.INFORMATION, "Succès", "Le statut du cours a été modifié avec succès.");
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Erreur", "Une erreur est survenue lors de la modification du statut du cours.");
+        }
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     private void afficherEmploiDuTempsEnseignant(Enseignant enseignant) {
@@ -328,6 +401,7 @@ public class EdtAdministrateurController implements Initializable {
             Label heureHeader = new Label("Horaires");
             Label salleHeader = new Label("Salle");
             Label classeHeader = new Label("Classe");
+            Label statutHeader = new Label("Statut");
             Label actionsHeader = new Label("Actions");
 
             matiereHeader.setPrefWidth(150);
@@ -335,9 +409,10 @@ public class EdtAdministrateurController implements Initializable {
             heureHeader.setPrefWidth(100);
             salleHeader.setPrefWidth(80);
             classeHeader.setPrefWidth(150);
+            statutHeader.setPrefWidth(80);
             actionsHeader.setPrefWidth(150);
 
-            header.getChildren().addAll(matiereHeader, dateHeader, heureHeader, salleHeader, classeHeader, actionsHeader);
+            header.getChildren().addAll(matiereHeader, dateHeader, heureHeader, salleHeader, classeHeader, statutHeader, actionsHeader);
             coursContainer.getChildren().add(header);
 
             for (Cours cours : coursEnseignant) {
@@ -350,6 +425,8 @@ public class EdtAdministrateurController implements Initializable {
                 Label horaires = new Label(cours.getHeure_debut() + " - " + cours.getHeure_fin());
                 Label salle = new Label(cours.getId_salle());
                 Label classe = new Label(cours.getClasse());
+                Label statutLabel = new Label(cours.isAnnulation() ? "Annulé" : "Prévu");
+                statutLabel.setStyle(cours.isAnnulation() ? "-fx-text-fill: red;" : "-fx-text-fill: green;");
 
                 Button modifierBtn = new Button("Modifier");
                 modifierBtn.setStyle("-fx-background-color: #ffbb33; -fx-text-fill: white;");
@@ -384,7 +461,29 @@ public class EdtAdministrateurController implements Initializable {
                     }
                 });
 
-                HBox boutonsContainer = new HBox(5, modifierBtn, supprimerBtn);
+                Button annulerBtn = new Button(cours.isAnnulation() ? "Rétablir" : "Annuler");
+                annulerBtn.setStyle(cours.isAnnulation() ? "-fx-background-color: #33cc33; -fx-text-fill: white;" : "-fx-background-color: #ff9900; -fx-text-fill: white;");
+                annulerBtn.setOnAction(event -> {
+                    boolean nouvelEtat = !cours.isAnnulation();
+                    boolean modificationReussie = csvService.modifierStatutAnnulationCours(cours.getId_cours(), nouvelEtat);
+
+                    if (modificationReussie) {
+                        afficherEmploiDuTempsEnseignant(enseignant);
+                        Alert success = new Alert(Alert.AlertType.INFORMATION);
+                        success.setTitle("Succès");
+                        success.setHeaderText(null);
+                        success.setContentText("Le statut du cours a été modifié avec succès.");
+                        success.showAndWait();
+                    } else {
+                        Alert error = new Alert(Alert.AlertType.ERROR);
+                        error.setTitle("Erreur");
+                        error.setHeaderText(null);
+                        error.setContentText("Une erreur est survenue lors de la modification du statut du cours.");
+                        error.showAndWait();
+                    }
+                });
+
+                HBox boutonsContainer = new HBox(5, modifierBtn, supprimerBtn, annulerBtn);
                 boutonsContainer.setAlignment(Pos.CENTER);
 
                 matiere.setPrefWidth(150);
@@ -392,9 +491,10 @@ public class EdtAdministrateurController implements Initializable {
                 horaires.setPrefWidth(100);
                 salle.setPrefWidth(80);
                 classe.setPrefWidth(150);
-                boutonsContainer.setPrefWidth(150);
+                statutLabel.setPrefWidth(80);
+                boutonsContainer.setPrefWidth(200);
 
-                coursLine.getChildren().addAll(matiere, date, horaires, salle, classe, boutonsContainer);
+                coursLine.getChildren().addAll(matiere, date, horaires, salle, classe, statutLabel, boutonsContainer);
                 coursContainer.getChildren().add(coursLine);
             }
 
@@ -402,6 +502,37 @@ public class EdtAdministrateurController implements Initializable {
         }
 
         edtEnseignantContainer.getChildren().add(container);
+    }
+
+    private void confirmerSuppressionCours(Cours cours, Enseignant enseignant) {
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Confirmation de suppression");
+        confirmation.setHeaderText("Supprimer le cours");
+        confirmation.setContentText("Êtes-vous sûr de vouloir supprimer ce cours de " + cours.getMatiere() + " ?");
+
+        Optional<ButtonType> result = confirmation.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            boolean suppressionReussie = csvService.supprimerCours(cours.getId_cours());
+
+            if (suppressionReussie) {
+                Platform.runLater(() -> afficherEmploiDuTempsEnseignant(enseignant));
+                showAlert(Alert.AlertType.INFORMATION, "Succès", "Le cours a été supprimé avec succès.");
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Erreur", "Une erreur est survenue lors de la suppression du cours.");
+            }
+        }
+    }
+
+    private void changerStatutAnnulation(Cours cours, Enseignant enseignant) {
+        boolean nouvelEtat = !cours.isAnnulation();
+        boolean modificationReussie = csvService.modifierStatutAnnulationCours(cours.getId_cours(), nouvelEtat);
+
+        if (modificationReussie) {
+            afficherEmploiDuTempsEnseignant(enseignant);
+            showAlert(Alert.AlertType.INFORMATION, "Succès", "Le statut du cours a été modifié avec succès.");
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Erreur", "Une erreur est survenue lors de la modification du statut du cours.");
+        }
     }
 
     private void ouvrirListeEtudiants() {
@@ -683,10 +814,7 @@ public class EdtAdministrateurController implements Initializable {
         popup.showAndWait();
     }
 
-    private boolean validerEtModifierCours(Cours cours, Etudiant etudiant, String matiere,
-                                           String date, String heureDebut, String heureFin,
-                                           String salle, String enseignantSelectionne,
-                                           Boolean estAnnule) {
+    private boolean validerEtModifierCours(Cours cours, Etudiant etudiant, String matiere, String date, String heureDebut, String heureFin, String salle, String enseignantSelectionne, Boolean estAnnule) {
         if (matiere == null || matiere.isEmpty() ||
                 date == null || date.isEmpty() ||
                 heureDebut == null || heureDebut.isEmpty() ||
@@ -999,4 +1127,46 @@ public class EdtAdministrateurController implements Initializable {
         }
         return heure;
     }
+
+    public boolean modifierStatutAnnulationCours(String idCours, boolean nouvelEtat) {
+        try {
+            List<Cours> tousLesCours = CsvService.getInstance().lireTousLesCours();
+            boolean trouve = false;
+
+            for (Cours cours : tousLesCours) {
+                if (cours.getId_cours().equals(idCours)) {
+                    cours.setAnnulation(nouvelEtat);
+                    trouve = true;
+                    break;
+                }
+            }
+
+            if (trouve) {
+                CsvService.getInstance().reecrireTousLesCours(tousLesCours);
+                return true;
+            } else {
+                System.err.println("Cours avec l'ID " + idCours + " non trouvé.");
+                return false;
+            }
+        } catch (Exception e) {
+            System.err.println("Erreur lors de la modification du statut d'annulation : " + e.getMessage());
+            return false;
+        }
+    }
+
+    private void afficherCoursTriés(String critereTri, List<Cours> coursEtudiant, Etudiant etudiant, VBox container) {
+        coursEtudiant.sort(switch (critereTri) {
+            case "Matière" -> Comparator.comparing(Cours::getMatiere);
+            case "Date" -> Comparator.comparing(Cours::getDate);
+            case "Horaires" -> Comparator.comparing(Cours::getHeure_debut);
+            case "Salle" -> Comparator.comparing(Cours::getId_salle);
+            case "Enseignant" -> Comparator.comparing(c -> {
+                Enseignant ens = csvService.getEnseignantById(c.getId_enseignant());
+                return ens != null ? ens.getNom() : "";
+            });
+            default -> Comparator.comparing(Cours::getDate); // fallback
+        });
+    }
+
+
 }
