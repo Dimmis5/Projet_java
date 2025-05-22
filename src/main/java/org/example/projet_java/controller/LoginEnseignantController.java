@@ -44,6 +44,7 @@ public class LoginEnseignantController {
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(Edt.class.getResource("edt-enseignant-view.fxml"));
                 Scene scene = new Scene(fxmlLoader.load(), 400,400);
+                scene.getStylesheets().add(getClass().getResource("/org/example/projet_java/style.css").toExternalForm());
                 Stage stage = new Stage();
                 stage.setTitle("Connexion Controller");
                 stage.setScene(scene);

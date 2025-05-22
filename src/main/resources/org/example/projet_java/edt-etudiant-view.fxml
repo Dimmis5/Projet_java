@@ -21,15 +21,15 @@
             <Label text="Emploi du temps"/>
 
             <HBox alignment="CENTER" spacing="20">
-                <Button fx:id="boutonVueJour" text="Vue Jour"/>
-                <Button fx:id="boutonVueSemaine" text="Vue Semaine"/>
-                <Button fx:id="boutonVueMois" text="Vue Mois"/>
+                <Button fx:id="boutonVueJour" text="Vue Jour" style="-fx-min-width: 100;"/>
+                <Button fx:id="boutonVueSemaine" text="Vue Semaine" style="-fx-min-width: 100;"/>
+                <Button fx:id="boutonVueMois" text="Vue Mois" style="-fx-min-width: 100;"/>
             </HBox>
 
             <HBox alignment="CENTER" spacing="20">
-                <Button fx:id="boutonSemainePrecedente" text="Précédent"/>
-                <Button fx:id="boutonSemaineCourante" text="Aujourd'hui"/>
-                <Button fx:id="boutonSemaineSuivante" text="Suivant"/>
+                <Button fx:id="boutonSemainePrecedente" text="Précédent" style="-fx-min-width: 120;"/>
+                <Button fx:id="boutonSemaineCourante" text="Aujourd'hui" style="-fx-min-width: 120;"/>
+                <Button fx:id="boutonSemaineSuivante" text="Suivant" style="-fx-min-width: 120;"/>
             </HBox>
 
             <Label fx:id="etiquetteMoisAnnee" alignment="CENTER" maxWidth="Infinity"/>
@@ -37,6 +37,8 @@
     </top>
 
     <center>
-        <GridPane fx:id="grilleCalendrier" hgap="1" vgap="1"/>
+        <ScrollPane fitToWidth="true" fitToHeight="true">
+            <GridPane fx:id="grilleCalendrier" hgap="1" vgap="1"/>
+        </ScrollPane>
     </center>
 </BorderPane>

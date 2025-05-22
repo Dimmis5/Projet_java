@@ -21,7 +21,6 @@ public class EdtEtudiantController {
     private static final DateTimeFormatter FORMAT_HEURE = DateTimeFormatter.ofPattern("H:mm");
     private static final DateTimeFormatter FORMAT_MOIS_ANNEE = DateTimeFormatter.ofPattern("MMMM yyyy");
 
-
     private final LocalTime heureDebut = LocalTime.of(8, 0);
     private final LocalTime heureFin = LocalTime.of(19, 0);
     private final int intervalMinutes = 60;
@@ -60,10 +59,17 @@ public class EdtEtudiantController {
         dateDebutSemaineCourante = dateCourante.with(DayOfWeek.MONDAY);
         premierJourMoisCourant = dateCourante.withDayOfMonth(1);
 
+        // Appliquer les styles CSS aux boutons
+        boutonVueJour.getStyleClass().add("button-normal");
+        boutonVueSemaine.getStyleClass().add("button-normal");
+        boutonVueMois.getStyleClass().add("button-normal");
+        boutonVueSemaine.getStyleClass().add("button-active");
+
         boutonVueJour.setOnAction(e -> changerModeAffichage(ModeAffichage.JOUR));
         boutonVueSemaine.setOnAction(e -> changerModeAffichage(ModeAffichage.SEMAINE));
         boutonVueMois.setOnAction(e -> changerModeAffichage(ModeAffichage.MOIS));
 
+        grilleCalendrier.getStyleClass().add("calendar-grid");
         afficherVueSemaine();
     }
 
@@ -73,9 +79,20 @@ public class EdtEtudiantController {
         rafraichirAffichage();
     }
 
-
     private void changerModeAffichage(ModeAffichage nouveauMode) {
         modeAffichage = nouveauMode;
+
+        // Mettre à jour les styles des boutons
+        boutonVueJour.getStyleClass().remove("button-active");
+        boutonVueSemaine.getStyleClass().remove("button-active");
+        boutonVueMois.getStyleClass().remove("button-active");
+
+        switch (modeAffichage) {
+            case JOUR: boutonVueJour.getStyleClass().add("button-active"); break;
+            case SEMAINE: boutonVueSemaine.getStyleClass().add("button-active"); break;
+            case MOIS: boutonVueMois.getStyleClass().add("button-active"); break;
+        }
+
         rafraichirAffichage();
     }
 
@@ -129,7 +146,7 @@ public class EdtEtudiantController {
 
         for (int ligne = 0; ligne < nombreCreneaux; ligne++) {
             Pane celluleVide = new Pane();
-            celluleVide.setStyle("-fx-border-color: #d3d3d3; -fx-border-width: 0.5px; -fx-background-color: #fafafa;");
+            celluleVide.getStyleClass().add("calendar-cell");
             celluleVide.setPrefHeight(80);
             celluleVide.setMaxHeight(80);
             celluleVide.setMinHeight(80);
@@ -142,6 +159,8 @@ public class EdtEtudiantController {
     }
 
     private void afficherCoursDansGrilleJour(List<Cours> cours) {
+        if (cours == null) return;
+
         cours.sort(Comparator.comparing(c -> parseHeure(c.getHeure_debut())));
 
         for (Cours c : cours) {
@@ -196,29 +215,48 @@ public class EdtEtudiantController {
     }
 
     private void configurerDispositionCalendrierSemaine() {
+        grilleCalendrier.getChildren().clear();
         grilleCalendrier.getColumnConstraints().clear();
         grilleCalendrier.getRowConstraints().clear();
 
-        ColumnConstraints colHeures = new ColumnConstraints(80);
-        grilleCalendrier.getColumnConstraints().add(colHeures);
+        // Colonne heures
+        ColumnConstraints colHeure = new ColumnConstraints(100);
+        colHeure.setHgrow(Priority.NEVER);
+        grilleCalendrier.getColumnConstraints().add(colHeure);
 
+        // Colonnes jours
         for (int i = 0; i < 7; i++) {
             ColumnConstraints col = new ColumnConstraints();
             col.setHgrow(Priority.ALWAYS);
-            col.setPercentWidth(100.0/7);
+            col.setMinWidth(120);
+            col.setMaxWidth(Double.MAX_VALUE);
             grilleCalendrier.getColumnConstraints().add(col);
         }
 
-        RowConstraints rowHeader = new RowConstraints(30);
+        // Ligne en-tête
+        RowConstraints rowHeader = new RowConstraints(35);
+        rowHeader.setVgrow(Priority.NEVER);
         grilleCalendrier.getRowConstraints().add(rowHeader);
 
-        int nombreCreneaux = 11;
-
-        for (int i = 0; i < nombreCreneaux; i++) {
-            RowConstraints row = new RowConstraints();
-            row.setPercentHeight(100.0/nombreCreneaux);
-            row.setVgrow(Priority.ALWAYS);
+        // Lignes créneaux
+        int nbCreneaux = (int) Duration.between(heureDebut, heureFin).toMinutes() / intervalMinutes;
+        for (int i = 0; i < nbCreneaux; i++) {
+            RowConstraints row = new RowConstraints(100);
+            row.setVgrow(Priority.NEVER);
+            row.setMinHeight(100);
+            row.setMaxHeight(100);
             grilleCalendrier.getRowConstraints().add(row);
+        }
+
+        // Ajouter des cellules vides
+        for (int row = 1; row <= nbCreneaux; row++) {
+            for (int col = 1; col <= 7; col++) {
+                Region celluleVide = new Region();
+                celluleVide.getStyleClass().add("calendar-cell");
+                celluleVide.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+                celluleVide.setMinSize(0, 0);
+                grilleCalendrier.add(celluleVide, col, row);
+            }
         }
     }
 
@@ -227,7 +265,7 @@ public class EdtEtudiantController {
         for (int ligne = 1; ligne <= nombreCreneaux; ligne++) {
             for (int col = 1; col <= 7; col++) {
                 Pane pane = new Pane();
-                pane.setStyle("-fx-border-color: #d3d3d3; -fx-border-width: 1px;");
+                pane.getStyleClass().add("calendar-cell");
                 grilleCalendrier.add(pane, col, ligne);
             }
         }
@@ -236,6 +274,8 @@ public class EdtEtudiantController {
     private void afficherCoursDansGrilleSemaine() {
         LocalDate finSemaine = dateDebutSemaineCourante.plusDays(6);
         List<Cours> coursSemaine = filtrerCoursParPeriode(dateDebutSemaineCourante, finSemaine);
+        if (coursSemaine == null) return;
+
         Map<LocalDate, List<Cours>> coursParJour = new HashMap<>();
 
         for (Cours cours : coursSemaine) {
@@ -299,7 +339,7 @@ public class EdtEtudiantController {
         String[] joursSemaine = {"Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"};
         for (int i = 0; i < 7; i++) {
             Label label = new Label(joursSemaine[i]);
-            label.setStyle("-fx-alignment: center; -fx-font-weight: bold;");
+            label.getStyleClass().add("calendar-header");
             grilleCalendrier.add(label, i, 0);
         }
 
@@ -314,14 +354,16 @@ public class EdtEtudiantController {
         while (dateCourante.isBefore(dernierJour.plusDays(1)) || ligne <= 6) {
             for (int col = 0; col < 7; col++) {
                 VBox cellule = new VBox(2);
+                cellule.getStyleClass().add("month-day");
                 cellule.setAlignment(Pos.TOP_CENTER);
                 cellule.setPadding(new Insets(5));
 
                 Label labelJour = new Label(String.valueOf(dateCourante.getDayOfMonth()));
-                labelJour.setStyle("-fx-font-weight: " +
-                        (dateCourante.getMonth() == premierJourMoisCourant.getMonth() ? "bold" : "normal") +
-                        "; -fx-text-fill: " +
-                        (dateCourante.getMonth() == premierJourMoisCourant.getMonth() ? "black" : "gray"));
+                if (dateCourante.getMonth() == premierJourMoisCourant.getMonth()) {
+                    labelJour.getStyleClass().add("month-day-number");
+                } else {
+                    labelJour.getStyleClass().add("month-day-number-other-month");
+                }
 
                 cellule.getChildren().add(labelJour);
                 afficherCoursDansCelluleMois(cellule, dateCourante);
@@ -335,28 +377,21 @@ public class EdtEtudiantController {
 
     private void afficherCoursDansCelluleMois(VBox cellule, LocalDate date) {
         List<Cours> coursDuJour = filtrerCoursParDate(date);
-        if (coursDuJour.isEmpty()) return;
+        if (coursDuJour == null || coursDuJour.isEmpty()) return;
 
         for (Cours cours : coursDuJour) {
             try {
                 Label labelCours = new Label(cours.getMatiere());
+                labelCours.getStyleClass().add("month-course");
+
+                // Appliquer une couleur basée sur le hash de la matière
+                int colorIndex = Math.abs(cours.getMatiere().hashCode()) % 6 + 1;
+                labelCours.getStyleClass().add("course-color-" + colorIndex);
 
                 if (cours.isAnnulation()) {
-                    labelCours.setStyle("-fx-background-color: #ffebee; " +
-                            "-fx-border-color: #f44336; " +
-                            "-fx-border-width: 1px; " +
-                            "-fx-border-radius: 3px; " +
-                            "-fx-padding: 2px 5px; " +
-                            "-fx-text-decoration: line-through;");
-                } else {
-                    labelCours.setStyle("-fx-background-color: #bbdefb; " +
-                            "-fx-border-color: #1976d2; " +
-                            "-fx-border-width: 1px; " +
-                            "-fx-border-radius: 3px; " +
-                            "-fx-padding: 2px 5px;");
+                    labelCours.getStyleClass().add("course-box-cancelled");
                 }
 
-                labelCours.getStyleClass().add("cours-mois");
                 labelCours.setTooltip(creerTooltipCours(cours));
                 cellule.getChildren().add(labelCours);
             } catch (Exception e) {
@@ -379,13 +414,14 @@ public class EdtEtudiantController {
 
     private StackPane creerCelluleCoursAvecCadre(VBox contenuCours, Cours cours) {
         StackPane cellule = new StackPane(contenuCours);
+        cellule.getStyleClass().add("course-box");
+
+        // Appliquer une couleur basée sur le hash de la matière
+        int colorIndex = Math.abs(cours.getMatiere().hashCode()) % 6 + 1;
+        cellule.getStyleClass().add("course-color-" + colorIndex);
 
         if (cours.isAnnulation()) {
-            cellule.setStyle("-fx-background-color: #ffebee; -fx-border-color: #f44336; -fx-border-width: 2px; " +
-                    "-fx-border-radius: 5px; -fx-padding: 8px;");
-        } else {
-            cellule.setStyle("-fx-background-color: #e3f2fd; -fx-border-color: #1976d2; -fx-border-width: 2px; " +
-                    "-fx-border-radius: 5px; -fx-padding: 8px;");
+            cellule.getStyleClass().add("course-box-cancelled");
         }
 
         cellule.setAlignment(Pos.CENTER);
@@ -398,13 +434,13 @@ public class EdtEtudiantController {
         contenu.setPadding(new Insets(3));
 
         Label matiere = new Label(cours.getMatiere());
-        matiere.setStyle("-fx-font-weight: bold; -fx-wrap-text: true; -fx-font-size: 12px;");
+        matiere.getStyleClass().add("course-title");
 
         Label salle = new Label("Salle: " + cours.getId_salle());
-        salle.setStyle("-fx-font-size: 10px;");
+        salle.getStyleClass().add("course-detail");
 
         Label horaire = new Label(cours.getHeure_debut() + "-" + cours.getHeure_fin());
-        horaire.setStyle("-fx-font-size: 10px;");
+        horaire.getStyleClass().add("course-detail");
 
         contenu.getChildren().addAll(matiere, salle, horaire);
 
@@ -417,7 +453,7 @@ public class EdtEtudiantController {
         Enseignant enseignant = csvService.getEnseignantById(cours.getId_enseignant().trim());
         if (enseignant != null) {
             Label prof = new Label(enseignant.getNom() + " " + enseignant.getPrenom());
-            prof.setStyle("-fx-font-size: 10px;");
+            prof.getStyleClass().add("course-detail");
             contenu.getChildren().add(prof);
         }
 
@@ -430,13 +466,13 @@ public class EdtEtudiantController {
         contenu.setPadding(new Insets(8));
 
         Label matiere = new Label(cours.getMatiere());
-        matiere.setStyle("-fx-font-weight: bold; -fx-wrap-text: true; -fx-font-size: 14px;");
+        matiere.getStyleClass().add("course-title");
 
         Label salle = new Label("Salle: " + cours.getId_salle());
-        salle.setStyle("-fx-font-size: 12px;");
+        salle.getStyleClass().add("course-detail");
 
         Label horaire = new Label("🕐 " + cours.getHeure_debut() + " - " + cours.getHeure_fin());
-        horaire.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;");
+        horaire.getStyleClass().add("course-detail");
 
         contenu.getChildren().addAll(matiere, salle, horaire);
 
@@ -449,7 +485,7 @@ public class EdtEtudiantController {
         Enseignant enseignant = csvService.getEnseignantById(cours.getId_enseignant().trim());
         if (enseignant != null) {
             Label prof = new Label(" " + enseignant.getNom() + " " + enseignant.getPrenom());
-            prof.setStyle("-fx-font-size: 12px;");
+            prof.getStyleClass().add("course-detail");
             contenu.getChildren().add(prof);
         }
 
@@ -483,7 +519,7 @@ public class EdtEtudiantController {
         for (int i = 0; i < 7; i++) {
             LocalDate date = debutSemaine.plusDays(i);
             Label label = new Label(date.format(formatter));
-            label.setStyle("-fx-alignment: center; -fx-font-weight: bold;");
+            label.getStyleClass().add("calendar-header");
             grilleCalendrier.add(label, i + 1, 0);
         }
     }
@@ -493,8 +529,7 @@ public class EdtEtudiantController {
         int ligne = 0;
         while (heure.isBefore(heureFin)) {
             Label label = new Label(heure.format(FORMAT_HEURE));
-            label.setStyle("-fx-alignment: center-right; -fx-font-weight: bold; -fx-font-size: 12px; " +
-                    "-fx-padding: 5px; -fx-text-fill: #666666;");
+            label.getStyleClass().add("time-header");
             GridPane.setRowIndex(label, ligne);
             GridPane.setColumnIndex(label, 0);
             grilleCalendrier.getChildren().add(label);
@@ -514,7 +549,7 @@ public class EdtEtudiantController {
 
         for (int i = 0; i < heures.length; i++) {
             Label label = new Label(heures[i].format(FORMAT_HEURE));
-            label.setStyle("-fx-alignment: center-right; -fx-font-weight: bold;");
+            label.getStyleClass().add("time-header");
             grilleCalendrier.add(label, 0, i + 1);
         }
     }
