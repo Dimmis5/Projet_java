@@ -1,0 +1,124 @@
+/* Styles communs */
+.calendar-grid {
+    -fx-background-color: white;
+    -fx-border-color: #333;
+    -fx-border-width: 1;
+}
+
+.calendar-header {
+
+}
+
+.time-header {
+}
+
+.calendar-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: #ddd;
+    -fx-border-width: 0.5;
+}
+
+/* Styles pour les cours */
+.course-box {
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+    -fx-padding: 4px;
+    -fx-border-width: 1px;
+    -fx-border-color: #333;
+    -fx-max-width: infinity;
+    -fx-max-height: infinity;
+}
+
+.course-box-normal {
+    -fx-background-color: #e3f2fd; /* Bleu clair */
+    -fx-border-color: #bbdefb;
+}
+
+.course-box-cancelled {
+    -fx-background-color: #ffebee; /* Rouge clair */
+    -fx-border-color: #f44336;
+    -fx-text-decoration: line-through;
+}
+
+.course-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+    -fx-text-fill: black;
+    -fx-wrap-text: true;
+}
+
+.course-detail {
+    -fx-font-size: 9px;
+    -fx-text-fill: black;
+    -fx-wrap-text: true;
+}
+
+/* Styles pour le mois */
+.month-day {
+    -fx-border-color: #ddd;
+    -fx-border-width: 1px;
+    -fx-padding: 2px;
+    -fx-background-color: white;
+}
+
+.month-day-number {
+    -fx-font-weight: bold;
+    -fx-text-fill: black;
+}
+
+.month-day-number-other-month {
+    -fx-text-fill: #a0a0a0;
+}
+
+.month-course {
+    -fx-font-size: 9px;
+    -fx-padding: 1px;
+    -fx-border-radius: 2px;
+    -fx-background-radius: 2px;
+}
+
+/* Styles pour les boutons */
+.button-normal {
+    -fx-background-color: #f9f9f9;
+    -fx-border-color: #ccc;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+.button-active {
+    -fx-background-color: #d0d0d0;
+    -fx-border-color: #999;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+/* Couleurs pour les matières */
+.course-color-1 {
+    -fx-background-color: #e3f2fd;
+    -fx-border-color: #bbdefb;
+}
+
+.course-color-2 {
+    -fx-background-color: #fce4ec;
+    -fx-border-color: #f8bbd9;
+}
+
+.course-color-3 {
+    -fx-background-color: #e8f5e8;
+    -fx-border-color: #c8e6c9;
+}
+
+.course-color-4 {
+    -fx-background-color: #fff3e0;
+    -fx-border-color: #ffcc02;
+}
+
+.course-color-5 {
+    -fx-background-color: #f3e5f5;
+    -fx-border-color: #e1bee7;
+}
+
+.course-color-6 {
+    -fx-background-color: #e0f2f1;
+    -fx-border-color: #b2dfdb;
+}
