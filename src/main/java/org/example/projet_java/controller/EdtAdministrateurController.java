@@ -17,11 +17,8 @@ import java.util.Comparator;
 import javafx.stage.Stage;
 import org.example.projet_java.model.*;
 import org.example.projet_java.service.CsvService;
-import org.w3c.dom.Text;
 
 import java.net.URL;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,22 +26,14 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 public class EdtAdministrateurController implements Initializable {
-
-    // UI Elements
     @FXML private ScrollPane scrollPane;
-    @FXML private BorderPane mainContainer;
-    @FXML private VBox infoContainer;
     @FXML private Label titreLabel;
     @FXML private VBox detailsContainer;
-    @FXML private VBox contentContainer;
-    @FXML private Label edtLabel;
 
-    @FXML private HBox etudiantSection;
     @FXML private ComboBox<String> etudiantComboBox;
     @FXML private Button btnListeEtudiants;
     @FXML private VBox etudiantInfoContainer;
 
-    @FXML private HBox enseignantSection;
     @FXML private ComboBox<String> enseignantComboBox;
     @FXML private Button btnListeEnseignants;
     @FXML private VBox enseignantInfoContainer;
@@ -186,7 +175,6 @@ public class EdtAdministrateurController implements Initializable {
         Label titreLabel = new Label("Emploi du temps de " + etudiant.getPrenom() + " " + etudiant.getNom());
         titreLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
-        // Création de la ComboBox de tri
         ComboBox<String> triComboBox = new ComboBox<>();
         triComboBox.getItems().addAll("Matière", "Date", "Horaires", "Salle", "Enseignant");
         triComboBox.setValue("Date");
@@ -205,7 +193,6 @@ public class EdtAdministrateurController implements Initializable {
         VBox coursContainer = new VBox(5);
         coursContainer.setPadding(new Insets(10, 0, 0, 0));
 
-        // Fonction pour afficher/mettre à jour les cours
         Runnable afficherCours = () -> {
             coursContainer.getChildren().clear();
 
@@ -216,7 +203,6 @@ public class EdtAdministrateurController implements Initializable {
                 return;
             }
 
-            // Création de l'en-tête
             HBox header = new HBox(10);
             header.setPadding(new Insets(5));
             header.setStyle("-fx-background-color: #e0e0e0; -fx-font-weight: bold;");
@@ -240,7 +226,6 @@ public class EdtAdministrateurController implements Initializable {
             header.getChildren().addAll(matiereHeader, dateHeader, heureHeader, salleHeader, enseignantHeader, statutHeader, actionsHeader);
             coursContainer.getChildren().add(header);
 
-            // Application du tri
             String critereTri = triComboBox.getValue();
             switch (critereTri) {
                 case "Matière":
@@ -263,7 +248,6 @@ public class EdtAdministrateurController implements Initializable {
                     break;
             }
 
-            // Affichage des cours
             for (Cours cours : coursEtudiant) {
                 HBox coursLine = new HBox(10);
                 coursLine.setPadding(new Insets(8, 5, 8, 5));
@@ -317,18 +301,14 @@ public class EdtAdministrateurController implements Initializable {
             }
         };
 
-        // Gestion du changement de tri
         triComboBox.setOnAction(e -> afficherCours.run());
 
-        // Affichage initial
         afficherCours.run();
 
-        // Organisation des éléments dans le conteneur principal
         container.getChildren().addAll(titreLabel, triContainer, coursContainer, ajoutBtn);
         edtContainer.getChildren().add(container);
     }
 
-    // Méthodes auxiliaires extraites pour plus de clarté
     private void confirmerSuppressionCours(Cours cours, Etudiant etudiant) {
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
         confirmation.setTitle("Confirmation de suppression");
@@ -500,39 +480,7 @@ public class EdtAdministrateurController implements Initializable {
 
             container.getChildren().addAll(titreLabel, coursContainer, ajoutBtn);
         }
-
         edtEnseignantContainer.getChildren().add(container);
-    }
-
-    private void confirmerSuppressionCours(Cours cours, Enseignant enseignant) {
-        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmation.setTitle("Confirmation de suppression");
-        confirmation.setHeaderText("Supprimer le cours");
-        confirmation.setContentText("Êtes-vous sûr de vouloir supprimer ce cours de " + cours.getMatiere() + " ?");
-
-        Optional<ButtonType> result = confirmation.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            boolean suppressionReussie = csvService.supprimerCours(cours.getId_cours());
-
-            if (suppressionReussie) {
-                Platform.runLater(() -> afficherEmploiDuTempsEnseignant(enseignant));
-                showAlert(Alert.AlertType.INFORMATION, "Succès", "Le cours a été supprimé avec succès.");
-            } else {
-                showAlert(Alert.AlertType.ERROR, "Erreur", "Une erreur est survenue lors de la suppression du cours.");
-            }
-        }
-    }
-
-    private void changerStatutAnnulation(Cours cours, Enseignant enseignant) {
-        boolean nouvelEtat = !cours.isAnnulation();
-        boolean modificationReussie = csvService.modifierStatutAnnulationCours(cours.getId_cours(), nouvelEtat);
-
-        if (modificationReussie) {
-            afficherEmploiDuTempsEnseignant(enseignant);
-            showAlert(Alert.AlertType.INFORMATION, "Succès", "Le statut du cours a été modifié avec succès.");
-        } else {
-            showAlert(Alert.AlertType.ERROR, "Erreur", "Une erreur est survenue lors de la modification du statut du cours.");
-        }
     }
 
     private void ouvrirListeEtudiants() {
@@ -637,16 +585,13 @@ public class EdtAdministrateurController implements Initializable {
         String nomClasse = etudiant.getClasse();
         int effectif = csvService.getEffectifClasse(nomClasse);
 
-        List<String> sallesDispo = csvService.Salles().stream()
-                .filter(salle -> salle.getCapacite() >= effectif).map(salle -> salle.getId_salle() + " - " + salle.getLocalisation() + " (Capacité: " + salle.getCapacite() + ")").collect(Collectors.toList());
+        List<String> sallesDispo = csvService.Salles().stream().filter(salle -> salle.getCapacite() >= effectif).map(salle -> salle.getId_salle() + " - " + salle.getLocalisation() + " (Capacité: " + salle.getCapacite() + ")").collect(Collectors.toList());
 
         salleCombo.setItems(FXCollections.observableArrayList(sallesDispo));
 
         ComboBox<String> enseignantCombo = new ComboBox<>();
         enseignantCombo.setItems(FXCollections.observableArrayList(
-                csvService.Enseignants().stream()
-                        .map(e -> e.getId() + " - " + e.getNom() + " " + e.getPrenom())
-                        .collect(Collectors.toList())
+                csvService.Enseignants().stream().map(e -> e.getId() + " - " + e.getNom() + " " + e.getPrenom()).collect(Collectors.toList())
         ));
 
         grid.add(new Label("ID Cours:"), 0, 0);
@@ -674,14 +619,15 @@ public class EdtAdministrateurController implements Initializable {
             }
             String idSalle = salleSelectionnee.split(" - ")[0].trim();
 
-            if (validerEtModifierCours(etudiant,
-                    coursField.getText(),
-                    matiereField.getText(),
-                    dateField.getText(),
-                    heureDebutField.getText(),
-                    heureFinField.getText(),
-                    idSalle,
-                    enseignantCombo.getValue())) {
+            String date = dateField.getText();
+            String heureDebut = heureDebutField.getText();
+            String heureFin = heureFinField.getText();
+            if (!csvService.isSalleDisponible(idSalle, date, heureDebut, heureFin)) {
+                afficherAlerte("Erreur", "La salle " + idSalle + " est déjà occupée à cette date et heure");
+                return;
+            }
+
+            if (validerEtModifierCours(etudiant, coursField.getText(), matiereField.getText(), date, heureDebut, heureFin, idSalle, enseignantCombo.getValue())) {
                 popup.close();
                 afficherEmploiDuTempsEtudiant(etudiant);
             }
@@ -702,9 +648,7 @@ public class EdtAdministrateurController implements Initializable {
     }
 
 
-    private boolean validerEtModifierCours(Etudiant etudiant, String idCours, String matiere,
-                                           String date, String heureDebut, String heureFin,
-                                           String salle, String enseignantSelectionne) {
+    private boolean validerEtModifierCours(Etudiant etudiant, String idCours, String matiere, String date, String heureDebut, String heureFin, String salle, String enseignantSelectionne) {
         if (idCours == null || idCours.isEmpty() ||
                 matiere == null || matiere.isEmpty() ||
                 date == null || date.isEmpty() ||
@@ -723,17 +667,7 @@ public class EdtAdministrateurController implements Initializable {
 
         String idEnseignant = enseignantSelectionne.split(" - ")[0];
 
-        // Créer un nouvel objet Cours
-        Cours nouveauCours = new Cours(
-                idCours,
-                salle,
-                matiere,
-                date,
-                heureDebut,
-                heureFin,
-                idEnseignant,
-                etudiant.getClasse(),
-                false);
+        Cours nouveauCours = new Cours(idCours, salle, matiere, date, heureDebut, heureFin, idEnseignant, etudiant.getClasse(), false);
 
         try {
             boolean succes = csvService.ajouterCours(nouveauCours);
@@ -767,8 +701,7 @@ public class EdtAdministrateurController implements Initializable {
         TextField salleField = new TextField(cours.getId_salle());
 
         ComboBox<String> enseignantCombo = new ComboBox<>();
-        enseignantCombo.setItems(FXCollections.observableArrayList(
-                csvService.Enseignants().stream().map(e -> e.getId() + " - " + e.getNom() + " " + e.getPrenom()).collect(Collectors.toList())
+        enseignantCombo.setItems(FXCollections.observableArrayList(csvService.Enseignants().stream().map(e -> e.getId() + " - " + e.getNom() + " " + e.getPrenom()).collect(Collectors.toList())
         ))
         ;
 
@@ -804,10 +737,22 @@ public class EdtAdministrateurController implements Initializable {
         Button validerBtn = new Button("Valider");
         validerBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
         validerBtn.setOnAction(e -> {
-            if (validerEtModifierCours(cours, etudiant, matiereField.getText(),
-                    dateField.getText(), heureDebutField.getText(),
-                    heureFinField.getText(), salleField.getText(),
-                    enseignantCombo.getValue(), annuleCombo.getValue())) {
+            String idSalle = salleField.getText();
+            String date = dateField.getText();
+            String heureDebut = heureDebutField.getText();
+            String heureFin = heureFinField.getText();
+
+            if (idSalle == null || idSalle.isEmpty()) {
+                afficherAlerte("Erreur", "Veuillez saisir une salle");
+                return;
+            }
+
+            if (!csvService.isSalleDisponible(idSalle, date, heureDebut, heureFin)) {
+                afficherAlerte("Erreur", "La salle " + idSalle + " est déjà occupée à cette date et heure");
+                return;
+            }
+
+            if (validerEtModifierCours(cours, etudiant, matiereField.getText(), date, heureDebut, heureFin, idSalle, enseignantCombo.getValue(), annuleCombo.getValue())) {
                 popup.close();
                 afficherEmploiDuTempsEtudiant(etudiant);
             }
@@ -822,7 +767,7 @@ public class EdtAdministrateurController implements Initializable {
         VBox popupContent = new VBox(10, grid, boutonsBox);
         popupContent.setPadding(new Insets(10));
 
-        Scene scene = new Scene(popupContent, 400, 450); // Augmenté la hauteur pour la nouvelle ComboBox
+        Scene scene = new Scene(popupContent, 400, 450);
         popup.setScene(scene);
         popup.showAndWait();
     }
@@ -841,16 +786,7 @@ public class EdtAdministrateurController implements Initializable {
 
         String idEnseignant = enseignantSelectionne.split(" - ")[0];
 
-        Cours coursModifie = new Cours(
-                cours.getId_cours(),
-                salle,
-                matiere,
-                date,
-                heureDebut,
-                heureFin,
-                idEnseignant,
-                etudiant.getClasse(),
-                estAnnule);
+        Cours coursModifie = new Cours(cours.getId_cours(), salle, matiere, date, heureDebut, heureFin, idEnseignant, etudiant.getClasse(), estAnnule);
 
         try {
             boolean succes = csvService.modifierCours(coursModifie);
@@ -925,21 +861,33 @@ public class EdtAdministrateurController implements Initializable {
         Button validerBtn = new Button("Valider");
         validerBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
         validerBtn.setOnAction(e -> {
-            if (validerEtAjouterCoursEnseignant(
-                    enseignant,
-                    coursField.getText(),
-                    matiereField.getText(),
-                    dateField.getText(),
-                    heureDebutField.getText(),
-                    heureFinField.getText(),
-                    salleComboBox.getValue(),
-                    classeComboBox.getValue()
-            )) {
+            String salleSelectionnee = salleComboBox.getValue();
+            String classeSelectionnee = classeComboBox.getValue();
+
+            if (salleSelectionnee == null || salleSelectionnee.isEmpty()) {
+                afficherAlerte("Erreur", "Veuillez sélectionner une salle");
+                return;
+            }
+            if (classeSelectionnee == null || classeSelectionnee.isEmpty()) {
+                afficherAlerte("Erreur", "Veuillez sélectionner une classe");
+                return;
+            }
+
+            String idSalle = salleSelectionnee.split(" - ")[0].trim();
+            String date = dateField.getText();
+            String heureDebut = heureDebutField.getText();
+            String heureFin = heureFinField.getText();
+
+            if (!csvService.isSalleDisponible(idSalle, date, heureDebut, heureFin)) {
+                afficherAlerte("Erreur", "La salle " + idSalle + " est déjà occupée à cette date et heure");
+                return;
+            }
+
+            if (validerEtAjouterCoursEnseignant(enseignant, coursField.getText(), matiereField.getText(), date, heureDebut, heureFin, idSalle, classeSelectionnee)) {
                 popup.close();
                 afficherEmploiDuTempsEnseignant(enseignant);
             }
         });
-
 
         Button annulerBtn = new Button("Annuler");
         annulerBtn.setOnAction(e -> popup.close());
@@ -1028,14 +976,27 @@ public class EdtAdministrateurController implements Initializable {
         Button validerBtn = new Button("Valider");
         validerBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
         validerBtn.setOnAction(e -> {
-            if (validerEtModifierCoursEnseignant(cours, enseignant, matiereField.getText(),
-                    dateField.getText(), heureDebutField.getText(),
-                    heureFinField.getText(), salleField.getText(),
-                    classeField.getText(), annuleCombo.getValue())) {
+            String idSalle = salleField.getText();
+            String date = dateField.getText();
+            String heureDebut = heureDebutField.getText();
+            String heureFin = heureFinField.getText();
+
+            if (idSalle == null || idSalle.isEmpty()) {
+                afficherAlerte("Erreur", "Veuillez saisir une salle");
+                return;
+            }
+
+            if (!csvService.isSalleDisponible(idSalle, date, heureDebut, heureFin)) {
+                afficherAlerte("Erreur", "La salle " + idSalle + " est déjà occupée à cette date et heure");
+                return;
+            }
+
+            if (validerEtModifierCoursEnseignant(cours, enseignant, matiereField.getText(), date, heureDebut, heureFin, idSalle, classeField.getText(), annuleCombo.getValue())) {
                 popup.close();
                 afficherEmploiDuTempsEnseignant(enseignant);
             }
         });
+
 
         Button annulerBtn = new Button("Annuler");
         annulerBtn.setOnAction(e -> popup.close());
@@ -1051,9 +1012,7 @@ public class EdtAdministrateurController implements Initializable {
         popup.showAndWait();
     }
 
-    private boolean validerEtModifierCoursEnseignant(Cours cours, Enseignant enseignant, String matiere,
-                                                     String date, String heureDebut, String heureFin,
-                                                     String salle, String classe, Boolean estAnnule) {
+    private boolean validerEtModifierCoursEnseignant(Cours cours, Enseignant enseignant, String matiere, String date, String heureDebut, String heureFin, String salle, String classe, Boolean estAnnule) {
         if (matiere == null || matiere.isEmpty() ||
                 date == null || date.isEmpty() ||
                 heureDebut == null || heureDebut.isEmpty() ||
@@ -1088,85 +1047,5 @@ public class EdtAdministrateurController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
-    }
-
-    private boolean plagesHorairesSeChevauchent(String debut1, String fin1, String debut2, String fin2) {
-        try {
-            debut1 = debut1.replace("h", ":").replace("H", ":");
-            fin1 = fin1.replace("h", ":").replace("H", ":");
-            debut2 = debut2.replace("h", ":").replace("H", ":");
-            fin2 = fin2.replace("h", ":").replace("H", ":");
-
-            debut1 = normaliserHeure(debut1);
-            fin1 = normaliserHeure(fin1);
-            debut2 = normaliserHeure(debut2);
-            fin2 = normaliserHeure(fin2);
-
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm");
-            LocalTime d1 = LocalTime.parse(debut1, formatter);
-            LocalTime f1 = LocalTime.parse(fin1, formatter);
-            LocalTime d2 = LocalTime.parse(debut2, formatter);
-            LocalTime f2 = LocalTime.parse(fin2, formatter);
-
-            return !(f1.isBefore(d2) || f2.isBefore(d1));
-        } catch (Exception e) {
-            System.err.println("Erreur lors de la comparaison des horaires: " + e.getMessage());
-            return true;
-        }
-    }
-
-    private String normaliserHeure(String heure) {
-        if (heure.length() == 4 && heure.contains(":")) { // format H:mm
-            return heure;
-        }
-        if (heure.length() == 1) { // format H
-            return heure + ":00";
-        }
-        if (heure.length() == 2) {
-            if (heure.contains(":")) { // format H:
-                return heure + "00";
-            } else { // format HH
-                return heure + ":00";
-            }
-        }
-        if (heure.length() == 3) {
-            if (heure.contains(":")) {
-                String[] parts = heure.split(":");
-                if (parts[1].length() == 1) {
-                    return parts[0] + ":0" + parts[1];
-                } else {
-                    return heure;
-                }
-            } else {
-                return heure.substring(0, 2) + ":" + heure.substring(2);
-            }
-        }
-        return heure;
-    }
-
-    public boolean modifierStatutAnnulationCours(String idCours, boolean nouvelEtat) {
-        try {
-            List<Cours> tousLesCours = CsvService.getInstance().lireTousLesCours();
-            boolean trouve = false;
-
-            for (Cours cours : tousLesCours) {
-                if (cours.getId_cours().equals(idCours)) {
-                    cours.setAnnulation(nouvelEtat);
-                    trouve = true;
-                    break;
-                }
-            }
-
-            if (trouve) {
-                CsvService.getInstance().reecrireTousLesCours(tousLesCours);
-                return true;
-            } else {
-                System.err.println("Cours avec l'ID " + idCours + " non trouvé.");
-                return false;
-            }
-        } catch (Exception e) {
-            System.err.println("Erreur lors de la modification du statut d'annulation : " + e.getMessage());
-            return false;
-        }
     }
 }
